@@ -180,14 +180,13 @@ export default class NetworkController {
 
   // Contract model
   private _contractsListForPush(
-    aliases: string[],
+    aliases: string[] | undefined,
     onlyChanged = false,
     changedLibraries: Contract[] = [],
   ): [string, Contract][] {
     const newVersion = this._newVersionRequired();
 
     aliases = aliases || Object.keys(this.projectFile.contracts);
-
     return aliases
       .map(alias => [alias, this.projectFile.contracts[alias]])
       .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])

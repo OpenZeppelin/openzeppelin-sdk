@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-const zosLib = require('@openzeppelin/upgrades'); // eslint-disable-line @typescript-eslint/no-var-requires
+const upgrades = require('@openzeppelin/upgrades'); // eslint-disable-line @typescript-eslint/no-var-requires
 import { ZWeb3, Contracts, App, Package, ProxyAdmin, ProxyFactory } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
@@ -169,7 +169,7 @@ describe('push script', function() {
       });
 
       it('should refuse to redeploy a contract if validation throws', async function() {
-        sinon.stub(zosLib, 'validate').throws(new Error('Stubbed error during contract validation'));
+        sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           networkFile: this.networkFile,
           network,
@@ -179,7 +179,7 @@ describe('push script', function() {
       });
 
       it('should redeploy contract skipping errors', async function() {
-        sinon.stub(zosLib, 'validate').throws(new Error('Stubbed error during contract validation'));
+        sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           force: true,
           networkFile: this.networkFile,
@@ -191,6 +191,98 @@ describe('push script', function() {
 
       afterEach(function() {
         sinon.restore();
+      });
+    });
+  };
+
+  const shouldDeployOnlySpecifiedContracts = function() {
+    describe('when contracts specified explicitly', function() {
+      beforeEach('loading previous addresses', function() {
+        this.previousAddress = this.networkFile.contract('Impl').address;
+        this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address;
+      });
+
+      it('should not deploy contracts if unmodified', async function() {
+        await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+      });
+
+      it('should deploy unmodified contract if forced', async function() {
+        await push({
+          contractAliases: ['Impl'],
+          networkFile: this.networkFile,
+          network,
+          txParams,
+          reupload: true,
+        });
+        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+      });
+
+      it('should deploy contracts if modified', async function() {
+        modifyBytecode.call(this, 'Impl');
+        await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+      });
+
+      it('should not deploy contracts if library is modified', async function() {
+        modifyLibraryBytecode.call(this, 'UintLib');
+        await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+        this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
+      });
+
+      context('validations', function() {
+        beforeEach('modifying contracts', function() {
+          modifyBytecode.call(this, 'Impl');
+          modifyStorageInfo.call(this, 'Impl');
+        });
+
+        it('should refuse to deploy a contract if storage is incompatible', async function() {
+          await push({
+            contractAliases: ['Impl'],
+            networkFile: this.networkFile,
+            network,
+            txParams,
+          }).should.be.rejectedWith(/have validation errors/);
+          this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+        });
+
+        it('should deploy contract ignoring warnings', async function() {
+          await push({
+            contractAliases: ['Impl'],
+            force: true,
+            networkFile: this.networkFile,
+            network,
+            txParams,
+          });
+          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+        });
+
+        it('should refuse to deploy a contract if validation throws', async function() {
+          sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+          await push({
+            contractAliases: ['Impl'],
+            networkFile: this.networkFile,
+            network,
+            txParams,
+          }).should.be.rejectedWith(/have validation errors/);
+          this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+        });
+
+        it('should deploy contract skipping errors', async function() {
+          sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+          await push({
+            contractAliases: ['Impl'],
+            force: true,
+            networkFile: this.networkFile,
+            network,
+            txParams,
+          });
+          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+        });
+
+        afterEach(function() {
+          sinon.restore();
+        });
       });
     });
   };
@@ -521,7 +613,7 @@ describe('push script', function() {
       this.networkFile = new NetworkFile(projectFile, network);
     });
 
-    describe('on push', function() {
+    describe.only('on push', function() {
       beforeEach('pushing', async function() {
         await push({ network, txParams, networkFile: this.networkFile });
         const newProjectFile = new ProjectFile('test/mocks/packages/package-with-contracts-v2.zos.json');
@@ -531,6 +623,7 @@ describe('push script', function() {
       shouldDeployApp();
       shouldDeployProvider();
       shouldDeployContracts();
+      shouldDeployOnlySpecifiedContracts();
       shouldRegisterContractsInDirectory();
       shouldRedeployContracts();
       shouldValidateContracts();
@@ -687,6 +780,7 @@ describe('push script', function() {
       });
 
       shouldDeployContracts();
+      shouldDeployOnlySpecifiedContracts();
       shouldValidateContracts();
       shouldRedeployContracts();
       shouldDeleteContracts({ unregisterFromDirectory: false });
