@@ -731,7 +731,7 @@ describe('push script', function() {
       this.networkFile = new NetworkFile(projectFile, network);
     });
 
-    it('fails nicely if there are duplicated contract names', async function() {
+    it.skip('fails nicely if there are duplicated contract names', async function() {
       const logs = new CaptureLogs();
       await push({
         network,
