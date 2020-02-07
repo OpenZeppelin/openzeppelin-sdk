@@ -1,6 +1,6 @@
 {
-  "name": "@openzeppelin/contracts-transpiler",
-  "version": "0.0.1",
+  "name": "@openzeppelin/upgradeability-transpiler",
+  "version": "0.1.0",
   "description": "Transpiles Solidity contracts to updgradable versions compatible with OpenZeppelin SDK.",
   "main": "./lib/index.js",
   "files": [
