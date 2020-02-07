@@ -122,7 +122,7 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(aliases: string[], { reupload = false, force = false } = {}): Promise<void | never> {
+  public async push(aliases: string[] | undefined, { reupload = false, force = false } = {}): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
     const contractObjects = this._contractsListForPush(aliases, !reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
