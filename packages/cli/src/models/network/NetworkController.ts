@@ -122,13 +122,13 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(reupload = false, force = false): Promise<void | never> {
+  public async push(aliases: string[] | undefined, { reupload = false, force = false } = {}): Promise<void | never> {
     const changedLibraries = this._solidityLibsForPush(!reupload);
-    const contracts = this._contractsListForPush(!reupload, changedLibraries);
+    const contractObjects = this._contractsListForPush(aliases, !reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
-    if (!this.validateContracts(contracts, buildArtifacts) && !force) {
+    if (!this.validateContracts(contractObjects, buildArtifacts) && !force) {
       throw Error(
         'One or more contracts have validation errors. Please review the items listed above and fix them, or run this command again with the --force option.',
       );
@@ -140,11 +140,11 @@ export default class NetworkController {
 
     this.checkNotFrozen();
     await this.uploadSolidityLibs(changedLibraries);
-    await Promise.all([this.uploadContracts(contracts), this.unsetContracts()]);
+    await Promise.all([this.uploadContracts(contractObjects), this.unsetContracts()]);
 
     await this._unsetSolidityLibs();
 
-    if (isEmpty(contracts) && isEmpty(changedLibraries)) {
+    if (isEmpty(contractObjects) && isEmpty(changedLibraries)) {
       Loggy.noSpin(__filename, 'push', `after-push`, `All implementations are up to date`);
     } else {
       Loggy.noSpin(__filename, 'push', `after-push`, `All implementations have been deployed`);
@@ -179,10 +179,16 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(onlyChanged = false, changedLibraries: Contract[] = []): [string, Contract][] {
+  private _contractsListForPush(
+    aliases: string[] | undefined,
+    onlyChanged = false,
+    changedLibraries: Contract[] = [],
+  ): [string, Contract][] {
     const newVersion = this._newVersionRequired();
 
-    return toPairs(this.projectFile.contracts)
+    aliases = aliases || Object.keys(this.projectFile.contracts);
+    return aliases
+      .map(alias => [alias, this.projectFile.contracts[alias]])
       .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
       .filter(
         ([contractAlias, contract]) =>
