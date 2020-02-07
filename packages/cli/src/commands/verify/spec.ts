@@ -1,5 +1,7 @@
 import { ParamDetails, Arg, Option } from '../../register-command';
 
+import { commonOptions } from '../utils';
+
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
@@ -122,8 +124,5 @@ export const options: Option[] = [
       }
     },
   },
-  {
-    format: '--no-interactive',
-    description: 'disable interactive prompts',
-  },
+  commonOptions.noInteractive,
 ];
