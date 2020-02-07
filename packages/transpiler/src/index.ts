@@ -1,4 +1,4 @@
-import flatten from 'lodash.flatten';
+import { flatten } from 'lodash';
 
 import { getContract, isContract, throwIfInvalidNode } from './solc/ast-utils';
 import { transpile } from './transpiler';

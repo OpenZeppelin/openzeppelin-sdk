@@ -1,4 +1,4 @@
-import flatten from 'lodash.flatten';
+import { flatten } from 'lodash';
 
 import { getNodeSources, getConstructor, getContract, isModifierInvocation } from '../solc/ast-utils';
 
