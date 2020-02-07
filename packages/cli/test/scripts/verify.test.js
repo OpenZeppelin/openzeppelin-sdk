@@ -154,7 +154,7 @@ describe('verify script', function() {
           status: 200,
           data: '<div id="infoModal"><div class="modal-body"> Error: </div></div>',
         });
-        await assertVerify(contract, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/);
+        await assertVerify({ contract, network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/);
       });
 
       it('logs a success info message when contract is verified', async function() {
