@@ -62,13 +62,6 @@ export const options: Option[] = [
         };
       }
     },
-    async after(params) {
-      if (process.env.NODE_ENV !== 'test') {
-        const { default: ConfigManager } = await import('../../models/config/ConfigManager');
-        const config = await ConfigManager.initNetworkConfiguration(params);
-        Object.assign(params, config);
-      }
-    },
   },
   {
     format: '-o, --optimizer <enabled>',
