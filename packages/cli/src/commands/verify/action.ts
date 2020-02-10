@@ -5,12 +5,20 @@ import ConfigManager from '../../models/config/ConfigManager';
 import ProjectFile from '../../models/files/ProjectFile';
 
 export async function action(params: Options & Args & { dontExitProcess: boolean }): Promise<void> {
+  const userNetworkName = params.network;
+
   if (process.env.NODE_ENV !== 'test') {
     const { network } = await ConfigManager.initNetworkConfiguration(params);
     Object.assign(params, { network });
   }
 
   const controller = new NetworkController(params.network, params.txParams, params.networkFile);
+
+  if (!controller.isContractDeployed(params.contract)) {
+    throw new Error(
+      `Contract '${params.contract}' has no proxies in network '${userNetworkName}'.\n\nVerification of regular instances is not yet supported.`,
+    );
+  }
 
   controller.checkLocalContractDeployed(params.contract, true);
 
