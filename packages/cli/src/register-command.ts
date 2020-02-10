@@ -17,7 +17,7 @@ export interface ParamDetails {
   prompt?: string;
   promptType?: 'confirm' | 'list' | 'input';
   choices?: readonly Choice[];
-  preselect?: string;
+  preselect?: string | boolean;
   validationError?: (value: string | boolean) => string | undefined;
 }
 
@@ -168,7 +168,7 @@ async function askQuestion(name: string, details: ParamDetails): Promise<string>
 
   const type = details.promptType ?? (choices === undefined ? 'input' : 'list');
 
-  const validate = value => validationError(value) ?? true;
+  const validate = value => validationError?.(value) ?? true;
 
   const answers = await inquirer.prompt({
     name: 'question',

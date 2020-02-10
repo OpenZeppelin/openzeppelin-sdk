@@ -14,7 +14,7 @@ import setAdmin from './set-admin';
 import status from './status';
 import unlink from './unlink';
 import update from './update';
-import verify from './verify';
+import * as verify from './verify';
 import unpack from './unpack';
 import transfer from './transfer';
 import balance from './balance';

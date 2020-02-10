@@ -79,6 +79,10 @@ async function publishToEtherchain(params: VerifierOptions): Promise<void | neve
 }
 
 async function publishToEtherscan(params: VerifierOptions): Promise<void | never> {
+  if (!params.apiKey) {
+    throw Error('Etherscan API key not specified. To get one, follow this link: https://etherscan.io/myapikey');
+  }
+
   const { network, compilerVersion, optimizer, contractAddress } = params;
   const compiler = `v${compilerVersion.replace('.Emscripten.clang', '')}`;
   const optimizerStatus = optimizer ? 1 : 0;
