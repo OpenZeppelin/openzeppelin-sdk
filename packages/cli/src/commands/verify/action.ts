@@ -2,8 +2,6 @@ import NetworkController from '../../models/network/NetworkController';
 import { Options, Args } from './spec';
 import ConfigManager from '../../models/config/ConfigManager';
 
-import ProjectFile from '../../models/files/ProjectFile';
-
 export async function action(params: Options & Args & { dontExitProcess: boolean }): Promise<void> {
   if (process.env.NODE_ENV !== 'test') {
     const { network } = await ConfigManager.initNetworkConfiguration(params);
