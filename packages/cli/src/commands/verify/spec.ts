@@ -5,8 +5,6 @@ import { commonOptions } from '../utils';
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 
-import ProjectFile from '../../models/files/ProjectFile';
-
 export const name = 'verify';
 export const description = "verify a contract's source with Etherscan or Etherchain";
 
@@ -26,12 +24,6 @@ interface OtherOptions {
   networkFile?: NetworkFile;
   txParams?: TxParams;
 }
-
-const compilerConfig = new ProjectFile().compilerOptions;
-const compilerDefaults = {
-  optimizer: (compilerConfig.optimizer && compilerConfig.optimizer.enabled) || false,
-  optimizerRuns: (compilerConfig.optimizer && compilerConfig.optimizer.runs) || 200,
-};
 
 export type Options = OptimizerOptions & RemoteOptions & OtherOptions;
 
@@ -82,10 +74,14 @@ export const options: Option[] = [
     format: '-o, --optimizer <enabled>',
     description: `whether compilation optimizations were enabled`,
     async details() {
+      const { default: ProjectFile } = await import('../../models/files/ProjectFile');
+      const compilerConfig = new ProjectFile().compilerOptions;
+      const optimizerDefault = compilerConfig.optimizer?.enabled ?? false;
+
       return {
         prompt: 'Was your contract compiled with optimizations enabled?',
         promptType: 'confirm',
-        preselect: compilerDefaults.optimizer,
+        preselect: optimizerDefault,
       };
     },
   },
@@ -94,9 +90,13 @@ export const options: Option[] = [
     description: `the number of runs for the optimizer`,
     async details(params: Partial<Options>) {
       if (params.optimizer) {
+        const { default: ProjectFile } = await import('../../models/files/ProjectFile');
+        const compilerConfig = new ProjectFile().compilerOptions;
+        const optimizerRunsDefault = compilerConfig.optimizer?.runs ?? 200;
+
         return {
           prompt: "Specify the optimizer 'runs' parameter",
-          preselect: compilerDefaults.optimizerRuns,
+          preselect: optimizerRunsDefault,
         };
       }
     },
