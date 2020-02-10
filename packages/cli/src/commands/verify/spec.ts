@@ -4,7 +4,6 @@ import { commonOptions } from '../utils';
 
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
-import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
 
 import ProjectFile from '../../models/files/ProjectFile';
 
