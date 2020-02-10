@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import pick from 'lodash.pick';
-import omitBy from 'lodash.omitby';
-import isUndefined from 'lodash.isundefined';
+import { pick, omitBy, isUndefined } from 'lodash';
 
 interface NetworkConfigInterface extends ConfigInterface {
   artifactDefaults: ArtifactDefaults;

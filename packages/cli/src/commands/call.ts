@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
 
 import call from '../scripts/call';
@@ -12,7 +12,7 @@ import {
   InquirerQuestions,
 } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
-import { SendTxPropsParams, SendTxSelectionParams } from './interfaces';
+import { SendTxSelectionParams } from './interfaces';
 import promptForMethodParams from '../prompts/method-params';
 import Telemetry from '../telemetry';
 

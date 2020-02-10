@@ -1,8 +1,7 @@
 'use strict';
 require('../setup');
 
-import mapKeys from 'lodash.mapkeys';
-import omit from 'lodash.omit';
+import { mapKeys, omit } from 'lodash';
 import { Contracts, Proxy } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 

@@ -1,5 +1,5 @@
 import semver from 'semver';
-import isString from 'lodash.isstring';
+import { isString } from 'lodash';
 import util from 'util';
 
 // TS-TODO: use typed SemVer dependency, some of these methods may actually

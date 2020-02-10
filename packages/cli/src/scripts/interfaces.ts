@@ -107,6 +107,7 @@ export interface UnpackParams {
 }
 
 export interface PushParams extends Network {
+  contractAliases?: string[];
   force?: boolean;
   reupload?: boolean;
   deployDependencies?: boolean;
@@ -186,4 +187,6 @@ export interface CompileParams {
   solcVersion: string;
   optimizer: string | boolean;
   optimizerRuns: string;
+  typechain: string;
+  typechainOutdir: string;
 }

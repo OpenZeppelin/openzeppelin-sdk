@@ -7,16 +7,13 @@ export default async function typechain(files: string, outDir: string, target: s
   const cwd = process.cwd();
   mkdirpSync(outDir);
 
-  // Hack required until https://github.com/ethereum-ts/TypeChain/pull/186 is merged
-  const relativeOutDir = path.relative(cwd, outDir);
-
   return tsGenerator(
     { cwd },
     new typeChain({
       cwd,
       rawConfig: {
         files,
-        outDir: relativeOutDir,
+        outDir,
         target,
       },
     }),

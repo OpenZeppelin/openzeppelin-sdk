@@ -1,9 +1,9 @@
-import omit from 'lodash.omit';
-import isString from 'lodash.isstring';
+import { omit, isString } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import add from './add';
 import push from '../scripts/push';
+import { PushParams } from '../scripts/interfaces';
 import Session from '../models/network/Session';
 import { compile } from '../models/compiler/Compiler';
 import Dependency from '../models/dependency/Dependency';
@@ -43,6 +43,7 @@ async function commandActions(options: any): Promise<void> {
 
 async function action(options: any): Promise<void> {
   const {
+    contractAlias,
     force,
     deployDependencies,
     reset: reupload,
@@ -67,7 +68,7 @@ async function action(options: any): Promise<void> {
   });
   const promptDeployDependencies = await promptForDeployDependencies(deployDependencies, network, interactive);
 
-  const pushArguments = {
+  const pushArguments: PushParams = {
     deployProxyAdmin,
     deployProxyFactory,
     force,
@@ -77,7 +78,10 @@ async function action(options: any): Promise<void> {
     ...promptDeployDependencies,
   };
 
-  if (!options.skipTelemetry) await Telemetry.report('push', pushArguments, interactive);
+  if (contractAlias) pushArguments.contractAliases = [contractAlias];
+
+  if (!options.skipTelemetry)
+    await Telemetry.report('push', (pushArguments as unknown) as Record<string, unknown>, interactive);
   await push(pushArguments);
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
@@ -90,9 +94,9 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
   return action(options);
 }
 
-async function runActionIfNeeded(contractName: string, network: string, options: any): Promise<void> {
+async function runActionIfNeeded(contractAlias: string, network: string, options: any): Promise<void> {
   if (!options.interactive) return;
-  await action({ ...options, dontExitProcess: true, skipTelemetry: true });
+  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contractAlias });
 }
 
 async function promptForDeployDependencies(

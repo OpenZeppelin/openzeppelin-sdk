@@ -1,9 +1,5 @@
 import fs from 'fs';
-import map from 'lodash.map';
-import uniq from 'lodash.uniq';
-import flatten from 'lodash.flatten';
-import fromPairs from 'lodash.frompairs';
-import toPairs from 'lodash.topairs';
+import { map, uniq, flatten, fromPairs, toPairs } from 'lodash';
 import semver from 'semver';
 import npm from 'npm-programmatic';
 import { exec } from 'child_process';

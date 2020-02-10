@@ -2,7 +2,7 @@
 
 require('../../setup');
 
-import without from 'lodash.without';
+import { without } from 'lodash';
 
 import Proxy from '../../../src/proxy/Proxy';
 import ZWeb3 from '../../../src/artifacts/ZWeb3';

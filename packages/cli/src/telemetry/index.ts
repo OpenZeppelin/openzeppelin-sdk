@@ -3,7 +3,7 @@ import uuid from 'uuid/v4';
 import path from 'path';
 import crypto from 'crypto';
 import envPaths from 'env-paths';
-import mapValues from 'lodash.mapvalues';
+import { mapValues } from 'lodash';
 import inquirer from 'inquirer';
 import proc from 'child_process';
 import process from 'process';
@@ -33,7 +33,7 @@ export interface UserEnvironment {
 export default {
   DISABLE_TELEMETRY: !!process.env.OPENZEPPELIN_DISABLE_TELEMETRY,
 
-  async report(commandName: string, params: { [key: string]: unknown }, interactive: boolean): Promise<void> {
+  async report(commandName: string, params: Record<string, unknown>, interactive: boolean): Promise<void> {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 

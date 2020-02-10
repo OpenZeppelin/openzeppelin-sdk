@@ -1,8 +1,8 @@
 import BN from 'bignumber.js';
-import flattenDeep from 'lodash.flattendeep';
+import { flattenDeep } from 'lodash';
 import { encodeParams, Loggy, ZWeb3 } from '@openzeppelin/upgrades';
 import { MethodArgType } from '../prompts/prompt';
-import zipWith from 'lodash.zipwith';
+import { zipWith } from 'lodash';
 import { isAddress, isHex } from 'web3-utils';
 
 // TODO: Deprecate in favor of a combination of parseArg and parseArray

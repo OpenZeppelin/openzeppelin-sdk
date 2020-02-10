@@ -7,7 +7,7 @@ import SimpleProject from '../../../src/project/SimpleProject';
 import shouldManageProxies from './ProxyProject.behaviour';
 import shouldManageDependencies from './DependenciesProject.behaviour';
 import shouldManageImplementations from './Implementations.behaviour';
-import noop from 'lodash.noop';
+import { noop } from 'lodash';
 import Contracts from '../../../src/artifacts/Contracts';
 
 const ImplV1 = Contracts.getFromLocal('DummyImplementation');
