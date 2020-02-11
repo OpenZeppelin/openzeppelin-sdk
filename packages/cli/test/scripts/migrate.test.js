@@ -1,7 +1,6 @@
 'use strict';
 require('../setup');
 
-import utils from 'web3-utils';
 import { Proxy, Contracts, toSemanticVersion } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 

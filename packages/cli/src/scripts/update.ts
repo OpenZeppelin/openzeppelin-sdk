@@ -22,7 +22,7 @@ export default async function update({
   const controller = new NetworkController(network, txParams, networkFile);
 
   try {
-    await controller.checkLocalContractsDeployed(!force);
+    await controller.throwOrLogErrorForProjectContracts(!force);
     const proxies = await controller.upgradeProxies(packageName, contractAlias, proxyAddress, methodName, methodArgs);
   } finally {
     controller.writeNetworkPackageIfNeeded();

@@ -23,7 +23,7 @@ export default async function createProxy({
 
   const controller = new NetworkController(network, txParams, networkFile);
   try {
-    await controller.checkContractDeployed(packageName, contractAlias, !force);
+    await controller.throwOrLogErrorForPackageContract(packageName, contractAlias, !force);
     const proxy = await controller.createProxy(
       packageName,
       contractAlias,

@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { isEmpty, intersection, difference, uniq, filter, every, partition, map, concat, toPairs } from 'lodash';
+import { isEmpty, intersection, difference, uniq, filter, every, map, concat, toPairs } from 'lodash';
 import toposort from 'toposort';
 
 import {
@@ -134,13 +134,13 @@ export default class NetworkController {
       );
     }
 
-    this._checkVersion();
+    this.checkVersion();
     await this.fetchOrDeploy(this.projectVersion);
     await this.handleDependenciesLink();
 
     this.checkNotFrozen();
     await this.uploadSolidityLibs(changedLibraries);
-    await Promise.all([this.uploadContracts(contracts), this.unsetContracts()]);
+    await Promise.all([this.uploadContracts(contracts), this.unsetMissingContracts()]);
 
     await this.unsetSolidityLibs();
 
@@ -166,21 +166,21 @@ export default class NetworkController {
   }
 
   // DeployerController
-  private _checkVersion(): void {
-    if (this.newVersionRequired()) {
+  private checkVersion(): void {
+    if (this.isNewVersionRequired()) {
       this.networkFile.frozen = false;
       this.networkFile.contracts = {};
     }
   }
 
   // DeployerController
-  private newVersionRequired(): boolean {
+  private isNewVersionRequired(): boolean {
     return this.projectVersion !== this.currentVersion && this.isPublished;
   }
 
   // Contract model
   private contractsListForPush(onlyChanged = false, changedLibraries: Contract[] = []): [string, Contract][] {
-    const newVersion = this.newVersionRequired();
+    const newVersion = this.isNewVersionRequired();
 
     return toPairs(this.projectFile.contracts)
       .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
@@ -220,8 +220,8 @@ export default class NetworkController {
   // Contract model || SolidityLib model
   public async uploadSolidityLibs(libs: Contract[]): Promise<void> {
     // Libs may have dependencies, so deploy them in order
-    for (let i = 0; i < libs.length; i++) {
-      await this.uploadSolidityLib(libs[i]);
+    for (const lib of libs) {
+      await this.uploadSolidityLib(lib);
     }
   }
 
@@ -353,14 +353,16 @@ export default class NetworkController {
   }
 
   // Contract model
-  public async unsetContracts(): Promise<void> {
+  public async unsetMissingContracts(): Promise<void> {
     await allPromisesOrError(
-      this.networkFile.contractAliasesMissingFromPackage().map(contractAlias => this.unsetContract(contractAlias)),
+      this.networkFile
+        .contractAliasesMissingFromPackage()
+        .map(contractAlias => this.unsetContractAndImplementation(contractAlias)),
     );
   }
 
   // Contract model
-  public async unsetContract(contractAlias: string): Promise<void | never> {
+  public async unsetContractAndImplementation(contractAlias: string): Promise<void | never> {
     try {
       Loggy.spin(__filename, 'unsetContract', `unset-contract-${contractAlias}`, `Removing ${contractAlias} contract`);
       await this.project.unsetImplementation(contractAlias);
@@ -382,7 +384,7 @@ export default class NetworkController {
   // DeployerController || Contract model
   public validateContract(contractAlias: string, contract: Contract, buildArtifacts: BuildArtifacts): boolean {
     try {
-      const existingContractInfo: any = this.networkFile.contract(contractAlias) || {};
+      const existingContractInfo = this.networkFile.contract(contractAlias) || {};
       const warnings = validate(contract, existingContractInfo, buildArtifacts);
       const newWarnings = newValidationErrors(warnings, existingContractInfo.warnings);
 
@@ -404,23 +406,30 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkContractDeployed(packageName: string, contractAlias: string, throwIfFail = false): void {
+  public throwOrLogErrorForPackageContract(packageName: string, contractAlias: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
-    const err = this.errorForContractDeployed(packageName, contractAlias);
-    if (err) this.handleErrorMessage(err, throwIfFail);
+    const err = this.getErrorForPackageContract(packageName, contractAlias);
+    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public checkLocalContractsDeployed(throwIfFail = false): void {
-    const err = this.errorForLocalContractsDeployed();
-    if (err) this.handleErrorMessage(err, throwIfFail);
+  public throwOrLogErrorForProjectContracts(throwIfFail = false): void {
+    const err = this.getErrorForProjectContracts();
+    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  private errorForLocalContractsDeployed(): string {
-    const [contractsDeployed, contractsMissing] = partition(this.projectFile.contractAliases, alias =>
-      this.isContractDeployed(alias),
+  public throwOrLogErrorForContract(contractAlias: string, throwIfFail = false): void {
+    const err = this.getErrorForContract(contractAlias);
+    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+  }
+
+  // Contract model
+  private getErrorForProjectContracts(): string {
+    const contractsMissing = this.projectFile.contractAliases.filter(
+      o => this.isProjectFileContract(o) && !this.isNetworkFileContract(o),
     );
+    const contractsDeployed = this.projectFile.contractAliases.filter(o => this.isNetworkFileContract(o));
     const contractsChanged = filter(contractsDeployed, alias => this.hasContractChanged(alias));
 
     if (!isEmpty(contractsMissing)) {
@@ -431,17 +440,10 @@ export default class NetworkController {
   }
 
   // Contract model
-  public checkLocalContractDeployed(contractAlias: string, throwIfFail = false): void {
-    // if (!packageName) packageName = this.projectFile.name
-    const err = this.errorForLocalContractDeployed(contractAlias);
-    if (err) this.handleErrorMessage(err, throwIfFail);
-  }
-
-  // Contract model
-  private errorForLocalContractDeployed(contractAlias: string): string {
-    if (!this.isContractDefined(contractAlias)) {
+  private getErrorForContract(contractAlias: string): string {
+    if (!this.isProjectFileContract(contractAlias)) {
       return `Contract ${contractAlias} not found in this project`;
-    } else if (!this.isContractDeployed(contractAlias)) {
+    } else if (!this.isNetworkFileContract(contractAlias)) {
       return `Contract ${contractAlias} is not deployed to ${this.network}.`;
     } else if (this.hasContractChanged(contractAlias)) {
       return `Contract ${contractAlias} has changed locally since the last deploy, consider running 'openzeppelin push'.`;
@@ -449,7 +451,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private handleErrorMessage(msg: string, throwIfFail = false): void | never {
+  private throwOrLogErrorMessage(msg: string, throwIfFail = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
@@ -464,8 +466,8 @@ export default class NetworkController {
 
   // Contract model
   public hasContractChanged(contractAlias: string, contract?: Contract): boolean {
-    if (!this.isLocalContract(contractAlias)) return false;
-    if (!this.isContractDeployed(contractAlias)) return true;
+    if (!this.isProjectFileContract(contractAlias)) return false;
+    if (this.isProjectFileContract(contractAlias) && !this.isNetworkFileContract(contractAlias)) return true;
 
     if (!contract) {
       const contractName = this.projectFile.contract(contractAlias);
@@ -475,18 +477,13 @@ export default class NetworkController {
   }
 
   // Contract model
-  public isLocalContract(contractAlias: string): boolean {
+  public isProjectFileContract(contractAlias: string): boolean {
     return this.projectFile.hasContract(contractAlias);
   }
 
   // Contract model
-  public isContractDefined(contractAlias: string): boolean {
-    return this.projectFile.hasContract(contractAlias);
-  }
-
-  // Contract model
-  public isContractDeployed(contractAlias: string): boolean {
-    return !this.isLocalContract(contractAlias) || this.networkFile.hasContract(contractAlias);
+  public isNetworkFileContract(contractAlias: string): boolean {
+    return this.networkFile.hasContract(contractAlias);
   }
 
   // VerifierController
@@ -1089,9 +1086,9 @@ export default class NetworkController {
   }
 
   // Contract model
-  private errorForContractDeployed(packageName: string, contractAlias: string): string {
+  private getErrorForPackageContract(packageName: string, contractAlias: string): string {
     if (packageName === this.projectFile.name) {
-      return this.errorForLocalContractDeployed(contractAlias);
+      return this.getErrorForContract(contractAlias);
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {

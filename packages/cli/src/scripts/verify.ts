@@ -18,6 +18,6 @@ export default async function verify(
     throw Error('Etherscan API key not specified. To get one, follow this link: https://etherscan.io/myapikey');
 
   const controller = new NetworkController(network, txParams, networkFile);
-  controller.checkLocalContractDeployed(contractAlias, true);
+  controller.throwOrLogErrorForContract(contractAlias, true);
   await controller.verifyAndPublishContract(contractAlias, optimizer, optimizerRuns as string, remote, apiKey);
 }
