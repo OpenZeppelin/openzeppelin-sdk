@@ -19,15 +19,15 @@ import Telemetry from '../telemetry';
 import { ProxyType, UpdateParams } from '../scripts/interfaces';
 
 const name = 'upgrade';
-const signature = `${name} [alias-or-address]`;
+const signature = `${name} [contract-or-address]`;
 const description =
-  'upgrade contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to upgrade all contracts in your project.';
+  'upgrade contract to a new logic. Provide the [contract] or [package]/[contract] you added your contract with, its [address], or use --all flag to upgrade all contracts in your project.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .alias('update')
-    .usage('[alias-or-address] --network <network> [options]')
+    .contract('update')
+    .usage('[contract-or-address] --network <network> [options]')
     .description(description)
     .option(
       '--init [function]',
