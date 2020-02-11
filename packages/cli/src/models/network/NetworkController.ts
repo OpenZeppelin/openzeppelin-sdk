@@ -122,9 +122,9 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(aliases: string[] | undefined, { reupload = false, force = false } = {}): Promise<void | never> {
+  public async push(contracts: string[] | undefined, { reupload = false, force = false } = {}): Promise<void | never> {
     const changedLibraries = this.solidityLibsForPush(!reupload);
-    const contractObjects = this.contractsListForPush(aliases, !reupload, changedLibraries);
+    const contractObjects = this.contractsListForPush(contracts, !reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
@@ -180,21 +180,20 @@ export default class NetworkController {
 
   // Contract model
   private contractsListForPush(
-    aliases: string[] | undefined,
+    contracts: string[] | undefined,
     onlyChanged = false,
     changedLibraries: Contract[] = [],
   ): [string, Contract][] {
     const newVersion = this.isNewVersionRequired();
 
-    aliases = aliases || Object.keys(this.projectFile.contracts);
-    return aliases
-      .map(alias => [alias, this.projectFile.contracts[alias]])
-      .map(([contractAlias, contractName]): [string, Contract] => [contractAlias, Contracts.getFromLocal(contractName)])
+    contracts = contracts || Object.keys(this.projectFile.contracts);
+    return contracts
+      .map((contractName): [string, Contract] => [contractName, Contracts.getFromLocal(contractName)])
       .filter(
-        ([contractAlias, contract]) =>
+        ([contractName, contract]) =>
           newVersion ||
           !onlyChanged ||
-          this.hasContractChanged(contractAlias, contract) ||
+          this.hasContractChanged(contractName, contract) ||
           this.hasChangedLibraries(contract, changedLibraries),
       );
   }
@@ -217,7 +216,7 @@ export default class NetworkController {
 
     const clashes = intersection(libNames, contractNames);
     if (!isEmpty(clashes)) {
-      throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`);
+      throw new Error(`Cannot upload libraries with the same name as a contract name: ${clashes.join(', ')}`);
     }
 
     return this.getLibsToDeploy(libNames, onlyChanged);
@@ -250,9 +249,7 @@ export default class NetworkController {
 
   // Contract model
   public async uploadContracts(contracts: [string, Contract][]): Promise<void> {
-    await allPromisesOrError(
-      contracts.map(([contractAlias, contract]) => this.uploadContract(contractAlias, contract)),
-    );
+    await allPromisesOrError(contracts.map(([contractName, contract]) => this.uploadContract(contractName, contract)));
   }
 
   // Contract model

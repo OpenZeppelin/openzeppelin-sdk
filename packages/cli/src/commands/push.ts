@@ -41,7 +41,7 @@ async function commandActions(options: any): Promise<void> {
 
 async function action(options: any): Promise<void> {
   const {
-    contractAlias,
+    contracts,
     force,
     deployDependencies,
     reset: reupload,
@@ -76,7 +76,7 @@ async function action(options: any): Promise<void> {
     ...promptDeployDependencies,
   };
 
-  if (contractAlias) pushArguments.contractAliases = [contractAlias];
+  if (contracts) pushArguments.contracts = [contracts];
 
   if (!options.skipTelemetry)
     await Telemetry.report('push', (pushArguments as unknown) as Record<string, unknown>, interactive);
@@ -92,9 +92,9 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
   return action(options);
 }
 
-async function runActionIfNeeded(contractAlias: string, network: string, options: any): Promise<void> {
+async function runActionIfNeeded(contract: string, network: string, options: any): Promise<void> {
   if (!options.interactive) return;
-  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contractAlias });
+  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contracts: [contract] });
 }
 
 async function promptForDeployDependencies(
