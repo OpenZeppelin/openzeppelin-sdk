@@ -16,7 +16,7 @@ export async function action(params: Options & Args & { dontExitProcess: boolean
 
   if (!controller.isContractDeployed(params.contract)) {
     throw new Error(
-      `Contract '${params.contract}' has no proxies in network '${userNetworkName}'.\n\nVerification of regular instances is not yet supported.`,
+      `Contract '${params.contract}' is not deployed to '${userNetworkName}'.\n\nVerification of regular instances is not yet supported.`,
     );
   }
 
