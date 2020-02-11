@@ -2,6 +2,7 @@
 require('../setup');
 import { accounts } from '@openzeppelin/test-environment';
 
+import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import sendTx from '../../src/scripts/send-tx';
 import createProxy from '../../src/scripts/create';

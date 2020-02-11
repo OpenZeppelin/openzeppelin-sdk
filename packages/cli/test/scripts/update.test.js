@@ -7,6 +7,7 @@ import { accounts } from '@openzeppelin/test-environment';
 
 import CaptureLogs from '../helpers/captureLogs';
 
+import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import bump from '../../src/scripts/bump';
 import link from '../../src/scripts/link';

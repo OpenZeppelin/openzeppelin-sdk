@@ -10,6 +10,7 @@ import { accounts } from '@openzeppelin/test-environment';
 import sinon from 'sinon';
 import push from '../../src/scripts/push';
 import freeze from '../../src/scripts/freeze';
+import add from '../../src/scripts/add';
 import bumpVersion from '../../src/scripts/bump';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';

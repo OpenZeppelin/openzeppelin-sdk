@@ -1,5 +1,7 @@
 import sinon from 'sinon';
 
+import * as addAll from '../../src/scripts/add-all';
+import * as add from '../../src/scripts/add';
 import * as bump from '../../src/scripts/bump';
 import * as check from '../../src/scripts/check';
 import * as create from '../../src/scripts/create';
