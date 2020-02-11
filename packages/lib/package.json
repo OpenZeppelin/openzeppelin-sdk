@@ -14,7 +14,8 @@
     "prepare-docs": "bash scripts/prepare-docs.sh",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "version": "oz-docs update-version --exact"
   },
   "lint-staged": {
     "gitDir": "../../",

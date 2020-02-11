@@ -15,7 +15,8 @@
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-    "lint:check": "eslint '*/**/*.{js,ts}' --quiet"
+    "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
+    "version": "oz-docs update-version --exact"
   },
   "lint-staged": {
     "gitDir": "../../",

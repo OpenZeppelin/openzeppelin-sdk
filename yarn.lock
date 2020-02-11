@@ -7339,14 +7339,14 @@ mocha@^6.2.2:
     yargs-unparser "1.6.0"
 
 "mock-dependency@file:tests/mocks/mock-dependency":
-  version "2.7.0-rc.2"
+  version "2.7.0"
 
 mock-fs@^4.1.0:
   version "4.10.2"
   resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.10.2.tgz#ee11e5a3288b0235fb345efe8b25610f7dd397b8"
 
 "mock-solc-0.6@file:tests/mocks/mock-solc-0.6":
-  version "2.7.0-rc.2"
+  version "2.7.0"
 
 "mock-stdlib-2@file:./packages/cli/test/mocks/mock-stdlib-2":
   version "1.2.0"
@@ -7837,7 +7837,7 @@ onetime@^5.1.0:
 
 "openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
   version "0.0.0"
-  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/f6b5291a2e289186376c23d08598cf9e99ed39b4"
+  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/af3466e2342fa004288b1b77841fa519148a879b"
   dependencies:
     chalk "^3.0.0"
     chokidar "^3.3.0"
