@@ -7,7 +7,7 @@ export default function remove({ contracts, projectFile }: RemoveParams): void |
   if (contracts.length === 0) throw new Error('At least one contract name must be provided to remove.');
 
   const controller = new LocalController(projectFile);
-  contracts.forEach(alias => controller.remove(alias));
+  contracts.forEach(contractName => controller.remove(contractName));
   Loggy.noSpin(
     __filename,
     'remove',
