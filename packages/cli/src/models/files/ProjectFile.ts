@@ -170,14 +170,6 @@ export default class ProjectFile {
     return !isEmpty(this.dependencies);
   }
 
-  public get contractAliases(): string[] {
-    return Object.keys(this.contracts);
-  }
-
-  public get contractNames(): string[] {
-    return Object.values(this.contracts);
-  }
-
   public get isPublished(): boolean {
     return !!this.data.publish;
   }
@@ -237,16 +229,6 @@ export default class ProjectFile {
         : pickBy({ ...this.data.compiler, ...configOptions } as ConfigFileCompilerOptions);
   }
 
-  // If the argument is an existing contract alias, return its corresponding
-  // contract name. Otherwise, assume it's a contract name and return it as is.
-  public normalizeContractAlias(nameOrAlias: string): string {
-    return this.contracts[nameOrAlias] ?? nameOrAlias;
-  }
-
-  public contract(alias: string): string {
-    return this.contracts[alias];
-  }
-
   public hasName(name: string): boolean {
     return this.name === name;
   }
@@ -259,8 +241,8 @@ export default class ProjectFile {
     return this.version === version;
   }
 
-  public hasContract(alias: string): boolean {
-    return !!this.contract(alias);
+  public hasContract(contract: string): boolean {
+    return this.contracts.includes(contract);
   }
 
   public hasContracts(): boolean {
@@ -277,12 +259,15 @@ export default class ProjectFile {
     delete this.data.dependencies[name];
   }
 
-  public addContract(alias: string, name: string | undefined): void {
-    this.data.contracts[alias] = name || alias;
+  public addContract(contract: string): void {
+    this.data.contracts.push(contract);
   }
 
-  public unsetContract(alias: string): void {
-    delete this.data.contracts[alias];
+  public removeContract(contract: string): void {
+    const index = this.data.contracts.indexOf(contract);
+    if (index > -1) {
+      this.data.contracts.splice(index, 1);
+    } else throw new Error(`Failed to remove ${contract} from project ${this.data.name} because it is not present.`);
   }
 
   public write(): void {

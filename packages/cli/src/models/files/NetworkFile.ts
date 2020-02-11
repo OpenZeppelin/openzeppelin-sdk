@@ -60,8 +60,8 @@ interface AddressWrapper {
 }
 
 interface NetworkFileData {
-  contracts: { [contractAlias: string]: ContractInterface };
-  solidityLibs: { [libAlias: string]: SolidityLibInterface };
+  contracts: { [name: string]: ContractInterface };
+  solidityLibs: { [name: string]: SolidityLibInterface };
   proxies: { [contractName: string]: ProxyInterface[] };
   manifestVersion?: string;
   zosversion?: string;
@@ -137,11 +137,11 @@ export default class NetworkFile {
     return this.data.version;
   }
 
-  public set contracts(contracts: { [contractAlias: string]: ContractInterface }) {
+  public set contracts(contracts: { [name: string]: ContractInterface }) {
     this.data.contracts = contracts;
   }
 
-  public get contracts(): { [contractAlias: string]: ContractInterface } {
+  public get contracts(): { [name: string]: ContractInterface } {
     return this.data.contracts || {};
   }
 
@@ -225,7 +225,7 @@ export default class NetworkFile {
     return this.projectFile.isPublished;
   }
 
-  public get contractAliases(): string[] {
+  public get contractNames(): string[] {
     return Object.keys(this.contracts);
   }
 
@@ -340,8 +340,8 @@ export default class NetworkFile {
     return this.data.contracts[alias];
   }
 
-  public contractAliasesMissingFromPackage(): any[] {
-    return difference(this.contractAliases, this.projectFile.contractAliases);
+  public contractAliasesMissingFromPackage(): string[] {
+    return difference(this.contractNames, this.projectFile.contracts);
   }
 
   public isCurrentVersion(version: string): boolean {

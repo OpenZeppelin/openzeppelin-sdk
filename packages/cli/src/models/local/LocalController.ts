@@ -69,7 +69,7 @@ export default class LocalController {
       `add-${contractAlias}`,
       `Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`,
     );
-    this.projectFile.addContract(contractAlias, contractName);
+    this.projectFile.addContract(contractName);
     Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
   }
 
@@ -88,7 +88,7 @@ export default class LocalController {
       );
     } else {
       Loggy.spin(__filename, 'remove', `remove-${contractAlias}`, `Removing ${contractAlias}`);
-      this.projectFile.unsetContract(contractAlias);
+      this.projectFile.removeContract(contractAlias);
       Loggy.succeed(`remove-${contractAlias}`, `Removed contract ${contractAlias}`);
     }
   }
@@ -106,13 +106,12 @@ export default class LocalController {
   // Contract model
   public validateAll(): boolean {
     const buildArtifacts = getBuildArtifacts();
-    return every(map(this.projectFile.contractAliases, contractAlias => this.validate(contractAlias, buildArtifacts)));
+    return every(map(this.projectFile.contracts, contractName => this.validate(contractName, buildArtifacts)));
   }
 
   // Contract model
-  public validate(contractAlias: string, buildArtifacts?: BuildArtifacts): boolean {
-    const contractName = this.projectFile.contract(contractAlias);
-    const contract = Contracts.getFromLocal(contractName || contractAlias);
+  public validate(contractName: string, buildArtifacts?: BuildArtifacts): boolean {
+    const contract = Contracts.getFromLocal(contractName);
     const warnings = validateContract(contract, {}, buildArtifacts);
     new ValidationLogger(contract).log(warnings, buildArtifacts);
     return validationPasses(warnings);
@@ -126,15 +125,10 @@ export default class LocalController {
   }
 
   // Contract model
-  public getContractSourcePath(contractAlias: string): { sourcePath: string; compilerVersion: string } | never {
-    const contractName = this.projectFile.contract(contractAlias);
-    if (contractName) {
-      const contractDataPath = Contracts.getLocalPath(contractName);
-      const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
-      return { sourcePath, compilerVersion: compiler.version };
-    } else {
-      throw Error(`Could not find ${contractAlias} in contracts directory.`);
-    }
+  public getContractSourcePath(contractName: string): { sourcePath: string; compilerVersion: string } | never {
+    const contractDataPath = Contracts.getLocalPath(contractName);
+    const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
+    return { sourcePath, compilerVersion: compiler.version };
   }
 
   public writePackage(): void {

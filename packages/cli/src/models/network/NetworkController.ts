@@ -205,11 +205,11 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private solidityLibsForPush(onlyChanged = false): Contract[] | never {
-    const { contractNames, contractAliases } = this.projectFile;
+    const contractNames = this.projectFile.contracts;
 
     const libNames = this.getAllSolidityLibNames(contractNames);
 
-    const clashes = intersection(libNames, contractAliases);
+    const clashes = intersection(libNames, contractNames);
     if (!isEmpty(clashes)) {
       throw new Error(`Cannot upload libraries with the same name as a contract alias: ${clashes.join(', ')}`);
     }
@@ -289,7 +289,7 @@ export default class NetworkController {
 
   // Contract model || SolidityLib model
   private async unsetSolidityLibs(): Promise<void> {
-    const { contractNames } = this.projectFile;
+    const contractNames = this.projectFile.contracts;
     const libNames = this.getAllSolidityLibNames(contractNames);
     await allPromisesOrError(
       this.networkFile.solidityLibsMissing(libNames).map(libName => this.unsetSolidityLib(libName)),
@@ -426,10 +426,10 @@ export default class NetworkController {
 
   // Contract model
   private getErrorForProjectContracts(): string {
-    const contractsMissing = this.projectFile.contractAliases.filter(
+    const contractsMissing = this.projectFile.contracts.filter(
       o => this.isProjectFileContract(o) && !this.isNetworkFileContract(o),
     );
-    const contractsDeployed = this.projectFile.contractAliases.filter(o => this.isNetworkFileContract(o));
+    const contractsDeployed = this.projectFile.contracts.filter(o => this.isNetworkFileContract(o));
     const contractsChanged = filter(contractsDeployed, alias => this.hasContractChanged(alias));
 
     if (!isEmpty(contractsMissing)) {
@@ -465,15 +465,14 @@ export default class NetworkController {
   }
 
   // Contract model
-  public hasContractChanged(contractAlias: string, contract?: Contract): boolean {
-    if (!this.isProjectFileContract(contractAlias)) return false;
-    if (this.isProjectFileContract(contractAlias) && !this.isNetworkFileContract(contractAlias)) return true;
+  public hasContractChanged(contractName: string, contract?: Contract): boolean {
+    if (!this.isProjectFileContract(contractName)) return false;
+    if (this.isProjectFileContract(contractName) && !this.isNetworkFileContract(contractName)) return true;
 
     if (!contract) {
-      const contractName = this.projectFile.contract(contractAlias);
       contract = Contracts.getFromLocal(contractName);
     }
-    return !this.networkFile.hasSameBytecode(contractAlias, contract);
+    return !this.networkFile.hasSameBytecode(contractName, contract);
   }
 
   // Contract model
@@ -488,7 +487,7 @@ export default class NetworkController {
 
   // VerifierController
   public async verifyAndPublishContract(
-    contractAlias: string,
+    contractName: string,
     optimizer: boolean,
     optimizerRuns: string,
     remote: string,
@@ -498,12 +497,11 @@ export default class NetworkController {
       __filename,
       'verifyAndPublishContract',
       'verify-and-publish',
-      `Verifying and publishing contract source code of ${contractAlias} on ${remote} (this usually takes under 30 seconds)`,
+      `Verifying and publishing contract source code of ${contractName} on ${remote} (this usually takes under 30 seconds)`,
     );
-    const contractName = this.projectFile.contract(contractAlias);
-    const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias);
+    const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractName);
     const contractSource = await flattenSourceCode([sourcePath]);
-    const contractAddress = this.networkFile.contracts[contractAlias].address;
+    const contractAddress = this.networkFile.contracts[contractName].address;
     await Verifier.verifyAndPublish(remote, {
       contractName,
       compilerVersion,
@@ -818,24 +816,21 @@ export default class NetworkController {
   }
 
   // Proxy model
-  private async updateTruffleDeployedInformation(contractAlias: string, implementation: Contract): Promise<void> {
-    const contractName = this.projectFile.normalizeContractAlias(contractAlias);
-    if (contractName) {
-      const path = Contracts.getLocalPath(contractName);
-      const data = fs.readJsonSync(path);
-      if (!data.networks) {
-        data.networks = {};
-      }
-      const networkId = await ZWeb3.getNetwork();
-      data.networks[networkId] = {
-        links: {},
-        events: {},
-        address: implementation.address,
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        updated_at: Date.now(),
-      };
-      fs.writeJsonSync(path, data, { spaces: 2 });
+  private async updateTruffleDeployedInformation(contractName: string, implementation: Contract): Promise<void> {
+    const path = Contracts.getLocalPath(contractName);
+    const data = fs.readJsonSync(path);
+    if (!data.networks) {
+      data.networks = {};
     }
+    const networkId = await ZWeb3.getNetwork();
+    data.networks[networkId] = {
+      links: {},
+      events: {},
+      address: implementation.address,
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      updated_at: Date.now(),
+    };
+    fs.writeJsonSync(path, data, { spaces: 2 });
   }
 
   // Proxy model
@@ -1086,15 +1081,15 @@ export default class NetworkController {
   }
 
   // Contract model
-  private getErrorForPackageContract(packageName: string, contractAlias: string): string {
+  private getErrorForPackageContract(packageName: string, contractName: string): string {
     if (packageName === this.projectFile.name) {
-      return this.getErrorForContract(contractAlias);
+      return this.getErrorForContract(contractName);
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {
       return `Dependency ${packageName} has not been linked yet. Please run 'openzeppelin push'.`;
-    } else if (!new Dependency(packageName).projectFile.contract(contractAlias)) {
-      return `Contract ${contractAlias} is not provided by ${packageName}.`;
+    } else if (!new Dependency(packageName).projectFile.contracts.includes(contractName)) {
+      return `Contract ${contractName} is not provided by ${packageName}.`;
     }
   }
 

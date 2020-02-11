@@ -43,7 +43,7 @@ export function contracts(source: ContractsSource = 'built'): Choice[] {
   // generate a list of built contracts and package contracts
   if (source === 'all') {
     const packageContracts = Object.keys(localProjectFile.dependencies).map(dependencyName => {
-      const contractNames: Choice[] = new Dependency(dependencyName).projectFile.contractAliases.map(
+      const contractNames: Choice[] = new Dependency(dependencyName).projectFile.contracts.map(
         contractName => `${dependencyName}/${contractName}`,
       );
 
