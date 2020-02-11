@@ -47,12 +47,12 @@ async function action(contractFullName: string, options: any): Promise<void> {
   if (!options.salt) throw new Error("option `--salt' is required");
 
   const { methodName, methodArgs } = parseMethodParams(options, 'initialize');
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const { contract: contractName, package: packageName } = fromContractFullName(contractFullName);
   const opts = {
     ...options,
     methodName,
     methodArgs,
-    contractAlias,
+    contractAlias: contractName,
     packageName,
   };
 
@@ -77,18 +77,18 @@ async function runSignatureQuery(options: any, network: string, txParams: TxPara
     query,
     methodName,
     methodArgs,
-    contractAlias,
+    contractName,
     packageName,
     force,
     salt,
     signature: signatureOption,
     admin,
   } = options;
-  if (!contractAlias) throw new Error('missing required argument: alias');
+  if (!contractName) throw new Error('missing required argument: contractName');
   if (typeof query === 'string') throw new Error("cannot specify argument `sender' as it is inferred from `signature'");
   const args = pickBy({
     packageName,
-    contractName: contractAlias,
+    contractName,
     methodName,
     methodArgs,
     force,
@@ -100,20 +100,11 @@ async function runSignatureQuery(options: any, network: string, txParams: TxPara
 }
 
 async function runCreate(options: any, network: string, txParams: TxParams) {
-  const {
-    methodName,
-    methodArgs,
-    contractAlias,
-    packageName,
-    force,
-    salt,
-    signature: signatureOption,
-    admin,
-  } = options;
-  if (!contractAlias) throw new Error('missing required argument: alias');
+  const { methodName, methodArgs, contractName, packageName, force, salt, signature: signatureOption, admin } = options;
+  if (!contractName) throw new Error('missing required argument: contractName');
   const args = pickBy({
     packageName,
-    contractName: contractAlias,
+    contractName,
     methodName,
     methodArgs,
     force,
