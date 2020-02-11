@@ -18,7 +18,7 @@ export default async function createProxy({
   kind = ProxyType.Upgradeable,
   networkFile,
 }: Partial<CreateParams>): Promise<Contract | never> {
-  if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.');
+  if (!contractAlias) throw Error('A contract name must be provided to create a new proxy.');
   validateSalt(salt, false);
 
   const controller = new NetworkController(network, txParams, networkFile);
