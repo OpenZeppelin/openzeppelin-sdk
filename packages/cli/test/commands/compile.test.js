@@ -2,6 +2,7 @@
 require('../setup');
 
 import { stubCommands, itShouldParse } from './share';
+import sinon from 'sinon';
 
 describe('compile command', function() {
   stubCommands();
@@ -34,6 +35,24 @@ describe('compile command', function() {
         version: '0.5.0',
         optimizer: { enabled: false },
       });
+    },
+  );
+
+  itShouldParse(
+    'should call compile with typechain',
+    'compiler',
+    'oz compile --typechain=web3-v1 --typechain-outdir=foo --no-interactive',
+    function(compiler) {
+      compiler.should.have.been.calledWith(
+        sinon.match({
+          manager: 'openzeppelin',
+          typechain: {
+            enabled: true,
+            outDir: 'foo',
+            target: 'web3-v1',
+          },
+        }),
+      );
     },
   );
 });

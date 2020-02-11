@@ -52,7 +52,6 @@ export type Params =
   | InitParams
   | UnpackParams
   | PushParams
-  | VerifyParams
   | SetAdminParams
   | AddParams
   | SessionParams
@@ -108,18 +107,12 @@ export interface UnpackParams {
 }
 
 export interface PushParams extends Network {
+  contractAliases?: string[];
   force?: boolean;
   reupload?: boolean;
   deployDependencies?: boolean;
   deployProxyAdmin?: boolean;
   deployProxyFactory?: boolean;
-}
-
-export interface VerifyParams extends Network {
-  apiKey: string;
-  remote: string;
-  optimizer?: boolean;
-  optimizerRuns?: string | number;
 }
 
 export interface SetAdminParams extends Network, PackageArgs {
@@ -194,4 +187,6 @@ export interface CompileParams {
   solcVersion: string;
   optimizer: string | boolean;
   optimizerRuns: string;
+  typechain: string;
+  typechainOutdir: string;
 }

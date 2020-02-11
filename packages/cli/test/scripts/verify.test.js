@@ -6,19 +6,19 @@ import axios from 'axios';
 
 import CaptureLogs from '../helpers/captureLogs';
 
-import verify from '../../src/scripts/verify';
+import { action as verify } from '../../src/commands/verify/action';
 import push from '../../src/scripts/push';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
 
 describe('verify script', function() {
-  const contractAlias = 'Impl';
+  const contract = 'Impl';
   const network = 'test';
   const txParams = {};
 
-  const assertVerify = async function(contractAlias, options, message) {
+  const assertVerify = async function(options, message) {
     try {
-      await verify(contractAlias, options);
+      await verify(options);
     } catch (error) {
       error.message.should.match(message);
     }
@@ -31,8 +31,7 @@ describe('verify script', function() {
         const networkFile = new NetworkFile(projectFile, network);
 
         await assertVerify(
-          contractAlias,
-          { network, networkFile },
+          { contract, network, networkFile },
           /Run 'openzeppelin init' first to initialize the project./,
         );
       });
@@ -41,29 +40,27 @@ describe('verify script', function() {
         const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
         const networkFile = new NetworkFile(projectFile, network);
         const nonExistentContract = 'NonExistent';
-        await assertVerify(nonExistentContract, { network, networkFile }, /not found in this project/);
+        await assertVerify({ contract: nonExistentContract, network, networkFile }, /not found in this project/);
       });
     });
 
     describe('with valid package and network files', async function() {
       beforeEach(function() {
         this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
-
         this.networkFile = new NetworkFile(this.projectFile, network);
       });
 
       it('throws error if contract not yet deployed', async function() {
-        await assertVerify(contractAlias, { network, networkFile: this.networkFile }, /is not deployed to/);
+        await assertVerify({ contract, network, networkFile: this.networkFile }, /is not deployed to/);
       });
 
       it('throws error if contract source code has changed locally since last deploy', async function() {
         await push({ network, networkFile: this.networkFile, txParams });
         const contracts = this.networkFile.contracts;
-        contracts[contractAlias].localBytecodeHash = '0x0303456';
+        contracts[contract].localBytecodeHash = '0x0303456';
         this.networkFile.contracts = contracts;
         await assertVerify(
-          contractAlias,
-          { network, networkFile: this.networkFile },
+          { contract, network, networkFile: this.networkFile },
           /has changed locally since the last deploy/,
         );
       });
@@ -89,8 +86,7 @@ describe('verify script', function() {
 
     it('throws error if specifying not permitted remote', async function() {
       await assertVerify(
-        contractAlias,
-        { network, networkFile: this.networkFile, remote: 'invalid-remote' },
+        { contract, network, networkFile: this.networkFile, remote: 'invalid-remote' },
         /Invalid remote/,
       );
     });
@@ -98,8 +94,7 @@ describe('verify script', function() {
     describe('against etherscan', function() {
       it('throws error if not specifying api key option', async function() {
         await assertVerify(
-          contractAlias,
-          { network, networkFile: this.networkFile, remote: 'etherscan' },
+          { contract, network, networkFile: this.networkFile, remote: 'etherscan' },
           /Etherscan API key not specified/,
         );
       });
@@ -110,8 +105,8 @@ describe('verify script', function() {
           data: { status: '0', result: 'Something went wrong' },
         });
         await assertVerify(
-          contractAlias,
           {
+            contract,
             network,
             networkFile: this.networkFile,
             remote: 'etherscan',
@@ -127,7 +122,8 @@ describe('verify script', function() {
           data: { status: '1', result: 'GU1D_NUMB3R' },
         });
         this.axiosStub.onCall(1).returns({ status: 200, data: { status: '1' } });
-        await verify(contractAlias, {
+        await verify({
+          contract,
           network,
           networkFile: this.networkFile,
           remote: 'etherscan',
@@ -143,8 +139,8 @@ describe('verify script', function() {
     describe('against etherchain', function() {
       it('throws error if specifying anything but mainnet as a network', async function() {
         await assertVerify(
-          contractAlias,
           {
+            contract,
             network: 'test',
             networkFile: this.networkFile,
             remote: 'etherchain',
@@ -158,7 +154,7 @@ describe('verify script', function() {
           status: 200,
           data: '<div id="infoModal"><div class="modal-body"> Error: </div></div>',
         });
-        await assertVerify(contractAlias, { network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/);
+        await assertVerify({ contract, network, networkFile: this.networkFile, remote: 'etherchain' }, /Error/);
       });
 
       it('logs a success info message when contract is verified', async function() {
@@ -166,7 +162,8 @@ describe('verify script', function() {
           status: 200,
           data: '<div id="infoModal"><div class="modal-body"> successful </div></div>',
         });
-        await verify(contractAlias, {
+        await verify({
+          contract,
           network,
           networkFile: this.networkFile,
           remote: 'etherchain',
