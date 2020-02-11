@@ -103,7 +103,7 @@ describe('publish script', function() {
     context('for implementation proxy', function() {
       it('should be owned by proxyAdmin', async function() {
         this.ownProxy = await create({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -117,7 +117,7 @@ describe('publish script', function() {
       it('should be owned by proxyAdmin', async function() {
         this.dependencyProxy = await create({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,

@@ -9,7 +9,7 @@ import { compile } from '../models/compiler/Compiler';
 import { fromContractFullName } from '../utils/naming';
 import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
-import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
+import { promptIfNeeded, networksList, contractsList, InquirerQuestions } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import { ProxyType, CreateParams } from '../scripts/interfaces';
 import Telemetry from '../telemetry';
@@ -21,14 +21,14 @@ interface PropsParams {
 }
 
 const name = 'create';
-const signature = `${name} [alias]`;
+const signature = `${name} [contract]`;
 const description =
-  'deploys a new upgradeable contract instance. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package.';
+  'deploys a new upgradeable contract instance. Provide the <contract> you added your contract with, or <package>/<contract> to create a contract from a linked package.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .usage('[alias] --network <network> [options]')
+    .usage('[contract] --network <network> [options]')
     .description(description)
     .option('--init [function]', `call function after creating contract. If none is given, 'initialize' will be used`)
     .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
@@ -68,7 +68,7 @@ export async function createAction(contractFullName: string, options: any): Prom
 
 async function action(contractFullName: string, options: any): Promise<void> {
   const { force, network, txParams, init: rawInitMethod } = options;
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const { contract: contractName, package: packageName } = fromContractFullName(contractFullName);
 
   const additionalOpts = {
     askForMethodParams: rawInitMethod,
@@ -78,7 +78,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
 
   const args = pickBy({
     packageName,
-    contractAlias,
+    contractName,
     methodName,
     methodArgs,
     force,

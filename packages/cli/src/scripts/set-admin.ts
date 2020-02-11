@@ -4,7 +4,7 @@ import { SetAdminParams } from './interfaces';
 export default async function setAdmin({
   newAdmin,
   packageName,
-  contractAlias,
+  contractName: contractAlias,
   proxyAddress,
   network,
   txParams = {},

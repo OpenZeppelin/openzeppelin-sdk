@@ -25,7 +25,7 @@ describe('call script', function() {
     await add({ contractsData, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
     await createProxy({
-      contractAlias: 'Impl',
+      contractName: 'Impl',
       network,
       txParams,
       networkFile: this.networkFile,

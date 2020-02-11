@@ -114,7 +114,7 @@ describe('create script', function() {
 
     it('should create a proxy for one of its contracts', async function() {
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -130,7 +130,7 @@ describe('create script', function() {
 
     it('should create a proxy with a different admin', async function() {
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -149,7 +149,7 @@ describe('create script', function() {
     it('should create a proxy for one of its contracts with explicit package name', async function() {
       await create({
         packageName: 'Herbs',
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -165,7 +165,7 @@ describe('create script', function() {
 
     it('should properly initialize a proxy with false boolean values', async function() {
       await create({
-        contractAlias: booleanContractAlias,
+        contractName: booleanContractAlias,
         network,
         txParams,
         methodName: 'initialize',
@@ -184,7 +184,7 @@ describe('create script', function() {
 
     it('should properly initialize a proxy with true boolean values', async function() {
       await create({
-        contractAlias: booleanContractAlias,
+        contractName: booleanContractAlias,
         network,
         txParams,
         methodName: 'initialize',
@@ -203,7 +203,7 @@ describe('create script', function() {
 
     xit('should record the proxy deployed address in contract build json file', async function() {
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -216,7 +216,7 @@ describe('create script', function() {
 
     it('should refuse to create a proxy for an undefined contract', async function() {
       await create({
-        contractAlias: 'NotExists',
+        contractName: 'NotExists',
         network,
         txParams,
         networkFile: this.networkFile,
@@ -231,7 +231,7 @@ describe('create script', function() {
       });
 
       await create({
-        contractAlias: 'NotDeployed',
+        contractName: 'NotDeployed',
         network,
         txParams,
         networkFile: this.networkFile,
@@ -240,19 +240,19 @@ describe('create script', function() {
 
     it('should be able to have multiple proxies for one of its contracts', async function() {
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
       });
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
       });
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -263,13 +263,13 @@ describe('create script', function() {
 
     it('should be able to handle proxies for more than one contract', async function() {
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
       });
       await create({
-        contractAlias: anotherContractAlias,
+        contractName: anotherContractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -287,7 +287,7 @@ describe('create script', function() {
 
     it('should deploy a proxy admin', async function() {
       await create({
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -298,7 +298,7 @@ describe('create script', function() {
     it('should store proxy admin if contract creation fails', async function() {
       await assertRevert(
         create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -314,7 +314,7 @@ describe('create script', function() {
       it('should create a proxy at an address given a salt', async function() {
         const salt = random(0, 2 ** 32);
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -332,7 +332,7 @@ describe('create script', function() {
       it('should create a proxy at an address given a salt with a different admin', async function() {
         const salt = random(0, 2 ** 32);
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -361,7 +361,7 @@ describe('create script', function() {
         should.exist(factoryAddress, 'Proxy factory was not stored');
 
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -387,7 +387,7 @@ describe('create script', function() {
 
         // Deploy a proxy to a random contract so we force a proxy admin to be deployed
         await create({
-          contractAlias: anotherContractAlias,
+          contractName: anotherContractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -398,7 +398,7 @@ describe('create script', function() {
         const admin = this.networkFile.proxyAdminAddress;
         const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, admin, '');
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -426,7 +426,7 @@ describe('create script', function() {
         });
         const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, salt, implementation, otherAdmin);
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -445,14 +445,14 @@ describe('create script', function() {
       it('should fail if an address is already in use when creating a proxy with a salt', async function() {
         const salt = random(0, 2 ** 32);
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
           salt,
         });
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -465,7 +465,7 @@ describe('create script', function() {
       it('should create a minimal proxy for one of its contracts', async function() {
         await create({
           kind: ProxyType.Minimal,
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -482,7 +482,7 @@ describe('create script', function() {
       it('should properly initialize a minimal proxy with true boolean values', async function() {
         await create({
           kind: ProxyType.Minimal,
-          contractAlias: booleanContractAlias,
+          contractName: booleanContractAlias,
           network,
           txParams,
           methodName: 'initialize',
@@ -511,7 +511,7 @@ describe('create script', function() {
 
       it('should warn when not initializing a contract with initialize method', async function() {
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -523,7 +523,7 @@ describe('create script', function() {
 
       it('should warn when not initializing a contract that inherits from one with an initialize method', async function() {
         await create({
-          contractAlias: anotherContractAlias,
+          contractName: anotherContractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -535,7 +535,7 @@ describe('create script', function() {
 
       it('should not warn when initializing a contract', async function() {
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           methodName: 'initialize',
@@ -548,7 +548,7 @@ describe('create script', function() {
 
       it('should not warn when a contract has not initialize method', async function() {
         await create({
-          contractAlias: uninitializableContractAlias,
+          contractName: uninitializableContractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -576,7 +576,7 @@ describe('create script', function() {
 
       it('should fail to create a proxy from a dependency without specifying package name', async function() {
         await create({
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -586,7 +586,7 @@ describe('create script', function() {
       it('should create a proxy from a dependency', async function() {
         await create({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -600,7 +600,7 @@ describe('create script', function() {
       it('should initialize a proxy from a dependency', async function() {
         await create({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -617,7 +617,7 @@ describe('create script', function() {
       it('should initialize a proxy from a dependency using explicit function', async function() {
         await create({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -643,7 +643,7 @@ describe('create script', function() {
       it('should refuse create a proxy for unlinked dependency', async function() {
         await create({
           packageName: 'mock-stdlib',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -653,7 +653,7 @@ describe('create script', function() {
 
     it('should refuse to create a proxy for an undefined contract', async function() {
       await create({
-        contractAlias: 'NotExists',
+        contractName: 'NotExists',
         network,
         txParams,
         networkFile: this.networkFile,
@@ -663,7 +663,7 @@ describe('create script', function() {
     it('should refuse to create a proxy for an undefined dependency', async function() {
       await create({
         packageName: 'NotExists',
-        contractAlias,
+        contractName: contractAlias,
         network,
         txParams,
         networkFile: this.networkFile,
@@ -677,7 +677,7 @@ describe('create script', function() {
 
       it('should refuse to create a proxy for a modified contract', async function() {
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -688,7 +688,7 @@ describe('create script', function() {
 
       it('should create a proxy for an unmodified contract', async function() {
         await create({
-          contractAlias: anotherContractAlias,
+          contractName: anotherContractAlias,
           network,
           txParams,
           networkFile: this.networkFile,
@@ -702,7 +702,7 @@ describe('create script', function() {
 
       it('should create a proxy for a modified contract if force is set', async function() {
         await create({
-          contractAlias,
+          contractName: contractAlias,
           network,
           txParams,
           force: true,

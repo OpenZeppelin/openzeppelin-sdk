@@ -81,19 +81,19 @@ describe('update script', function() {
     this.withLibraryImplV1Address = this.networkFile.contract('WithLibraryImpl').address;
 
     this.proxy1 = await createProxy({
-      contractAlias: 'Impl',
+      contractName: 'Impl',
       network,
       txParams,
       networkFile: this.networkFile,
     });
     this.proxy2 = await createProxy({
-      contractAlias: 'Impl',
+      contractName: 'Impl',
       network,
       txParams,
       networkFile: this.networkFile,
     });
     this.proxy3 = await createProxy({
-      contractAlias: 'WithLibraryImpl',
+      contractName: 'WithLibraryImpl',
       network,
       txParams,
       networkFile: this.networkFile,
@@ -129,7 +129,7 @@ describe('update script', function() {
           contract: 'Impl',
         })[0].address;
         await update({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           proxyAddress,
           network,
           txParams,
@@ -155,7 +155,7 @@ describe('update script', function() {
       it('should upgrade the version of all proxies given the contract alias', async function() {
         // Upgrade all 'Impl' proxies
         await update({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           proxyAddress: undefined,
           network,
           txParams,
@@ -182,7 +182,7 @@ describe('update script', function() {
           omit(proxy, 'kind'),
         ); // remove proxy.kind to check it properly defaults to Upgradeable
         await update({
-          contractAlias: undefined,
+          contractName: undefined,
           proxyAddress: undefined,
           all: true,
           network,
@@ -215,7 +215,7 @@ describe('update script', function() {
           networkFile: this.networkFile,
         });
         await update({
-          contractAlias: undefined,
+          contractName: undefined,
           proxyAddress: undefined,
           all: true,
           network,
@@ -242,7 +242,7 @@ describe('update script', function() {
           contract: 'Impl',
         })[0].address;
         await update({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           proxyAddress,
           network,
           txParams,
@@ -256,7 +256,7 @@ describe('update script', function() {
 
         // Upgrade all
         await update({
-          contractAlias: undefined,
+          contractName: undefined,
           proxyAddress: undefined,
           all: true,
           network,
@@ -278,7 +278,7 @@ describe('update script', function() {
           contract: 'Impl',
         })[0].address;
         await update({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           methodName: 'migrate',
           methodArgs: [42],
           proxyAddress,
@@ -296,7 +296,7 @@ describe('update script', function() {
 
       it('should upgrade multiple proxies and migrate them', async function() {
         await update({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           methodName: 'migrate',
           methodArgs: [42],
           proxyAddress: undefined,
@@ -325,7 +325,7 @@ describe('update script', function() {
         await push({ network, txParams, networkFile: this.networkFile });
 
         await update({
-          contractAlias: undefined,
+          contractName: undefined,
           proxyAddress: undefined,
           all: true,
           methodName: 'migrate',
@@ -357,7 +357,7 @@ describe('update script', function() {
         this.networkFile.contracts = contracts;
 
         await update({
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           proxyAddress: null,
           network,
           txParams,
@@ -374,7 +374,7 @@ describe('update script', function() {
 
         it('should refuse to upgrade a proxy for a modified contract', async function() {
           await update({
-            contractAlias: 'Impl',
+            contractName: 'Impl',
             network,
             txParams,
             networkFile: this.networkFile,
@@ -383,7 +383,7 @@ describe('update script', function() {
 
         it('should upgrade a proxy for a modified contract if force is set', async function() {
           await update({
-            contractAlias: 'Impl',
+            contractName: 'Impl',
             network,
             txParams,
             force: true,
@@ -407,7 +407,7 @@ describe('update script', function() {
 
         it('should not warn when migrating a contract', async function() {
           await update({
-            contractAlias: 'Impl',
+            contractName: 'Impl',
             network,
             txParams,
             methodName: 'migrate',
@@ -425,7 +425,7 @@ describe('update script', function() {
           await push({ network, txParams, networkFile: this.networkFile });
 
           await update({
-            contractAlias: 'NoMigrate',
+            contractName: 'NoMigrate',
             network,
             txParams,
             networkFile: this.networkFile,
@@ -442,7 +442,7 @@ describe('update script', function() {
         await createProxies.call(this);
         await createProxy({
           kind: ProxyType.Minimal,
-          contractAlias: 'Impl',
+          contractName: 'Impl',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -452,7 +452,7 @@ describe('update script', function() {
 
       it('should not attempt to upgrade a minimal proxy', async function() {
         await update({
-          contractAlias: undefined,
+          contractName: undefined,
           proxyAddress: undefined,
           all: true,
           network,
@@ -493,14 +493,14 @@ describe('update script', function() {
         });
         await createProxy({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
         });
         await createProxy({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -557,7 +557,7 @@ describe('update script', function() {
       it('should upgrade the version of all proxies given their name', async function() {
         await update({
           packageName: 'mock-stdlib-undeployed-2',
-          contractAlias: 'Greeter',
+          contractName: 'Greeter',
           network,
           txParams,
           networkFile: this.networkFile,

@@ -19,7 +19,7 @@ async function action(contractAlias: string, options: any): Promise<void> {
   ConfigManager.initStaticConfiguration();
   if (!options.skipCompile) await compile();
   await Telemetry.report('check', { contractAlias }, options.interactive);
-  check({ contractAlias });
+  check({ contractName: contractAlias });
 }
 
 export default { name, signature, description, register, action };

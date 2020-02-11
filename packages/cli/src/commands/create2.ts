@@ -88,7 +88,7 @@ async function runSignatureQuery(options: any, network: string, txParams: TxPara
   if (typeof query === 'string') throw new Error("cannot specify argument `sender' as it is inferred from `signature'");
   const args = pickBy({
     packageName,
-    contractAlias,
+    contractName: contractAlias,
     methodName,
     methodArgs,
     force,
@@ -113,7 +113,7 @@ async function runCreate(options: any, network: string, txParams: TxParams) {
   if (!contractAlias) throw new Error('missing required argument: alias');
   const args = pickBy({
     packageName,
-    contractAlias,
+    contractName: contractAlias,
     methodName,
     methodArgs,
     force,

@@ -6,7 +6,7 @@ import { validateSalt } from '../utils/input';
 
 export default async function createProxy({
   packageName,
-  contractAlias,
+  contractName: contractAlias,
   methodName,
   methodArgs,
   network,

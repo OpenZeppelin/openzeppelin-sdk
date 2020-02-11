@@ -93,7 +93,7 @@ describe('migrate-manifest-version script', function() {
       describe('create', function() {
         beforeEach('create proxy', async function() {
           this.newProxy = await create({
-            contractAlias: 'ImplV1',
+            contractName: 'ImplV1',
             network,
             txParams,
             networkFile: this.networkFile,
@@ -114,7 +114,7 @@ describe('migrate-manifest-version script', function() {
       describe('update', function() {
         beforeEach('update proxy', async function() {
           await update({
-            contractAlias: 'ImplV1',
+            contractName: 'ImplV1',
             proxyAddress: this.implV1Proxy.address,
             network,
             txParams,
@@ -180,7 +180,7 @@ describe('migrate-manifest-version script', function() {
       describe('create', function() {
         beforeEach('creates proxy', async function() {
           this.newProxy = await create({
-            contractAlias: 'ImplV1',
+            contractName: 'ImplV1',
             network,
             txParams: { from: owner },
             networkFile: this.networkFile,
@@ -201,7 +201,7 @@ describe('migrate-manifest-version script', function() {
       describe('update', function() {
         beforeEach('update proxy', async function() {
           await update({
-            contractAlias: 'ImplV1',
+            contractName: 'ImplV1',
             proxyAddress: this.implV1Proxy.address,
             network,
             txParams,

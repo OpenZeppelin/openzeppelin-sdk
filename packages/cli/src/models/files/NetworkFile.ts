@@ -340,7 +340,7 @@ export default class NetworkFile {
     return this.data.contracts[alias];
   }
 
-  public contractAliasesMissingFromPackage(): string[] {
+  public contractsMissingFromPackage(): string[] {
     return difference(this.contractNames, this.projectFile.contracts);
   }
 
@@ -414,11 +414,11 @@ export default class NetworkFile {
   }
 
   public addContract(
-    alias: string,
+    contractName: string,
     instance: Contract,
     { warnings, types, storage }: { warnings?: any; types?: any; storage?: any } = {},
   ): void {
-    this.setContract(alias, {
+    this.setContract(contractName, {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
@@ -430,12 +430,12 @@ export default class NetworkFile {
     });
   }
 
-  public setContract(alias: string, value: ContractInterface): void {
-    this.data.contracts[alias] = value;
+  public setContract(contractName: string, value: ContractInterface): void {
+    this.data.contracts[contractName] = value;
   }
 
-  public unsetContract(alias: string): void {
-    delete this.data.contracts[alias];
+  public unsetContract(contractName: string): void {
+    delete this.data.contracts[contractName];
   }
 
   public setProxies(packageName: string, alias: string, value: ProxyInterface[]): void {

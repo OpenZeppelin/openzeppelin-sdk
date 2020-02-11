@@ -3,7 +3,7 @@ import { UpdateParams } from './interfaces';
 
 export default async function update({
   packageName,
-  contractAlias,
+  contractName: contractAlias,
   proxyAddress,
   methodName,
   methodArgs,
