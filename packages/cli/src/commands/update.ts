@@ -26,7 +26,7 @@ const description =
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .contract('update')
+    .alias('update')
     .usage('[contract-or-address] --network <network> [options]')
     .description(description)
     .option(

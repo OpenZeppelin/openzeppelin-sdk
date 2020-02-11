@@ -146,7 +146,6 @@ describe('deploy (action)', function() {
   });
 
   // see push tests for reference
-  // test with alias
   // custom gasprice in txparams
   // saved in truffle artifact
 });
