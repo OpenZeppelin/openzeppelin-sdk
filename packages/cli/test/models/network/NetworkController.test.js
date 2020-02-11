@@ -9,7 +9,7 @@ import NetworkFile from '../../../src/models/files/NetworkFile';
 import ProjectFile from '../../../src/models/files/ProjectFile';
 import { AppProjectDeployer } from '../../../src/models/network/ProjectDeployer';
 
-describe('NetworkController', function() {
+describe.only('NetworkController', function() {
   let projectFile, networkFile, controller;
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('NetworkController', function() {
     sinon.restore();
   });
 
-  describe('_getAllSolidityLibNames()', () => {
+  describe('getAllSolidityLibNames()', () => {
     let controllerMock;
     beforeEach(() => {
       projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
