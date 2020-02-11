@@ -2,7 +2,6 @@ import { pickBy } from 'lodash';
 import { Loggy } from '@openzeppelin/upgrades';
 
 import link from './link';
-import add from './add';
 import push from './push';
 import create from '../scripts/create';
 import Session from '../models/network/Session';
@@ -58,7 +57,6 @@ export async function createAction(contractFullName: string, options: any): Prom
   });
 
   await link.runActionIfNeeded(promptedContractFullName, options);
-  await add.runActionIfNeeded(promptedContractFullName, options);
   await push.runActionIfNeeded(promptedContractFullName, network, {
     ...options,
     network: promptedNetwork,

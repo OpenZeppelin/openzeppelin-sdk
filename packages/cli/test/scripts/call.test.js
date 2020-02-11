@@ -1,10 +1,8 @@
 'use strict';
 require('../setup');
 
-import utils from 'web3-utils';
 import { accounts } from '@openzeppelin/test-environment';
 
-import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import call from '../../src/scripts/call';
 import sendTx from '../../src/scripts/send-tx';

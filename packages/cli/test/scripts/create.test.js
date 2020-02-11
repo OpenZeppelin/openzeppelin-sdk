@@ -7,7 +7,6 @@ import { accounts } from '@openzeppelin/test-environment';
 import CaptureLogs from '../helpers/captureLogs';
 import { Contracts, Logger, helpers, Proxy, MinimalProxy, assertRevert } from '@openzeppelin/upgrades';
 
-import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import create from '../../src/scripts/create';
 import queryDeployment from '../../src/scripts/query-deployment';

@@ -1,7 +1,6 @@
 import { omit, isString } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
-import add from './add';
 import push from '../scripts/push';
 import Session from '../models/network/Session';
 import { compile } from '../models/compiler/Compiler';
@@ -36,7 +35,6 @@ const register: (program: any) => any = program =>
     .action(commandActions);
 
 async function commandActions(options: any): Promise<void> {
-  await add.runActionIfNeeded(null, options);
   await action(options);
 }
 

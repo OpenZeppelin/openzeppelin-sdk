@@ -1,7 +1,6 @@
 'use strict';
 require('../setup');
 
-import add from '../../src/scripts/add';
 import bump from '../../src/scripts/bump';
 import link from '../../src/scripts/link';
 import ProjectFile from '../../src/models/files/ProjectFile';

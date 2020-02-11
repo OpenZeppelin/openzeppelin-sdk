@@ -1,5 +1,3 @@
-import add from './add';
-import addAll from './add-all';
 import bump from './bump';
 import create from './create';
 import freeze from './freeze';
@@ -20,8 +18,6 @@ import balance from './balance';
 import accounts from './accounts';
 
 export default {
-  add,
-  addAll,
   bump,
   create,
   freeze,

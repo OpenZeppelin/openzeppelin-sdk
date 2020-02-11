@@ -1,4 +1,3 @@
-import add from './add';
 import bump from './bump';
 import check from './check';
 import create from './create';
@@ -25,7 +24,6 @@ import accounts from './accounts';
 import * as deploy from './deploy';
 
 export default {
-  add,
   bump,
   check,
   create,
