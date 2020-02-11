@@ -49,7 +49,6 @@ export default class LocalController {
     }
     this.projectFile.name = name;
     this.projectFile.version = version || DEFAULT_VERSION;
-    this.projectFile.contracts = {};
     if (publish) this.projectFile.publish = publish;
     Loggy.noSpin(
       __filename,

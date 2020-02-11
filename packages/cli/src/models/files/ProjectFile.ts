@@ -33,7 +33,7 @@ interface ProjectFileData {
   manifestVersion?: string;
   zosversion?: string;
   dependencies: { [name: string]: string };
-  contracts: { [alias: string]: string };
+  contracts: string[];
   publish: boolean;
   compiler: Partial<ConfigFileCompilerOptions>;
   telemetryOptIn?: boolean;
@@ -99,7 +99,7 @@ export default class ProjectFile {
     this.filePath = this.filePath || PROJECT_FILE_PATH;
     this.data = this.data || defaultData;
     checkVersion(this.data.manifestVersion || this.data.zosversion, this.filePath);
-    if (!this.data.contracts) this.data.contracts = {};
+    if (!this.data.contracts) this.data.contracts = [];
     if (!this.data.dependencies) this.data.dependencies = {};
   }
 
@@ -143,11 +143,11 @@ export default class ProjectFile {
     return this.data.version;
   }
 
-  public set contracts(contracts: { [alias: string]: string }) {
+  public set contracts(contracts: string[]) {
     this.data.contracts = contracts;
   }
-  public get contracts(): { [alias: string]: string } {
-    return this.data.contracts || {};
+  public get contracts(): string[] {
+    return this.data.contracts;
   }
 
   public get dependencies(): { [name: string]: string } {
