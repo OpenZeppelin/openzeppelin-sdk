@@ -71,7 +71,7 @@
     "env-paths": "^2.2.0",
     "ethereumjs-util": "^6.1.0",
     "find-up": "^3.0.0",
-    "firebase": "^6.6.0",
+    "firebase": "^7.8.0",
     "fs-extra": "^7.0.1",
     "glob": "^7.1.6",
     "inquirer": "^6.4.1",
