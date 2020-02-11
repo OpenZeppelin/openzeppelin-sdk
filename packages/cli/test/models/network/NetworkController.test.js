@@ -9,7 +9,7 @@ import NetworkFile from '../../../src/models/files/NetworkFile';
 import ProjectFile from '../../../src/models/files/ProjectFile';
 import { AppProjectDeployer } from '../../../src/models/network/ProjectDeployer';
 
-describe.only('NetworkController', function() {
+describe('NetworkController', function() {
   let projectFile, networkFile, controller;
 
   beforeEach(() => {
