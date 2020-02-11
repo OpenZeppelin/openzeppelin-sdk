@@ -10,7 +10,7 @@ export async function action(params: Options & Args & { dontExitProcess: boolean
 
   const controller = new NetworkController(params.network, params.txParams, params.networkFile);
 
-  controller.checkLocalContractDeployed(params.contract, true);
+  controller.throwOrLogErrorForContract(params.contract, true);
 
   await controller.verifyAndPublishContract(
     params.contract,

@@ -123,8 +123,8 @@ export default class NetworkController {
 
   // DeployerController
   public async push(aliases: string[] | undefined, { reupload = false, force = false } = {}): Promise<void | never> {
-    const changedLibraries = this._solidityLibsForPush(!reupload);
-    const contractObjects = this._contractsListForPush(aliases, !reupload, changedLibraries);
+    const changedLibraries = this.solidityLibsForPush(!reupload);
+    const contractObjects = this.contractsListForPush(aliases, !reupload, changedLibraries);
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
@@ -140,7 +140,7 @@ export default class NetworkController {
 
     this.checkNotFrozen();
     await this.uploadSolidityLibs(changedLibraries);
-    await Promise.all([this.uploadContracts(contractObjects), this.unsetContracts()]);
+    await Promise.all([this.uploadContracts(contractObjects), this.unsetMissingContracts()]);
 
     await this.unsetSolidityLibs();
 
@@ -179,12 +179,12 @@ export default class NetworkController {
   }
 
   // Contract model
-  private _contractsListForPush(
+  private contractsListForPush(
     aliases: string[] | undefined,
     onlyChanged = false,
     changedLibraries: Contract[] = [],
   ): [string, Contract][] {
-    const newVersion = this._newVersionRequired();
+    const newVersion = this.isNewVersionRequired();
 
     aliases = aliases || Object.keys(this.projectFile.contracts);
     return aliases
