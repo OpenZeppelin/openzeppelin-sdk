@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24 <0.6.0;
+pragma solidity >=0.4.24 <0.7.0;
 
 
 /**
@@ -51,8 +51,9 @@ contract Initializable {
     // deployed when running a constructor, any checks on its code size will
     // yield zero, making it an effective way to detect if a contract is
     // under construction or not.
+    address self = address(this);
     uint256 cs;
-    assembly { cs := extcodesize(address) }
+    assembly { cs := extcodesize(self) }
     return cs == 0;
   }
 

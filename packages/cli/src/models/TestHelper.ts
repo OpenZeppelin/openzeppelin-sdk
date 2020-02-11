@@ -14,7 +14,7 @@ export default async function(
 ): Promise<ProxyAdminProject | AppProject> {
   const controller = new NetworkController('test', txParams, networkFile);
   await controller.deployDependencies();
-  await controller.push(false, true);
+  await controller.push(undefined, { reupload: false, force: true });
 
   return controller.project;
 }

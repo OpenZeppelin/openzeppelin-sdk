@@ -14,6 +14,7 @@ var path = require('path');
 var wrapper = require('solc-wrapper');
 var binary = require('./soljson-v0.5.9+commit.e560f70d');
 var solc = wrapper(binary);
+var solcCompile = solc.compile ? solc.compile : solc.compileStandardWrapper;
 
 // FIXME: remove annoying exception catcher of Emscripten
 //        see https://github.com/chriseth/browser-solidity/issues/167
@@ -61,7 +62,7 @@ function abort (msg) {
 
 if (argv['standard-json']) {
   var input = fs.readFileSync(process.stdin.fd).toString('utf8');
-  var output = solc.compileStandardWrapper(input);
+  var output = solcCompile(input);
 
   console.log(output);
   process.exit(0);
@@ -84,7 +85,7 @@ for (var i = 0; i < files.length; i++) {
   }
 }
 
-var output = JSON.parse(solc.compileStandardWrapper(JSON.stringify({
+var output = JSON.parse(solcCompile(JSON.stringify({
   language: 'Solidity',
   settings: {
     optimizer: {

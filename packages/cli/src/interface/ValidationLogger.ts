@@ -11,12 +11,13 @@ import {
 } from '@openzeppelin/upgrades';
 import { ContractInterface } from '../models/files/NetworkFile';
 
-const DOCS_HOME = 'https://docs.openzeppelin.com/sdk/2.6';
-const DANGEROUS_OPERATIONS_LINK = `${DOCS_HOME}/writing-contracts#potentially-unsafe-operations`;
-const AVOID_INITIAL_VALUES_LINK = `${DOCS_HOME}/writing-contracts#avoid-initial-values-in-field-declarations`;
-const INITIALIZERS_LINK = `${DOCS_HOME}/writing-contracts#initializers`;
-const STORAGE_CHECKS_LINK = `${DOCS_HOME}/writing-contracts#modifying-your-contracts`;
-const VANILLA_CONTRACTS_LINK = `${DOCS_HOME}/linking#linking-the-contracts-ethereum-package`;
+const CLI_HOME = 'https://docs.openzeppelin.com/cli/2.6';
+const UPGRADES_HOME = 'https://docs.openzeppelin.com/upgrades/2.6/';
+const DANGEROUS_OPERATIONS_LINK = `${UPGRADES_HOME}/writing-upgradeable#potentially-unsafe-operations`;
+const AVOID_INITIAL_VALUES_LINK = `${UPGRADES_HOME}/writing-upgradeable#avoid-initial-values-in-field-declarations`;
+const INITIALIZERS_LINK = `${UPGRADES_HOME}/writing-upgradeable#initializers`;
+const STORAGE_CHECKS_LINK = `${UPGRADES_HOME}/writing-upgradeable#modifying-your-contracts`;
+const VANILLA_CONTRACTS_LINK = `${CLI_HOME}/dependencies#linking-the-contracts-ethereum-package`;
 
 export default class ValidationLogger {
   public contract: Contract;

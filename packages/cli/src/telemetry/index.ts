@@ -33,7 +33,7 @@ export interface UserEnvironment {
 export default {
   DISABLE_TELEMETRY: !!process.env.OPENZEPPELIN_DISABLE_TELEMETRY,
 
-  async report(commandName: string, params: { [key: string]: unknown }, interactive: boolean): Promise<void> {
+  async report(commandName: string, params: Record<string, unknown>, interactive: boolean): Promise<void> {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
