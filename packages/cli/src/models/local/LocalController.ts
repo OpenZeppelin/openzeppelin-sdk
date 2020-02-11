@@ -62,34 +62,29 @@ export default class LocalController {
     this.projectFile.version = version;
   }
 
-  public add(contractAlias: string, contractName: string): void {
-    Loggy.spin(
-      __filename,
-      'add',
-      `add-${contractAlias}`,
-      `Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`,
-    );
+  public add(contractName: string): void {
+    Loggy.spin(__filename, 'add', `add-${contractName}`, `Adding ${contractName}`);
     this.projectFile.addContract(contractName);
-    Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
+    Loggy.succeed(`add-${contractName}`, `Added contract ${contractName}`);
   }
 
   public addAll(): void {
     const manager = new ContractManager(this.projectFile);
-    manager.getContractNames().forEach(name => this.add(name, name));
+    manager.getContractNames().forEach(name => this.add(name));
   }
 
-  public remove(contractAlias: string): void {
-    if (!this.projectFile.hasContract(contractAlias)) {
+  public remove(contractName: string): void {
+    if (!this.projectFile.hasContract(contractName)) {
       Loggy.noSpin.error(
         __filename,
         'remove',
-        `remove-${contractAlias}`,
-        `Contract ${contractAlias} to be removed was not found`,
+        `remove-${contractName}`,
+        `Contract ${contractName} to be removed was not found`,
       );
     } else {
-      Loggy.spin(__filename, 'remove', `remove-${contractAlias}`, `Removing ${contractAlias}`);
-      this.projectFile.removeContract(contractAlias);
-      Loggy.succeed(`remove-${contractAlias}`, `Removed contract ${contractAlias}`);
+      Loggy.spin(__filename, 'remove', `remove-${contractName}`, `Removing ${contractName}`);
+      this.projectFile.removeContract(contractName);
+      Loggy.succeed(`remove-${contractName}`, `Removed contract ${contractName}`);
     }
   }
 

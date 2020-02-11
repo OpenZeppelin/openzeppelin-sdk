@@ -115,6 +115,11 @@ export interface SetAdminParams extends Network, PackageArgs {
   newAdmin?: string;
 }
 
+export interface AddParams {
+  contracts: string[];
+  projectFile?: ProjectFile;
+}
+
 export interface SessionParams {
   from?: string;
   close?: boolean;
