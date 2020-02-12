@@ -8,7 +8,7 @@ import add from '../../src/scripts/add';
 import addAll from '../../src/scripts/add-all';
 import ProjectFile from '../../src/models/files/ProjectFile';
 
-describe.only('add script', function() {
+describe('add script', function() {
   const contractName = 'ImplV1';
   const contracts = [contractName];
 
