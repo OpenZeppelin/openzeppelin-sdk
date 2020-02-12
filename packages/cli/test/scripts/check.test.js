@@ -7,7 +7,7 @@ import ProjectFile from '../../src/models/files/ProjectFile';
 
 const expect = require('chai').expect;
 
-describe('check script', function() {
+describe.only('check script', function() {
   beforeEach('setup', async function() {
     this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
   });
@@ -22,22 +22,14 @@ describe('check script', function() {
 
   describe('on single contract', function() {
     it('outputs no issues found', function() {
-      const contractAlias = 'ImplV1';
-      this.projectFile.addContract(contractAlias);
-      check({ contractName: contractAlias, projectFile: this.projectFile });
+      const contractName = 'ImplV1';
+      this.projectFile.addContract(contractName);
+      check({ contractName, projectFile: this.projectFile });
       this.logs.infos[0].should.match(/No issues/);
     });
 
-    it('outputs a warning on contract found by alias', function() {
-      const contractAlias = 'MyContract';
-      this.projectFile.addContract(contractAlias, 'WithDelegateCall');
-      check({ contractName: contractAlias, projectFile: this.projectFile });
-      this.logs.infos.should.be.empty;
-      this.logs.warns[0].should.match(/delegatecall/);
-    });
-
     it('outputs a warning on contract found by name', function() {
-      this.projectFile.addContract('MyContract', 'WithDelegateCall');
+      this.projectFile.addContract('WithDelegateCall');
       check({
         contractName: 'WithDelegateCall',
         projectFile: this.projectFile,
