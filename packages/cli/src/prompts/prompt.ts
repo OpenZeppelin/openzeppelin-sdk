@@ -113,9 +113,9 @@ export function proxiesList(
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
     const separator = packageName === projectFile.name ? 'Your contracts' : packageName;
-    const packageList = groupedByPackage[packageName].map(({ contract, address }) => {
-      const name = pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
-      const contractFullName = packageName === projectFile.name ? `${contract}` : `${packageName}/${contract}`;
+    const packageList = groupedByPackage[packageName].map(({ contractName, address }) => {
+      const name = pickProxyBy === 'byAddress' ? `${contractName} at ${address}` : contractName;
+      const contractFullName = packageName === projectFile.name ? `${contractName}` : `${packageName}/${contractName}`;
       const proxyReference = pickProxyBy === 'byAddress' ? address : contractFullName;
 
       return {
@@ -238,7 +238,7 @@ export function proxyInfo(contractInfo: any, network: string): any {
   } else {
     const proxies = networkFile.getProxies(proxyParams);
     const proxy = proxies[0] || {};
-    const contractFullName = toContractFullName(proxy.package, proxy.contract);
+    const contractFullName = toContractFullName(proxy.package, proxy.contractName);
 
     return {
       contractFullName,

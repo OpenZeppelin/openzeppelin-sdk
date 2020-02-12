@@ -39,7 +39,6 @@ interface SolidityLibInterface {
 export interface ProxyInterface {
   contractName?: string;
   package?: string;
-  contract?: any;
   address?: string;
   version?: string;
   implementation?: string;
@@ -312,7 +311,7 @@ export default class NetworkFile {
     return !isEmpty(this.dependencies);
   }
 
-  public getProxies({ package: packageName, contract, address, kind }: ProxyInterface = {}): ProxyInterface[] {
+  public getProxies({ package: packageName, contractName, address, kind }: ProxyInterface = {}): ProxyInterface[] {
     if (isEmpty(this.data.proxies)) return [];
     const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) =>
       map(proxiesList, proxyInfo => ({
@@ -325,7 +324,7 @@ export default class NetworkFile {
       allProxies,
       proxy =>
         (!packageName || proxy.package === packageName) &&
-        (!contract || proxy.contract === contract) &&
+        (!contractName || proxy.contract === contractName) &&
         (!address || proxy.address === address) &&
         (!kind || proxy.kind === kind),
     );
@@ -458,7 +457,7 @@ export default class NetworkFile {
   }
 
   public updateProxy(
-    { package: proxyPackageName, contract: proxyContractName, address: proxyAddress }: ProxyInterface,
+    { package: proxyPackageName, contractName: proxyContractName, address: proxyAddress }: ProxyInterface,
     fn: (...args: any[]) => any,
   ): void {
     const fullname = toContractFullName(proxyPackageName, proxyContractName);

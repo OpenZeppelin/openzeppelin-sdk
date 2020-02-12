@@ -898,8 +898,8 @@ export default class NetworkController {
   // Proxy model
   private async upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
-      const name = { packageName: proxy.package, contractName: proxy.contract };
-      const contract = this.contractManager.getContractClass(proxy.package, proxy.contract);
+      const name = { packageName: proxy.package, contractName: proxy.contractName };
+      const contract = this.contractManager.getContractClass(proxy.package, proxy.contractName);
       await this.setSolidityLibs(contract);
       const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);
@@ -921,7 +921,7 @@ export default class NetworkController {
           __filename,
           '_upgradeProxy',
           `upgrade-proxy-${proxy.address}`,
-          `Contract ${proxy.contract} at ${proxy.address} is up to date.`,
+          `Contract ${proxy.contractName} at ${proxy.address} is up to date.`,
         );
         newImplementation = currentImplementation;
       }
@@ -932,7 +932,7 @@ export default class NetworkController {
         version: semanticVersionToString(projectVersion),
       }));
     } catch (error) {
-      error.message = `Proxy ${toContractFullName(proxy.package, proxy.contract)} at ${
+      error.message = `Proxy ${toContractFullName(proxy.package, proxy.contractName)} at ${
         proxy.address
       } failed to upgrade with error: ${error.message}`;
       throw error;
@@ -953,7 +953,7 @@ export default class NetworkController {
 
     const proxies = this.networkFile.getProxies({
       package: packageName || (contractName ? this.projectFile.name : undefined),
-      contract: contractName,
+      contractName,
       address: proxyAddress,
       kind: ProxyType.Upgradeable,
     });

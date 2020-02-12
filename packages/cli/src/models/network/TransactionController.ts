@@ -132,7 +132,7 @@ export default class TransactionController {
     methodArgs: string[],
   ): { contract: Contract; method: any } | never {
     if (!this.networkFile.hasProxies({ address })) throw Error(`Proxy at address ${address} not found.`);
-    const { package: packageName, contract: contractName } = this.networkFile.getProxy(address);
+    const { package: packageName, contractName } = this.networkFile.getProxy(address);
     const contractManager = new ContractManager(this.projectFile);
     const contract = contractManager.getContractClass(packageName, contractName).at(address);
     const method = getABIFunction(contract, methodName, methodArgs);
