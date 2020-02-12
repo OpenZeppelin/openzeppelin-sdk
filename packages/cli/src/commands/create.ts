@@ -70,7 +70,7 @@ export async function createAction(contractFullName: string, options: any): Prom
 
 async function action(contractFullName: string, options: any): Promise<void> {
   const { force, network, txParams, init: rawInitMethod } = options;
-  const { contract: contractName, package: packageName } = fromContractFullName(contractFullName);
+  const { contractName, package: packageName } = fromContractFullName(contractFullName);
 
   const additionalOpts = {
     askForMethodParams: rawInitMethod,

@@ -1,6 +1,6 @@
 {
   "manifestVersion": "2.2",
-  "contracts": {},
+  "contracts": [],
   "dependencies": {},
   "name": "transpiler-test",
   "version": "1.0.0",

@@ -3,12 +3,12 @@
   "manifestVersion": "2.2",
   "publish": true,
   "version": "1.1.0",
-  "contracts": {
-    "Impl": "ImplV1",
-    "WithFailingConstructor": "WithFailingConstructor",
-    "WithSelfDestruct": "WithSelfDestruct",
-    "WithParentWithSelfDestruct": "WithParentWithSelfDestruct",
-    "WithDelegateCall": "WithDelegateCall",
-    "WithParentWithDelegateCall": "WithParentWithDelegateCall"
-  }
+  "contracts": [
+    "ImplV1",
+    "WithFailingConstructor",
+    "WithSelfDestruct",
+    "WithParentWithSelfDestruct",
+    "WithDelegateCall",
+    "WithParentWithDelegateCall"
+  ]
 }

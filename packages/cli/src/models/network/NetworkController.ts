@@ -186,7 +186,7 @@ export default class NetworkController {
   ): [string, Contract][] {
     const newVersion = this.isNewVersionRequired();
 
-    contracts = contracts || Object.keys(this.projectFile.contracts);
+    contracts = contracts || this.projectFile.contracts;
     return contracts
       .map((contractName): [string, Contract] => [contractName, Contracts.getFromLocal(contractName)])
       .filter(

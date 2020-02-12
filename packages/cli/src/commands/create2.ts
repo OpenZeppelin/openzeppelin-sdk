@@ -47,7 +47,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
   if (!options.salt) throw new Error("option `--salt' is required");
 
   const { methodName, methodArgs } = parseMethodParams(options, 'initialize');
-  const { contract: contractName, package: packageName } = fromContractFullName(contractFullName);
+  const { contractName, package: packageName } = fromContractFullName(contractFullName);
   const opts = {
     ...options,
     methodName,

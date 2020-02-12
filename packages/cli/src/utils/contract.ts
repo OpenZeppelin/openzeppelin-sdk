@@ -8,14 +8,14 @@ export interface ParsedContractReference {
 
 export function parseContractReference(contractReference: string): ParsedContractReference {
   let proxyAddress;
-  let contractAlias;
+  let contractName;
   let packageName;
 
   if (contractReference && contractReference.startsWith('0x')) {
     proxyAddress = contractReference;
   } else if (contractReference) {
-    ({ contract: contractAlias, package: packageName } = fromContractFullName(contractReference));
+    ({ contractName, package: packageName } = fromContractFullName(contractReference));
   }
 
-  return { proxyAddress, contractName: contractAlias, packageName };
+  return { proxyAddress, contractName: contractName, packageName };
 }

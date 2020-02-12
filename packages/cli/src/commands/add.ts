@@ -44,7 +44,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
 
 async function runActionIfNeeded(contractFullName?: string, options?: any): Promise<void> {
   const { interactive } = options;
-  const { contract: contractName, package: packageName } = fromContractFullName(contractFullName);
+  const { contractName, package: packageName } = fromContractFullName(contractFullName);
   const projectFile = new ProjectFile();
   options = { ...options, skipTelemetry: true };
 

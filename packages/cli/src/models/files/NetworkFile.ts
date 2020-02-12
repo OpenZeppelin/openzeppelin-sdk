@@ -324,7 +324,7 @@ export default class NetworkFile {
       allProxies,
       proxy =>
         (!packageName || proxy.package === packageName) &&
-        (!contractName || proxy.contract === contractName) &&
+        (!contractName || proxy.contractName === contractName) &&
         (!address || proxy.address === address) &&
         (!kind || proxy.kind === kind),
     );

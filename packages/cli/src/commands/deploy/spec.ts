@@ -59,7 +59,7 @@ export const args: Arg[] = [
 
       const contractName = params.contract;
 
-      const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
+      const { package: packageName, contractName: contractAlias } = fromContractFullName(contractName);
       const contract = new ContractManager().getContractClass(packageName, contractAlias);
       const constructorInputs = getConstructorInputs(contract);
 

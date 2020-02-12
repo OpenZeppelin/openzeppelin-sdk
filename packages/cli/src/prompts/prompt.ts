@@ -202,11 +202,11 @@ function contractMethods(
   constant: Mutability = Mutability.NotConstant,
   projectFile: ProjectFile,
 ): any[] {
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const { contractName, package: packageName } = fromContractFullName(contractFullName);
   const contractManager = new ContractManager(projectFile);
 
   try {
-    const contract = contractManager.getContractClass(packageName, contractAlias);
+    const contract = contractManager.getContractClass(packageName, contractName);
     return contractMethodsFromAbi(contract, constant);
   } catch (e) {
     if (e instanceof ContractNotFound) {

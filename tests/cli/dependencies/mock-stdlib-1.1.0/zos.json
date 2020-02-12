@@ -2,7 +2,5 @@
   "name": "mock-stdlib",
   "manifestVersion": "2",
   "version": "1.1.0",
-  "contracts": {
-    "Greeter": "Greeter"
-  }
+  "contracts": ["Greeter"]
 }

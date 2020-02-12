@@ -1,8 +1,6 @@
 {
   "manifestVersion": "2.2",
-  "contracts": {
-    "TokenExchange": "TokenExchange"
-  },
+  "contracts": ["TokenExchange"],
   "name": "example-linking-contracts",
   "version": "1.0.0",
   "dependencies": {
