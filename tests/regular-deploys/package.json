@@ -1,0 +1,13 @@
+{
+  "name": "regular-deploys",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@openzeppelin/cli": "2.7.0",
+    "@openzeppelin/test-environment": "^0.1.2"
+  }
+}
