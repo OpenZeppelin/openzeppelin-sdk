@@ -58,7 +58,6 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
     "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.2",
-    "@openzeppelin/test-environment": "^0.1.0",
     "@openzeppelin/upgrades": "2.7.0",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
@@ -98,6 +97,7 @@
     "web3-utils": "1.2.2"
   },
   "devDependencies": {
+    "@openzeppelin/test-environment": "^0.1.2",
     "@types/chai-as-promised": "^7.1.2",
     "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",

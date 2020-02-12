@@ -1013,6 +1013,15 @@
     fs-extra "^8.1.0"
     try-require "^1.2.1"
 
+"@openzeppelin/contract-loader@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contract-loader/-/contract-loader-0.6.1.tgz#fa0fbddf78d1ec8e6c9bbe25d8e5d646274541f9"
+  integrity sha512-vYNapuK6THq5ueOReFkMfW4Ajk4gZ8jdf1AeoFUyD/U4gQyIedROU0/GB9J93mQ1hb8wVrxiWjGq6Ou3OVbjVg==
+  dependencies:
+    find-up "^4.1.0"
+    fs-extra "^8.1.0"
+    try-require "^1.2.1"
+
 "@openzeppelin/fuzzy-solidity-import-parser@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@openzeppelin/fuzzy-solidity-import-parser/-/fuzzy-solidity-import-parser-0.1.2.tgz#3b9f524d6028ca73df60474a313e0295e5610c51"
@@ -1041,6 +1050,23 @@
   integrity sha512-Ce79b4f+NUHYD2+vGnO8eXPHie3FDGRMWettIHfP/C/JMnfoSM8FJlqyGy3A0TMC0xDI2kbTQ/ofRotR/Un2yA==
   dependencies:
     "@openzeppelin/contract-loader" "^0.5.0"
+    "@truffle/contract" "^4.0.38"
+    ansi-colors "^4.1.1"
+    ethereumjs-wallet "^0.6.3"
+    find-up "^4.1.0"
+    ganache-core "^2.8.0"
+    lodash.merge "^4.6.2"
+    p-queue "^6.2.0"
+    semver "^6.3.0"
+    try-require "^1.2.1"
+    web3 "1.2.2"
+
+"@openzeppelin/test-environment@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/test-environment/-/test-environment-0.1.2.tgz#62fa8d1b00d45a8c7a0e7de20e230abef3fb1178"
+  integrity sha512-dgtpN6voS1UmTvV3qwymZDiVRhRDxI+Fl9UQciTFvvpgsSSPL4jVwaKoYSCO/IMcYynzQJvrQtw6LT5wI2Ayjg==
+  dependencies:
+    "@openzeppelin/contract-loader" "^0.6.1"
     "@truffle/contract" "^4.0.38"
     ansi-colors "^4.1.1"
     ethereumjs-wallet "^0.6.3"
@@ -7357,7 +7383,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-libdeps@file:./packages/cli/test/mocks/mock-stdlib-libdeps":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
@@ -7370,9 +7396,6 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
-  version "1.1.0"
-
-"mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
