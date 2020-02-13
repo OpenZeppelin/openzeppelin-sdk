@@ -123,13 +123,6 @@ jobs:
           workspace: examples/first-project
           run-yarn: true
 
-  integration-cli-regular-deploys:
-    <<: *defaults
-    steps:
-      - test:
-          workspace: tests/regular-deploys
-          run-yarn: true
-
   integration-cli-geth: &integration
     <<: *defaults
     docker:
@@ -156,6 +149,13 @@ jobs:
     steps:
       - test:
           workspace: tests/kits/test
+          run-yarn: true
+
+  integration-cli-regular-deploys:
+    <<: *integration
+    steps:
+      - test:
+          workspace: tests/regular-deploys
           run-yarn: true
 
 workflows:
