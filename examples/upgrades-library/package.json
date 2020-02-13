@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@openzeppelin/cli": "2.7.0",
-    "@openzeppelin/test-environment": "^0.1.1",
+    "@openzeppelin/test-environment": "^0.1.2",
     "chai": "^4.1.2",
     "mocha": "^6.2.2"
   }
