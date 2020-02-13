@@ -6,12 +6,9 @@ import add from '../../src/scripts/add';
 import push from '../../src/scripts/push';
 import sendTx from '../../src/scripts/send-tx';
 import createProxy from '../../src/scripts/create';
-import { Contracts } from '@openzeppelin/upgrades';
 import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import NetworkFile from '../../src/models/files/NetworkFile';
-
-const ImplV1 = Contracts.getFromLocal('ImplV1');
 
 describe('send-tx script', function() {
   const [account] = accounts;
@@ -25,11 +22,11 @@ describe('send-tx script', function() {
 
     this.networkFile = new NetworkFile(this.projectFile, network);
 
-    const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
-    await add({ contractsData, projectFile: this.projectFile });
+    const contracts = ['ImplV1'];
+    await add({ contracts, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
     await createProxy({
-      contractName: 'Impl',
+      contractName: 'ImplV1',
       network,
       txParams,
       networkFile: this.networkFile,
