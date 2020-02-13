@@ -181,3 +181,5 @@ workflows:
           requires: [test-lib, test-cli]
       - integration-cli-kits:
           requires: [test-lib, test-cli]
+      - integration-cli-regular-deploys:
+          requires: [test-lib, test-cli]
