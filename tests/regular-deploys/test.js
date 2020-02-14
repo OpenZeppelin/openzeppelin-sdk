@@ -10,18 +10,18 @@ const exec = promisify(proc.exec);
 
 async function main() {
   const net = await network();
-  await testAnswer(net, 'regular');
-  await testAnswer(net, 'upgradeable');
-  await testAnswer(net, 'minimal');
+  await testSimple(net, 'regular');
+  await testSimple(net, 'upgradeable');
+  await testSimple(net, 'minimal');
 
-  await testValue(net, 'regular', 'ValueWithConstructor');
-  await testValue(net, 'upgradeable', 'ValueWithInitializer');
+  await testArguments(net, 'regular', 'ValueWithConstructor');
+  await testArguments(net, 'upgradeable', 'ValueWithInitializer');
 
-  await assert.rejects(testValue(net, 'upgradeable', 'ValueWithConstructor'));
+  await assert.rejects(testArguments(net, 'upgradeable', 'ValueWithConstructor'));
 }
 
 // Tests a simple contract with no constructor or initializer.
-async function testAnswer(net, kind) {
+async function testSimple(net, kind) {
   const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" Answer`);
   const instance = deploy.stdout.trim();
   const call = await exec(`oz call -n "${net}" --to "${instance}" --method answer`)
@@ -29,7 +29,7 @@ async function testAnswer(net, kind) {
 }
 
 // Tests a contract with constructor/initializer arguments.
-async function testValue(net, kind, contract) {
+async function testArguments(net, kind, contract) {
   const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" "${contract}" 5 10`);
   const instance = deploy.stdout.trim();
   const call = await exec(`oz call -n "${net}" --to "${instance}" --method value`)
