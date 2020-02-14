@@ -91,6 +91,7 @@
     "mocha": "^6.2.2",
     "mock-dependency": "file:../../tests/mocks/mock-dependency",
     "mock-solc-0.6": "file:../../tests/mocks/mock-solc-0.6",
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "prettier": "^1.19.1",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.3.0",
