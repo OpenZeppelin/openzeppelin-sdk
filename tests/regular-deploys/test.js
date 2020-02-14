@@ -10,8 +10,13 @@ const exec = promisify(proc.exec);
 
 async function main() {
   const net = await network();
+  await deploy(net, 'regular');
+  await deploy(net, 'upgradeable');
+  await deploy(net, 'minimal');
+}
 
-  const deploy = await exec(`oz deploy -n "${net}" -k regular Demo`);
+async function deploy(net, kind) {
+  const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" Demo`);
   const instance = deploy.stdout.trim();
 
   const call = await exec(`oz call -n "${net}" --to "${instance}" --method answer`)
