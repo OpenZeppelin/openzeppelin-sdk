@@ -1,7 +1,7 @@
 {
   "manifestVersion": "2.2",
   "contracts": {
-    "Demo": "Demo"
+    "Answer": "Answer"
   },
   "dependencies": {},
   "name": "regular-deploys",

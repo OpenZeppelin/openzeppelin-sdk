@@ -10,15 +10,14 @@ const exec = promisify(proc.exec);
 
 async function main() {
   const net = await network();
-  await deploy(net, 'regular');
-  await deploy(net, 'upgradeable');
-  await deploy(net, 'minimal');
+  await testAnswer(net, 'regular');
+  await testAnswer(net, 'upgradeable');
+  await testAnswer(net, 'minimal');
 }
 
-async function deploy(net, kind) {
-  const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" Demo`);
+async function testAnswer(net, kind) {
+  const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" Answer`);
   const instance = deploy.stdout.trim();
-
   const call = await exec(`oz call -n "${net}" --to "${instance}" --method answer`)
   assert.strictEqual(call.stdout, '42\n');
 }
