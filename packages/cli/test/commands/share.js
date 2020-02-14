@@ -16,7 +16,6 @@ import * as push from '../../src/scripts/push';
 import * as remove from '../../src/scripts/remove';
 import * as session from '../../src/scripts/session';
 import * as update from '../../src/scripts/update';
-import * as verify from '../../src/scripts/verify';
 import * as setAdmin from '../../src/scripts/set-admin';
 import * as unpack from '../../src/scripts/unpack';
 import * as transfer from '../../src/scripts/transfer';
@@ -67,7 +66,6 @@ exports.stubCommands = function() {
     this.remove = sinon.stub(remove, 'default');
     this.session = sinon.stub(session, 'default');
     this.update = sinon.stub(update, 'default');
-    this.verify = sinon.stub(verify, 'default');
     this.setAdmin = sinon.stub(setAdmin, 'default');
     this.unpack = sinon.stub(unpack, 'default');
     this.transfer = sinon.stub(transfer, 'default');

@@ -1,5 +1,4 @@
-import isEmpty from 'lodash.isempty';
-import isString from 'lodash.isstring';
+import { isEmpty, isString } from 'lodash';
 import utils from 'web3-utils';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';

@@ -11,7 +11,8 @@
     "tests/cli/workdir",
     "tests/kits/test",
     "tests/kits/workdir",
-    "tests/mocks/*"
+    "tests/mocks/*",
+    "tests/regular-deploys"
   ],
   "nohoist": [
     "**/mock-stdlib"

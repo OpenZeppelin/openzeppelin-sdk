@@ -3,7 +3,7 @@ import { CompileParams } from '../scripts/interfaces';
 import { ProjectCompilerOptions } from '../models/compiler/ProjectCompilerOptions';
 import Telemetry from '../telemetry';
 import ProjectFile from '../models/files/ProjectFile';
-import isUndefined from 'lodash.isundefined';
+import { isUndefined } from 'lodash';
 import { promptIfNeeded } from '../prompts/prompt';
 import { TypechainQuestions, TypechainSettingsQuestions } from '../prompts/typechain';
 

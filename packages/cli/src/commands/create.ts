@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 import { Loggy } from '@openzeppelin/upgrades';
 
 import link from './link';
@@ -12,7 +12,7 @@ import { hasToMigrateProject } from '../prompts/migrations';
 import ConfigManager from '../models/config/ConfigManager';
 import { promptIfNeeded, networksList, contractsList, methodsList, InquirerQuestions } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
-import { ProxyType } from '../scripts/interfaces';
+import { ProxyType, CreateParams } from '../scripts/interfaces';
 import Telemetry from '../telemetry';
 
 interface PropsParams {
@@ -38,9 +38,9 @@ const register: (program: any) => any = program =>
     .withNetworkOptions()
     .withSkipCompileOption()
     .withNonInteractiveOption()
-    .action(commandActions);
+    .action(createAction);
 
-async function commandActions(contractFullName: string, options: any): Promise<void> {
+export async function createAction(contractFullName: string, options: any): Promise<void> {
   if (options.minimal) {
     Loggy.noSpin.warn(__filename, 'action', 'create-minimal-proxy', 'Minimal proxy support is still experimental.');
   }
@@ -84,7 +84,7 @@ async function action(contractFullName: string, options: any): Promise<void> {
     methodName,
     methodArgs,
     force,
-  });
+  } as CreateParams);
 
   if (options.minimal) args.kind = ProxyType.Minimal;
 

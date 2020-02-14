@@ -1,13 +1,5 @@
 import path from 'path';
-import max from 'lodash.max';
-import maxBy from 'lodash.maxby';
-import pick from 'lodash.pick';
-import pickBy from 'lodash.pickby';
-import omitBy from 'lodash.omitby';
-import isUndefined from 'lodash.isundefined';
-import groupBy from 'lodash.groupby';
-import sortBy from 'lodash.sortby';
-import uniqBy from 'lodash.uniqby';
+import { max, maxBy, pick, pickBy, omitBy, isUndefined, groupBy, sortBy, uniqBy } from 'lodash';
 import glob from 'glob';
 import { promisify } from 'util';
 import { readJsonSync, ensureDirSync, readJSON, writeJson, unlink } from 'fs-extra';

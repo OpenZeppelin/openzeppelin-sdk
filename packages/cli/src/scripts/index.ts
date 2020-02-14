@@ -14,7 +14,6 @@ import session from './session';
 import setAdmin from './set-admin';
 import unlink from './unlink';
 import update from './update';
-import verify from './verify';
 import transfer from './transfer';
 import balance from './balance';
 import accounts from './accounts';
@@ -36,7 +35,6 @@ export default {
   setAdmin,
   unlink,
   update,
-  verify,
   transfer,
   balance,
   accounts,

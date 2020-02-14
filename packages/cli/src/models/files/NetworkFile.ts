@@ -1,13 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import findIndex from 'lodash.findindex';
-import isEmpty from 'lodash.isempty';
-import isEqual from 'lodash.isequal';
-import difference from 'lodash.difference';
-import flatMap from 'lodash.flatmap';
-import map from 'lodash.map';
-import filter from 'lodash.filter';
-import find from 'lodash.find';
+import { findIndex, isEmpty, isEqual, difference, flatMap, map, filter, find } from 'lodash';
 
 import {
   Loggy,
@@ -52,6 +45,7 @@ export interface ProxyInterface {
   implementation?: string;
   admin?: string;
   kind?: ProxyType;
+  bytecodeHash?: string; // Only used for non-proxies from regulear deploys.
 }
 
 export interface DependencyInterface {

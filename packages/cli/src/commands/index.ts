@@ -14,7 +14,7 @@ import setAdmin from './set-admin';
 import status from './status';
 import unlink from './unlink';
 import update from './update';
-import verify from './verify';
+import * as verify from './verify';
 import unpack from './unpack';
 import transfer from './transfer';
 import balance from './balance';
@@ -22,6 +22,7 @@ import sendTx from './send-tx';
 import call from './call';
 import compile from './compile';
 import accounts from './accounts';
+import * as deploy from './deploy';
 
 export default {
   add,
@@ -48,4 +49,5 @@ export default {
   call,
   compile,
   accounts,
+  deploy,
 };

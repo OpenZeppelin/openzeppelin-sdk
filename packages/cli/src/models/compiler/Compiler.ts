@@ -6,8 +6,8 @@ import { ProjectCompilerOptions } from './ProjectCompilerOptions';
 import findUp from 'find-up';
 import ProjectFile from '../files/ProjectFile';
 import { promisify } from 'util';
+import { merge } from 'lodash';
 import { join } from 'path';
-import merge from 'lodash.merge';
 import typechain from './Typechain';
 
 const state = { alreadyCompiled: false };

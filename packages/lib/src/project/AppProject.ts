@@ -1,6 +1,4 @@
-import concat from 'lodash.concat';
-import map from 'lodash.map';
-import isEmpty from 'lodash.isempty';
+import { concat, map, isEmpty } from 'lodash';
 
 import App from '../application/App';
 import Package from '../application/Package';
@@ -122,7 +120,7 @@ class BaseAppProject extends BasePackageProject {
     );
 
     await Promise.all(
-      concat(
+      concat<Promise<void | boolean>>(
         map(proxyAdminProject.implementations, (contractInfo, contractAlias) =>
           appProject.registerImplementation(contractAlias, contractInfo),
         ),
@@ -148,7 +146,7 @@ class BaseAppProject extends BasePackageProject {
     );
 
     await Promise.all(
-      concat(
+      concat<Promise<void | boolean>>(
         map(simpleProject.implementations, (contractInfo, contractAlias) =>
           appProject.registerImplementation(contractAlias, contractInfo),
         ),

@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import pick from 'lodash.pick';
-import omit from 'lodash.omit';
-import isUndefined from 'lodash.isundefined';
+import { pick, omitBy, isUndefined } from 'lodash';
 
 interface NetworkConfigInterface extends ConfigInterface {
   artifactDefaults: ArtifactDefaults;
@@ -125,8 +123,8 @@ const NetworkConfig = {
 
   getArtifactDefaults(zosConfigFile: ConfigInterface, network: Network): ArtifactDefaults {
     const defaults = ['gas', 'gasPrice', 'from'];
-    const configDefaults = omit(pick(zosConfigFile, defaults), isUndefined);
-    const networkDefaults = omit(pick(network, defaults), isUndefined);
+    const configDefaults = omitBy(pick(zosConfigFile, defaults), isUndefined);
+    const networkDefaults = omitBy(pick(network, defaults), isUndefined);
 
     return { ...configDefaults, ...networkDefaults };
   },

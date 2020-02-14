@@ -1,9 +1,4 @@
-import some from 'lodash.some';
-import reverse from 'lodash.reverse';
-import includes from 'lodash.includes';
-import isEqual from 'lodash.isequal';
-import pick from 'lodash.pick';
-import flatten from 'lodash.flatten';
+import { some, reverse, includes, isEqual, pick, flatten } from 'lodash';
 
 import { getBuildArtifacts, BuildArtifacts } from '../artifacts/BuildArtifacts';
 import Contract from '../artifacts/Contract';

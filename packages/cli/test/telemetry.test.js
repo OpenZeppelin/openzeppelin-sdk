@@ -127,16 +127,17 @@ describe('telemetry', function() {
                 stringField: 'foo',
                 numberField: 3,
                 objectField: { stringField: 'foo', arrayField: [1, 2, 3] },
+                network: 'development',
               };
             });
 
             context('when a non-development network is specified', function() {
-              it('conceals all options recursively except for the network name', async function() {
-                await Telemetry.report('create', { network: 'ropsten', ...this.commandData }, true);
+              it('conceals all options recursively except for the command and network name', async function() {
+                await Telemetry.report('create', this.commandData, true);
                 const [, commandData] = this.sendToFirebase.getCall(0).args;
 
                 commandData.name.should.eq('create');
-                commandData.network.should.eq('ropsten');
+                commandData.network.should.eq('development');
                 shouldConcealOptions(commandData);
               });
             });

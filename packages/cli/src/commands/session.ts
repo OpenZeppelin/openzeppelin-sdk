@@ -3,7 +3,7 @@ import session from '../scripts/session';
 import { promptIfNeeded, networksList, InquirerQuestions } from '../prompts/prompt';
 import ConfigManager from '../models/config/ConfigManager';
 import Telemetry from '../telemetry';
-import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../models/network/Session';
+import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../models/network/defaults';
 
 const name = 'session';
 const signature: string = name;

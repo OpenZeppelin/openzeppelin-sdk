@@ -1,10 +1,8 @@
-import uniqBy from 'lodash.uniqby';
-import flatten from 'lodash.flatten';
-import isEmpty from 'lodash.isempty';
-import groupBy from 'lodash.groupby';
-import difference from 'lodash.difference';
+import { uniqBy, flatten, isEmpty, groupBy } from 'lodash';
 import inquirer from 'inquirer';
 import { contractMethodsFromAbi, ContractMethodMutability as Mutability, ABI } from '@openzeppelin/upgrades';
+
+import { ContractNotFound } from '@openzeppelin/upgrades/lib/errors';
 
 import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
@@ -12,8 +10,9 @@ import ProjectFile from '../models/files/ProjectFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
-import { ProxyType } from '../scripts/interfaces';
 import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
+
+import * as choices from './choices';
 
 type ChoicesT = string[] | { [key: string]: any };
 
@@ -85,9 +84,7 @@ export async function promptIfNeeded(
   if (DISABLE_INTERACTIVITY) interactive = false;
 
   const argsAndOptsQuestions = Object.keys(argsAndOpts)
-    .filter(
-      name => argsAndOpts[name] === undefined || (typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name])),
-    )
+    .filter(name => typeof argsAndOpts[name] !== 'boolean' && isEmpty(argsAndOpts[name]))
     .filter(name => props[name] && !hasEmptyChoices(props[name]))
     .map(name => promptFor(name, defaults, props));
 
@@ -138,45 +135,13 @@ export function proxiesList(
 }
 
 // Generate a list of contracts names
-export function contractsList(name: string, message: string, type: string, source?: string): { [key: string]: any } {
-  const localProjectFile = new ProjectFile();
-  const contractManager = new ContractManager(localProjectFile);
-  const contractsFromBuild = contractManager.getContractNames();
-  const contractsFromLocal = Object.keys(localProjectFile.contracts)
-    .map(alias => ({ name: localProjectFile.contracts[alias], alias }))
-    .map(({ name: contractName, alias }) => {
-      const label = contractName === alias ? alias : `${alias}[${contractName}]`;
-      return { name: label, value: alias };
-    });
-
-  // get contracts from `build/contracts`
-  if (!source || source === 'built') {
-    return inquirerQuestion(name, message, type, contractsFromBuild);
-    // get contracts from project.json file
-  } else if (source === 'notAdded') {
-    const contracts = difference(
-      contractsFromBuild,
-      contractsFromLocal.map(({ value }) => value),
-    );
-    return inquirerQuestion(name, message, type, contracts);
-  } else if (source === 'added') {
-    return inquirerQuestion(name, message, type, contractsFromLocal);
-    // generate a list of built contracts and package contracts
-  } else if (source === 'all') {
-    const packageContracts = Object.keys(localProjectFile.dependencies).map(dependencyName => {
-      const contractNames = new Dependency(dependencyName).projectFile.contractAliases.map(
-        contractName => `${dependencyName}/${contractName}`,
-      );
-
-      if (contractNames.length > 0) {
-        contractNames.unshift(new inquirer.Separator(` = ${dependencyName} =`));
-      }
-      return contractNames;
-    });
-    if (contractsFromBuild.length > 0) contractsFromBuild.unshift(new inquirer.Separator(` = Your contracts =`));
-
-    return inquirerQuestion(name, message, type, [...contractsFromBuild, ...flatten(packageContracts)]);
-  } else return [];
+export function contractsList(
+  name: string,
+  message: string,
+  type: string,
+  source?: choices.ContractsSource,
+): { [key: string]: any } {
+  return inquirerQuestion(name, message, type, choices.contracts(source));
 }
 
 // Generate a list of methods names for a particular contract
@@ -202,6 +167,11 @@ export function methodsList(
         return 0;
       else if (!a.name.startsWith('*') && b.name.startsWith('*')) return 1;
     });
+}
+
+export function argLabelWithIndex(arg: MethodArg, index: number): string {
+  const prefix = arg.name || `#${index}`;
+  return `${prefix}: ${ABI.getArgTypeLabel(arg)}`;
 }
 
 export function argLabel(arg: MethodArg): string {
@@ -234,10 +204,17 @@ function contractMethods(
 ): any[] {
   const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
   const contractManager = new ContractManager(projectFile);
-  if (!contractManager.hasContract(packageName, contractAlias)) return [];
-  const contract = contractManager.getContractClass(packageName, contractAlias);
 
-  return contractMethodsFromAbi(contract, constant);
+  try {
+    const contract = contractManager.getContractClass(packageName, contractAlias);
+    return contractMethodsFromAbi(contract, constant);
+  } catch (e) {
+    if (e instanceof ContractNotFound) {
+      return [];
+    } else {
+      throw e;
+    }
+  }
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {

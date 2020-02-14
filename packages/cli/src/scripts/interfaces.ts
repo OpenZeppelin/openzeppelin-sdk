@@ -37,6 +37,7 @@ interface Proxy extends Network, MethodParams, PackageArgs {
 export enum ProxyType {
   Upgradeable = 'Upgradeable',
   Minimal = 'Minimal',
+  NonProxy = 'NonProxy',
 }
 
 export type Params =
@@ -51,7 +52,6 @@ export type Params =
   | InitParams
   | UnpackParams
   | PushParams
-  | VerifyParams
   | SetAdminParams
   | AddParams
   | SessionParams
@@ -67,10 +67,10 @@ export type Params =
   | CompileParams;
 
 export interface CreateParams extends Proxy {
-  salt?: string;
-  signature?: string;
-  admin?: string;
-  kind?: ProxyType;
+  salt: string;
+  signature: string;
+  admin: string;
+  kind: ProxyType;
 }
 
 export interface CompareParams extends Network {}
@@ -84,7 +84,7 @@ export interface FreezeParams extends Network {}
 export interface PublishParams extends Network {}
 
 export interface UpdateParams extends Proxy {
-  all?: boolean;
+  all: boolean;
 }
 
 export interface LinkParams extends Dependencies {
@@ -107,18 +107,12 @@ export interface UnpackParams {
 }
 
 export interface PushParams extends Network {
+  contractAliases?: string[];
   force?: boolean;
   reupload?: boolean;
   deployDependencies?: boolean;
   deployProxyAdmin?: boolean;
   deployProxyFactory?: boolean;
-}
-
-export interface VerifyParams extends Network {
-  apiKey: string;
-  remote: string;
-  optimizer?: boolean;
-  optimizerRuns?: string | number;
 }
 
 export interface SetAdminParams extends Network, PackageArgs {

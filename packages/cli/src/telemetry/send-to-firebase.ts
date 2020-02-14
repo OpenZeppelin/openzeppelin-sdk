@@ -3,7 +3,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import { CommandData, UserEnvironment } from '.';
+import { StringObject, UserEnvironment } from '.';
 
 const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAZoGB2p26UejODezZPmczgwehI6xlSKPs',
@@ -17,7 +17,7 @@ const FIREBASE_CONFIG = {
 
 interface Arguments {
   uuid: string;
-  commandData: CommandData;
+  commandData: StringObject;
   userEnvironment: UserEnvironment;
 }
 

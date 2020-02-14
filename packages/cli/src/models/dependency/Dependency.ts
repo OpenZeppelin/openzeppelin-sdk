@@ -1,8 +1,5 @@
 import fs from 'fs';
-import map from 'lodash.map';
-import uniq from 'lodash.uniq';
-import flatten from 'lodash.flatten';
-import fromPairs from 'lodash.frompairs';
+import { map, uniq, flatten, fromPairs, toPairs } from 'lodash';
 import semver from 'semver';
 import npm from 'npm-programmatic';
 import { exec } from 'child_process';
@@ -92,18 +89,12 @@ export default class Dependency {
     // this should all be handled at the Project level. Consider adding a setImplementations (plural) method
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
-    const contracts = map(this.projectFile.contracts, (contractName, contractAlias) => [
+    const contracts = toPairs(this.projectFile.contracts).map(([contractAlias, contractName]): [Contract, string] => [
       Contracts.getFromNodeModules(this.name, contractName),
       contractAlias,
-    ]) as [Contract, string][];
+    ]);
 
-    const pipeline = [
-      someContracts => map(someContracts, ([contract]) => getSolidityLibNames(contract.schema.bytecode)),
-      someContracts => flatten(someContracts),
-      someContracts => uniq(someContracts),
-    ];
-
-    const libraryNames = pipeline.reduce((xs, f) => f(xs), contracts);
+    const libraryNames = uniq(flatten(contracts.map(([contract]) => getSolidityLibNames(contract.schema.bytecode))));
 
     const libraries = fromPairs(
       await Promise.all(

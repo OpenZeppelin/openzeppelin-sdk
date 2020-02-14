@@ -1,5 +1,5 @@
 import program, { Command } from 'commander';
-import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../models/network/Session';
+import { DEFAULT_TX_TIMEOUT, DEFAULT_TX_BLOCK_TIMEOUT } from '../models/network/defaults';
 
 program.Command.prototype.withNetworkTimeoutOption = function(): Command {
   return this.option(

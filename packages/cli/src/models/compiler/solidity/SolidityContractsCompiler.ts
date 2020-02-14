@@ -1,5 +1,5 @@
 import path from 'path';
-import flatMap from 'lodash.flatmap';
+import { flatMap } from 'lodash';
 import semver from 'semver';
 import { Loggy } from '@openzeppelin/upgrades';
 import solc, {

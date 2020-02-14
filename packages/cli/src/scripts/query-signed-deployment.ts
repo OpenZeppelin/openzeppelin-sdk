@@ -15,7 +15,7 @@ export default async function querySignedDeployment({
   signature = null,
   admin = null,
   networkFile,
-}: CreateParams): Promise<string | never> {
+}: Partial<CreateParams>): Promise<string | never> {
   validateSalt(salt, true);
   const controller = new NetworkController(network, txParams, networkFile);
 

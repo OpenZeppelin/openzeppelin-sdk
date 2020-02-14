@@ -1,4 +1,4 @@
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 
 import push from './push';
 import update from '../scripts/update';
@@ -16,7 +16,7 @@ import {
 } from '../prompts/prompt';
 import promptForMethodParams from '../prompts/method-params';
 import Telemetry from '../telemetry';
-import { ProxyType } from '../scripts/interfaces';
+import { ProxyType, UpdateParams } from '../scripts/interfaces';
 
 const name = 'upgrade';
 const signature = `${name} [alias-or-address]`;
@@ -79,7 +79,7 @@ async function action(proxyReference: string, options: any): Promise<void> {
     force,
     ...parsedContractReference,
     ...initMethodParams,
-  });
+  } as UpdateParams);
   await Telemetry.report('update', { ...args, network, txParams }, interactive);
   await update({ ...args, network, txParams });
 }

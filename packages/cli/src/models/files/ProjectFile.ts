@@ -1,8 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import pickBy from 'lodash.pickby';
-import isEqual from 'lodash.isequal';
-import isEmpty from 'lodash.isempty';
+import { pickBy, isEqual, isEmpty } from 'lodash';
 
 import { Loggy } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
@@ -37,7 +35,7 @@ interface ProjectFileData {
   dependencies: { [name: string]: string };
   contracts: { [alias: string]: string };
   publish: boolean;
-  compiler: ConfigFileCompilerOptions;
+  compiler: Partial<ConfigFileCompilerOptions>;
   telemetryOptIn?: boolean;
 }
 
@@ -186,7 +184,7 @@ export default class ProjectFile {
 
   public get compilerOptions(): ProjectCompilerOptions {
     // Awkward destructuring is due to https://github.com/microsoft/TypeScript/issues/26235
-    const config: ConfigFileCompilerOptions = this.data.compiler;
+    const config: Partial<ConfigFileCompilerOptions> = this.data.compiler;
     const manager = config && config.manager;
     const version = config && config.solcVersion;
     const inputDir = config && config.contractsDir;
@@ -234,7 +232,15 @@ export default class ProjectFile {
     };
 
     this.data.compiler =
-      manager === 'trufle' ? { manager: 'truffle' } : pickBy({ ...this.data.compiler, ...configOptions });
+      manager === 'trufle'
+        ? { manager: 'truffle' }
+        : pickBy({ ...this.data.compiler, ...configOptions } as ConfigFileCompilerOptions);
+  }
+
+  // If the argument is an existing contract alias, return its corresponding
+  // contract name. Otherwise, assume it's a contract name and return it as is.
+  public normalizeContractAlias(nameOrAlias: string): string {
+    return this.contracts[nameOrAlias] ?? nameOrAlias;
   }
 
   public contract(alias: string): string {

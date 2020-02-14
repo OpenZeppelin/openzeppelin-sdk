@@ -3,13 +3,12 @@ import uuid from 'uuid/v4';
 import path from 'path';
 import crypto from 'crypto';
 import envPaths from 'env-paths';
-import mapValues from 'lodash.mapvalues';
+import { mapValues } from 'lodash';
 import inquirer from 'inquirer';
 import proc from 'child_process';
 import process from 'process';
 
 import { DISABLE_INTERACTIVITY } from '../prompts/prompt';
-import { Params } from '../scripts/interfaces';
 import ProjectFile from '../models/files/ProjectFile';
 
 type Field = string | number | boolean;
@@ -19,11 +18,6 @@ interface GlobalTelemetryOptions {
   uuid: string;
   salt: string;
 }
-
-export type CommandData = Params & {
-  name: string;
-  network?: string;
-};
 
 export interface UserEnvironment {
   platform: string;
@@ -39,27 +33,27 @@ export interface UserEnvironment {
 export default {
   DISABLE_TELEMETRY: !!process.env.OPENZEPPELIN_DISABLE_TELEMETRY,
 
-  async report(commandName: string, options: Params, interactive: boolean): Promise<void> {
+  async report(commandName: string, params: Record<string, unknown>, interactive: boolean): Promise<void> {
     const telemetryOptions = await checkOptIn(interactive);
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
-    // extract network name if present
-    let network;
-    if ('network' in options) {
-      network = options.network;
-      if (network.match(/dev-/)) network = 'development';
+    // normalize network name
+    const { ZWeb3 } = await import('@openzeppelin/upgrades');
+    let network = await ZWeb3.getNetworkName();
+    if (network.match(/dev-/)) {
+      network = 'development';
     }
 
     // Conceal data before sending it
-    const concealedData = concealData(options, telemetryOptions.salt);
-    const commandData: Concealed<CommandData> = { ...concealedData, name: commandName };
+    const concealedData = concealData(params, telemetryOptions.salt);
+    const commandData: StringObject = { ...concealedData, name: commandName };
     if (network !== undefined) commandData.network = network;
 
-    const userEnvironment = getUserEnvironment();
+    const userEnvironment = await getUserEnvironment();
     this.sendToFirebase(telemetryOptions.uuid, commandData, userEnvironment);
   },
 
-  sendToFirebase(uuid: string, commandData: Concealed<CommandData>, userEnvironment: UserEnvironment): void {
+  sendToFirebase(uuid: string, commandData: StringObject, userEnvironment: UserEnvironment): void {
     // We send to Firebase in a child process so that the CLI is not blocked from exiting.
     const child = proc.fork(path.join(__dirname, './send-to-firebase'), [], {
       stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
@@ -112,16 +106,20 @@ async function checkOptIn(interactive: boolean): Promise<GlobalTelemetryOptions 
   return globalOptions;
 }
 
-function getUserEnvironment(): UserEnvironment {
+async function getUserEnvironment(): Promise<UserEnvironment> {
   return {
     platform: process.platform,
     arch: process.arch,
     nodeVersion: process.version,
-    cliVersion: require('../../package.json').version,
+    cliVersion: await getCLIVersion(),
     upgradesVersion: getDependencyVersion('@openzeppelin/upgrades'),
     truffleVersion: getDependencyVersion('truffle'),
     web3Version: getDependencyVersion('web3'),
   };
+}
+
+async function getCLIVersion(): Promise<string> {
+  return JSON.parse(await fs.readFile(__dirname + '/../../package.json', 'utf8')).version;
 }
 
 function getDependencyVersion(dep: string): string | undefined {
@@ -140,25 +138,16 @@ function hashField(field: Field, salt: string): string {
   return hash.digest('hex');
 }
 
-function concealData<T>(obj: T, salt: string): Concealed<T> {
+function concealData(obj: { [key: string]: unknown }, salt: string): StringObject {
   return mapValues(obj, function recur(val) {
     if (Array.isArray(val)) {
       return val.map(recur);
     } else if (typeof val === 'object') {
       return mapValues(val, recur);
     } else {
-      return hashField(val, salt);
+      return hashField(val as Field, salt);
     }
   });
 }
 
-// This type essentially recursively converts everything into a string.
-type Concealed<T> = T extends (infer U)[]
-  ? ConcealedArray<U>
-  : T extends object
-  ? { [P in keyof T]: Concealed<T[P]> }
-  : string;
-
-// Necessary to avoid error on the recursive type alias.
-// https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
-interface ConcealedArray<T> extends Array<Concealed<T>> {}
+export type StringObject = { [key in string]?: string | StringObject };

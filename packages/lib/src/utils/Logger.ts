@@ -1,5 +1,5 @@
 import path from 'path';
-import pickBy from 'lodash.pickby';
+import { pickBy } from 'lodash';
 import chalk from 'chalk';
 import Spinnies from 'spinnies';
 

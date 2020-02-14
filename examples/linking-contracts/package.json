@@ -1,6 +1,6 @@
 {
   "name": "example-linking-contracts",
-  "version": "2.7.1",
+  "version": "2.8.0-rc.0",
   "private": true,
   "description": "",
   "main": "index.js",
@@ -8,11 +8,11 @@
   "author": "Santiago Palladino <santiago@openzeppelin.com>",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.7.1",
+    "@openzeppelin/upgrades": "2.8.0-rc.0",
     "openzeppelin-eth": "^2.2.0"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "2.7.1",
+    "@openzeppelin/cli": "2.8.0-rc.0",
     "ganache-cli": "^6.4.3"
   }
 }
