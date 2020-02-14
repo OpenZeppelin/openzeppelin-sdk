@@ -13,13 +13,27 @@ async function main() {
   await testAnswer(net, 'regular');
   await testAnswer(net, 'upgradeable');
   await testAnswer(net, 'minimal');
+
+  await testValue(net, 'regular', 'ValueWithConstructor');
+  await testValue(net, 'upgradeable', 'ValueWithInitializer');
+
+  await assert.rejects(testValue(net, 'upgradeable', 'ValueWithConstructor'));
 }
 
+// Tests a simple contract with no constructor or initializer.
 async function testAnswer(net, kind) {
   const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" Answer`);
   const instance = deploy.stdout.trim();
   const call = await exec(`oz call -n "${net}" --to "${instance}" --method answer`)
   assert.strictEqual(call.stdout, '42\n');
+}
+
+// Tests a contract with constructor/initializer arguments.
+async function testValue(net, kind, contract) {
+  const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" "${contract}" 5 10`);
+  const instance = deploy.stdout.trim();
+  const call = await exec(`oz call -n "${net}" --to "${instance}" --method value`)
+  assert.strictEqual(call.stdout, '50\n');
 }
 
 async function network() {
