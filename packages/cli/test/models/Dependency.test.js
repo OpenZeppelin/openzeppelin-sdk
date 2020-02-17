@@ -161,7 +161,7 @@ describe('Dependency', function() {
         it('deploys a dependency', async function() {
           const project = await this.dependency.deploy({ from });
           const address = await project.getImplementation({
-            contractName: 'Greeter',
+            contractName: 'GreeterImpl',
           });
           address.should.be.nonzeroAddress;
         });
@@ -173,7 +173,7 @@ describe('Dependency', function() {
           projectFile.should.not.be.null;
           projectFile.filePath.should.match(new RegExp(`/${libname}/zos\\.json$`));
           projectFile.version.should.eq('1.1.0');
-          projectFile.contracts.should.include({ Greeter: 'GreeterImpl' });
+          projectFile.contracts.should.include('GreeterImpl');
         });
       });
 
