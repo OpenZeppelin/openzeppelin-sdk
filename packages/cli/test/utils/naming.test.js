@@ -7,10 +7,10 @@ describe('naming', function() {
   describe('fromContractFullName', function() {
     const testFn = (input, expected) => () => fromContractFullName(input).should.deep.eq(expected);
 
-    it('parses contract name', testFn('foo', { contract: 'foo' }));
+    it('parses contract name', testFn('foo', { contractName: 'foo' }));
     it('parses package name', testFn('pkg/', { package: 'pkg' }));
-    it('parses contract and package name', testFn('pkg/foo', { contract: 'foo', package: 'pkg' }));
-    it('parses package name with slashes', testFn('org/pkg/foo', { contract: 'foo', package: 'org/pkg' }));
+    it('parses contract name and package name', testFn('pkg/foo', { contractName: 'foo', package: 'pkg' }));
+    it('parses package name with slashes', testFn('org/pkg/foo', { contractName: 'foo', package: 'org/pkg' }));
   });
 
   describe('toContractFullName', function() {
