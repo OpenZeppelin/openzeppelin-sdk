@@ -207,7 +207,7 @@ describe.only('update script', function() {
         });
       });
 
-      it('should upgrade the version of all proxies given the contract alias', async function() {
+      it('should upgrade the version of all proxies given the contract name', async function() {
         // Upgrade all 'ImplV1' proxies
 
         await update({
