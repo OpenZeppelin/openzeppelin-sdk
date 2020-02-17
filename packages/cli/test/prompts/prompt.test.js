@@ -14,7 +14,7 @@ import ConfigManager from '../../src/models/config/ConfigManager';
 import ProjectFile from '../../src/models/files/ProjectFile';
 import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../src/prompts/prompt';
 
-describe.only('prompt', function() {
+describe('prompt', function() {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
