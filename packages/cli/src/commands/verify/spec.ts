@@ -23,6 +23,8 @@ interface OtherOptions {
   // The following are not available as CLI flags, and they are only used in tests.
   networkFile?: NetworkFile;
   txParams?: TxParams;
+  // This is not a CLI flag. It is set right after the network option is obtained.
+  userNetworkName?: string;
 }
 
 export type Options = OptimizerOptions & RemoteOptions & OtherOptions;
@@ -60,6 +62,14 @@ export const options: Option[] = [
           choices: networks,
           preselect: lastNetwork,
         };
+      }
+    },
+    async after(params: Options) {
+      if (process.env.NODE_ENV !== 'test') {
+        const { default: ConfigManager } = await import('../../models/config/ConfigManager');
+        const { network } = await ConfigManager.initNetworkConfiguration(params);
+        const userNetworkName = params.network;
+        Object.assign(params, { network, userNetworkName });
       }
     },
   },
