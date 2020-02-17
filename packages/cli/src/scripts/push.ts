@@ -19,7 +19,6 @@ export default async function push({
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
     await controller.push(contracts, { reupload, force });
-    const { appAddress } = controller;
   } finally {
     controller.writeNetworkPackageIfNeeded();
   }

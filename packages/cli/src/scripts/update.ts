@@ -3,7 +3,7 @@ import { UpdateParams } from './interfaces';
 
 export default async function update({
   packageName,
-  contractName: contractAlias,
+  contractName,
   proxyAddress,
   methodName,
   methodArgs,
@@ -13,7 +13,7 @@ export default async function update({
   txParams = {},
   networkFile,
 }: Partial<UpdateParams>) {
-  if (!packageName && !contractAlias && !proxyAddress && !all) {
+  if (!packageName && !contractName && !proxyAddress && !all) {
     throw Error(
       'The package name, contract name, or address to upgrade must be provided, or set the `all` flag to upgrade all contracts in the application.',
     );
@@ -23,7 +23,7 @@ export default async function update({
 
   try {
     await controller.throwOrLogErrorForProjectContracts(!force);
-    const proxies = await controller.upgradeProxies(packageName, contractAlias, proxyAddress, methodName, methodArgs);
+    const proxies = await controller.upgradeProxies(packageName, contractName, proxyAddress, methodName, methodArgs);
   } finally {
     controller.writeNetworkPackageIfNeeded();
   }

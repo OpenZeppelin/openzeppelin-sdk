@@ -260,7 +260,7 @@ export default class ProjectFile {
   }
 
   public addContract(contract: string): void {
-    this.data.contracts.push(contract);
+    if (!this.data.contracts.includes(contract)) this.data.contracts.push(contract);
   }
 
   public removeContract(contract: string): void {
