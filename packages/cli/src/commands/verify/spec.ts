@@ -71,7 +71,7 @@ export const options: Option[] = [
         const userNetworkName = params.network;
         Object.assign(params, { network, userNetworkName });
       }
-    }
+    },
   },
   {
     format: '-o, --optimizer <enabled>',
