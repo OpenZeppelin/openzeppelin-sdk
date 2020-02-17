@@ -60,6 +60,9 @@ export async function action(params: Options & Args): Promise<void> {
 }
 
 async function runCreate(params: Options & Args): Promise<void> {
+  // The syntax params['key'] is used to circumvent the type checker.
+  // This hack is temporary and should be removed once we remove the create command.
+
   if (params.arguments.length > 0) {
     // Translate arguments to syntax expected by create.
     params['args'] = params.arguments.join(',');
@@ -70,6 +73,7 @@ async function runCreate(params: Options & Args): Promise<void> {
   }
 
   params.skipCompile = true;
+  params['noDeprecationWarning'] = true;
 
   await createAction(params.contract, params);
 }

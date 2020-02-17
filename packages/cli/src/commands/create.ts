@@ -45,6 +45,15 @@ export async function createAction(contractFullName: string, options: any): Prom
     Loggy.noSpin.warn(__filename, 'action', 'create-minimal-proxy', 'Minimal proxy support is still experimental.');
   }
 
+  if (!options.noDeprecationWarning) {
+    Loggy.noSpin.warn(
+      __filename,
+      'action',
+      'create-deprecation',
+      'The create command is deprecated. Use deploy instead.',
+    );
+  }
+
   const { skipCompile } = options;
   if (!skipCompile) await compile();
 
