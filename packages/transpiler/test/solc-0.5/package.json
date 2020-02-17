@@ -1,0 +1,23 @@
+{
+  "name": "transpiler-test",
+  "version": "0.0.1",
+  "description": "",
+  "main": ".src/index.ts",
+  "scripts": {
+    "clean": "rm -rf build/contracts && rm -rf contracts/__upgradable__",
+    "compile:contracts": "../../../../bootstrap/node_modules/.bin/oz compile",
+    "test": "npm run clean && npm run compile:contracts && jest --verbose"
+  },
+  "author": "Igor Yalovoy <igor@openzeppelin.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "fs-extra": "^8.1.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.3.0",
+    "ts-node": "^8.5.4"
+  }
+}

@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Diamond contract is converted to a valid DCUpgradable contract 1`] = `
+"pragma solidity ^0.5.0;
+import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
+
+contract DAUpgradable is Initializable {
+    function initialize() external initializer {
+        __init(true);
+    }
+
+    function __init(bool callChain) internal {
+        
+        
+        foo = 42;
+        
+        emit Log(\\"DA\\");
+    
+    }
+
+    event Log(string);
+    uint256 public foo ;
+    
+}
+
+contract DB1Upgradable is Initializable, DAUpgradable {
+    function initialize() external initializer {
+        __init(true);
+    }
+
+    function __init(bool callChain) internal {
+        if(callChain) {
+            DAUpgradable.__init(false);
+        }
+        
+        hello = \\"hello\\";
+        
+        emit Log(\\"DB1\\");
+    
+    }
+
+    string public hello ;
+    
+}
+
+contract DB2Upgradable is Initializable, DAUpgradable {
+    function initialize() external initializer {
+        __init(true);
+    }
+
+    function __init(bool callChain) internal {
+        if(callChain) {
+            DAUpgradable.__init(false);
+        }
+        
+        bar = true;
+        
+        emit Log(\\"DB2\\");
+    
+    }
+
+    bool public bar ;
+    
+}
+
+contract DCUpgradable is Initializable, DB2Upgradable, DB1Upgradable {
+    function initialize() external initializer {
+        __init(true);
+    }
+
+    function __init(bool callChain) internal {
+        if(callChain) {
+            DAUpgradable.__init(false);
+            DB2Upgradable.__init(false);
+            DB1Upgradable.__init(false);
+        }
+        
+        owner = address(0x123);
+        
+        emit Log(\\"DC\\");
+    
+    }
+
+    address public owner ;
+    
+}"
+`;

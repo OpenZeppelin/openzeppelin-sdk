@@ -1,0 +1,51 @@
+{
+  "name": "@openzeppelin/upgradeability-transpiler",
+  "version": "0.1.0",
+  "description": "Transpiles Solidity contracts to updgradable versions compatible with OpenZeppelin SDK.",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "npm run test --prefix ./test/solc-0.5",
+    "compile:ts": "rm -rf lib && tsc",
+    "prepare": "npm run compile:ts",
+    "watch": "tsc -w",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix",
+    "lint:check": "eslint '*/**/*.{js,ts}' --quiet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenZeppelin/openzeppelin-sdk.git"
+  },
+  "keywords": [
+    "solidity",
+    "openzeppelin",
+    "smart-contarcts",
+    "ethereum",
+    "upgradeability",
+    "openzeppelin-sdk"
+  ],
+  "author": "Igor Yalovoy <igor@openzeppelin.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OpenZeppelin/openzeppelin-sdk/issues"
+  },
+  "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk#readme",
+  "dependencies": {
+    "ajv": "^6.10.2",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.1.4",
+    "@typescript-eslint/eslint-plugin": "^2.15.0",
+    "@typescript-eslint/parser": "^2.15.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.4"
+  }
+}
