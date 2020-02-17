@@ -56,7 +56,7 @@ describe('init script', function() {
 
     it('should have an empty contracts object', async function() {
       await init({ publish, name, version, projectFile: this.projectFile });
-      this.projectFile.contracts.should.be.eql({});
+      this.projectFile.contracts.should.be.eql([]);
     });
 
     it('should set dependency', async function() {
