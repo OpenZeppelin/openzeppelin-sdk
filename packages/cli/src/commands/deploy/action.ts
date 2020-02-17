@@ -3,7 +3,6 @@ import { getConstructorInputs } from '@openzeppelin/upgrades';
 import Session from '../../models/network/Session';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
-import ConfigManager from '../../models/config/ConfigManager';
 import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
