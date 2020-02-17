@@ -25,7 +25,7 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
 const GreeterV2 = Contracts.getFromNodeModules('mock-stdlib-2', 'GreeterImpl');
 
-describe.only('update script', function() {
+describe('update script', function() {
   const [owner, anotherAccount] = accounts;
 
   const network = 'test';
