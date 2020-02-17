@@ -1,14 +1,8 @@
 import NetworkController from '../../models/network/NetworkController';
 import { Options, Args } from './spec';
-import ConfigManager from '../../models/config/ConfigManager';
 
 export async function action(params: Options & Args & { dontExitProcess: boolean }): Promise<void> {
-  const userNetworkName = params.network;
-
-  if (process.env.NODE_ENV !== 'test') {
-    const { network } = await ConfigManager.initNetworkConfiguration(params);
-    Object.assign(params, { network });
-  }
+  const { userNetworkName } = params;
 
   const controller = new NetworkController(params.network, params.txParams, params.networkFile);
 
