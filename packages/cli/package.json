@@ -15,8 +15,8 @@
     "test:watch": "fgbg 'mocha -w --recursive test-build/test' 'tsc -w -p tsconfig.test.json'",
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
-    "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-    "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
+    "lint": "yarn lint:check --fix",
+    "lint:check": "eslint 'src/**/*.{js,ts}' --quiet",
     "version": "oz-docs update-version --exact"
   },
   "lint-staged": {
