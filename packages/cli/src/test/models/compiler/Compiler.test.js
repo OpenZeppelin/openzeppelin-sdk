@@ -101,9 +101,9 @@ describe('Compiler', function() {
   });
 
   describe('typechain', function() {
-    const testRoot = path.resolve(__dirname, '../../../test/');
-    const artifactsDir = path.join(testRoot, 'mocks', 'mock-stdlib', 'build', 'contracts');
-    const typechainOutdir = path.join(testRoot, 'tmp', 'typechain');
+    const rootDir = path.resolve(__dirname, '../../../../');
+    const artifactsDir = path.join(rootDir, 'mocks', 'mock-stdlib', 'build', 'contracts');
+    const typechainOutdir = path.join(rootDir, 'tmp', 'typechain');
 
     const typechain = {
       enabled: true,
