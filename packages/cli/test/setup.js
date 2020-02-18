@@ -9,7 +9,6 @@ import { OPEN_ZEPPELIN_FOLDER } from '../src/models/files/constants';
 import Dependency from '../src/models/dependency/Dependency';
 import ProjectFile from '../src/models/files/ProjectFile';
 import NetworkFile from '../src/models/files/NetworkFile';
-import Session from '../src/models/network/Session';
 
 import chaiAsPromised from 'chai-as-promised';
 import chaiString from 'chai-string';

@@ -218,19 +218,19 @@ function contractMethods(
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {
-  const { contractAlias, proxyAddress, packageName } = contractInfo;
+  const { contractName, proxyAddress, packageName } = contractInfo;
   const projectFile = new ProjectFile();
   const networkFile = new NetworkFile(projectFile, network);
   const proxyParams = {
-    contract: contractAlias,
+    contract: contractName,
     address: proxyAddress,
     package: packageName,
   };
 
-  if (!proxyAddress && !contractAlias) {
+  if (!proxyAddress && !contractName) {
     return { proxyReference: undefined, contractFullName: undefined };
   } else if (!networkFile.hasProxies(proxyParams)) {
-    const contractFullName = toContractFullName(packageName, contractAlias);
+    const contractFullName = toContractFullName(packageName, contractName);
     return {
       proxyReference: proxyAddress || contractFullName,
       contractFullName,
