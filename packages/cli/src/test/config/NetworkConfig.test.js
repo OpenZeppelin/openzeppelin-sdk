@@ -9,7 +9,7 @@ import { cleanupfn } from '../helpers/cleanup';
 import NetworkConfig from '../../models/config/NetworkConfig';
 
 describe('NetworkConfig', function() {
-  const tmpDir = 'test/tmp';
+  const tmpDir = 'tmp';
   const contractsDir = `${tmpDir}/contracts`;
   const networkConfigFile = `${tmpDir}/networks.js`;
   const networkConfigDir = `${process.cwd()}/${tmpDir}`;

@@ -8,7 +8,7 @@ import TruffleConfig from '../../models/config/TruffleConfig';
 import CaptureLogs from '../helpers/captureLogs';
 
 describe('TruffleConfig', () => {
-  const testDir = `${process.cwd()}/test/tmp`;
+  const testDir = `${process.cwd()}/tmp`;
 
   beforeEach('create test dir', function() {
     fs.mkdirSync(testDir, { recursive: true });

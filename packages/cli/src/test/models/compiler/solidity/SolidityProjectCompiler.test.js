@@ -11,7 +11,7 @@ import CaptureLogs from '../../../helpers/captureLogs';
 
 describe('SolidityProjectCompiler', function() {
   const rootDir = path.resolve(__dirname, '../../../../../');
-  const baseTestBuildDir = `${rootDir}/test/tmp`;
+  const baseTestBuildDir = `${rootDir}/tmp`;
 
   after('cleanup test build dir', function() {
     fs.removeSync(baseTestBuildDir);

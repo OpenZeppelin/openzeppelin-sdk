@@ -16,7 +16,7 @@ describe('ContractManager', function() {
     describe('getContractNames', function() {
       context('without directory created', function() {
         beforeEach('create test dir', function() {
-          this.testDir = `${process.cwd()}/test/tmp`;
+          this.testDir = `${process.cwd()}/tmp`;
           this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
           this.contractManager = new ContractManager(this.projectFile);
           fs.mkdirSync(this.testDir, { recursive: true });
@@ -36,7 +36,7 @@ describe('ContractManager', function() {
       context('with directory created', function() {
         context('without contracts', function() {
           beforeEach('create test dir', function() {
-            this.testDir = `${process.cwd()}/test/tmp`;
+            this.testDir = `${process.cwd()}/tmp`;
             this.projectFile = new ProjectFile(`${this.testDir}/zos.json`);
             this.contractManager = new ContractManager(this.projectFile);
             fs.mkdirSync(this.testDir, { recursive: true });

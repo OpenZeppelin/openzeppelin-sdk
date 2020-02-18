@@ -12,7 +12,7 @@ import ConfigManager from '../../models/config/ConfigManager';
 describe('init script', function() {
   const name = 'MyApp';
   const version = '0.3.0';
-  const tmpDir = 'test/tmp';
+  const tmpDir = 'tmp';
 
   before('create tmp dir and stub ZosConfig#initialize', function() {
     fs.mkdirSync(tmpDir, { recursive: true });
