@@ -33,11 +33,7 @@ describe('NetworkFile', function() {
     it('fails to load missing manifestVersion', function() {
       expect(
         () =>
-          new NetworkFile(
-            this.appProjectFile,
-            'test',
-            'mocks/networks/network-missing-manifest-version.zos.test.json',
-          ),
+          new NetworkFile(this.appProjectFile, 'test', 'mocks/networks/network-missing-manifest-version.zos.test.json'),
       ).to.throw(/Manifest version identifier not found/);
     });
 

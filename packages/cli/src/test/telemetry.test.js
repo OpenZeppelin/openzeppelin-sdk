@@ -164,8 +164,10 @@ describe('telemetry', function() {
               userEnvironment.platform.should.eq('awesome-linux');
               userEnvironment.arch.should.eq('x128');
               userEnvironment.nodeVersion.should.eq('v18.01');
-              userEnvironment.cliVersion.should.eq((fs.readJsonSync(require.resolve('../../package.json'))).version);
-              userEnvironment.upgradesVersion.should.eq(fs.readJsonSync(require.resolve('../../../lib/package.json')).version);
+              userEnvironment.cliVersion.should.eq(fs.readJsonSync(require.resolve('../../package.json')).version);
+              userEnvironment.upgradesVersion.should.eq(
+                fs.readJsonSync(require.resolve('../../../lib/package.json')).version,
+              );
               userEnvironment.truffleVersion.should.eq(require('truffle/package.json').version);
               userEnvironment.web3Version.should.eq(require('web3/package.json').version);
             });
