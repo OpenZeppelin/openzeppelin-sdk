@@ -6,13 +6,14 @@ export async function action(params: Options & Args & { dontExitProcess: boolean
 
   const controller = new NetworkController(params.network, params.txParams, params.networkFile);
 
-  if (!controller.isContractDeployed(params.contract)) {
-    throw new Error(
-      `Contract '${params.contract}' is not deployed to '${userNetworkName}'.\n\nVerification of regular instances is not yet supported.`,
-    );
+  try {
+    controller.checkLocalContractDeployed(params.contract, true);
+  } catch (e) {
+    if (!e.message.includes('has changed locally')) {
+      e.message += '\n\nVerification of regular instances is not yet supported.';
+    }
+    throw e;
   }
-
-  controller.checkLocalContractDeployed(params.contract, true);
 
   await controller.verifyAndPublishContract(
     params.contract,
