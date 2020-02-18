@@ -37,7 +37,7 @@ describe('verify script', function() {
       });
 
       it('throws error if contract not yet added', async function() {
-        const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+        const projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
         const networkFile = new NetworkFile(projectFile, network);
         const nonExistentContract = 'NonExistent';
         await assertVerify({ contract: nonExistentContract, network, networkFile }, /not found in this project/);
@@ -46,7 +46,7 @@ describe('verify script', function() {
 
     describe('with valid package and network files', async function() {
       beforeEach(function() {
-        this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+        this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
         this.networkFile = new NetworkFile(this.projectFile, network);
       });
 
@@ -71,7 +71,7 @@ describe('verify script', function() {
     const network = 'mainnet';
 
     beforeEach(async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await push({ network, networkFile: this.networkFile, txParams });

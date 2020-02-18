@@ -13,7 +13,7 @@ describe('link script', function() {
   };
 
   beforeEach('setup', async function() {
-    this.projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
+    this.projectFile = new ProjectFile('mocks/packages/package-with-stdlib.zos.json');
     this.shouldHaveDependency = shouldHaveDependency.bind(this);
   });
 

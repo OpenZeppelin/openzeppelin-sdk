@@ -32,7 +32,7 @@ describe('migrate-manifest-version script', function() {
 
   beforeEach('initialize environment for manifest version 2', async function() {
     // set package and network file
-    const projectFile = new ProjectFile('test/mocks/packages/package-with-manifest-version-2.zos.json');
+    const projectFile = new ProjectFile('mocks/packages/package-with-manifest-version-2.zos.json');
     projectFile.publish = false;
     this.networkFile = new NetworkFile(projectFile, network);
     this.networkFile.manifestVersion = '2';

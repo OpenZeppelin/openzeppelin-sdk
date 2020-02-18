@@ -31,7 +31,7 @@ describe('set-admin script', function() {
 
   describe('on application contract', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await push({ network, txParams, networkFile: this.networkFile });
@@ -128,7 +128,7 @@ describe('set-admin script', function() {
 
   describe('on dependency contract', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-undeployed-stdlib.zos.json');
       this.networkFile = new NetworkFile(this.projectFile, network);
 
       await push({

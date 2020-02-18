@@ -93,7 +93,7 @@ describe('query-signed-deployment script', function() {
 
   describe('on unpublished project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
       this.projectFile.version = version;
       this.projectFile.publish = false;
     });
@@ -103,7 +103,7 @@ describe('query-signed-deployment script', function() {
 
   describe('on published project', function() {
     beforeEach('setup', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
       this.projectFile.version = version;
       this.projectFile.publish = true;
     });

@@ -6,7 +6,7 @@ import ProjectFile from '../../models/files/ProjectFile';
 
 describe('unlink script', function() {
   beforeEach(async function() {
-    this.projectFile = new ProjectFile('test/mocks/packages/package-with-multiple-stdlibs.zos.json');
+    this.projectFile = new ProjectFile('mocks/packages/package-with-multiple-stdlibs.zos.json');
   });
 
   describe('without valid parameters', function() {

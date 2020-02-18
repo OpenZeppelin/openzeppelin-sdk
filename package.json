@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "lerna": "^3.13.4",
-    "mock-stdlib-root": "file:./packages/cli/test/mocks/mock-stdlib",
+    "mock-stdlib-root": "file:./packages/cli/mocks/mock-stdlib",
     "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "yarn": "^1.17.3"
   }

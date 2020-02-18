@@ -12,8 +12,8 @@ describe('bin helpers', function() {
 
     context('when package.json or zos.json found', function() {
       it('returns the correct directory', function() {
-        const path = 'test/mocks/mock-stdlib-2/build/contracts';
-        findRootDirectory(path).should.match(/\/test\/mocks\/mock-stdlib-2/g);
+        const path = 'mocks/mock-stdlib-2/build/contracts';
+        findRootDirectory(path).should.match(/\/mocks\/mock-stdlib-2/g);
       });
     });
   });

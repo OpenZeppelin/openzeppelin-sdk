@@ -83,7 +83,7 @@ exports.stubCommands = function() {
     });
     this.getManifestVersion = sinon.stub(NetworkFile, 'getManifestVersion').returns('2.2');
     this.projectFile = sinon.stub(ProjectFile.prototype, 'exists').returns(true);
-    const projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
+    const projectFile = new ProjectFile('mocks/mock-stdlib/zos.json');
     this.dependency = sinon.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
       return projectFile;
     });

@@ -84,8 +84,8 @@ describe('Dependency', function() {
         it('returns true', function() {
           Dependency.hasDependenciesForDeploy(
             'test',
-            'test/mocks/packages/package-with-multiple-stdlibs.zos.json',
-            'test/mocks/networks/network-with-stdlibs.zos.test.json',
+            'mocks/packages/package-with-multiple-stdlibs.zos.json',
+            'mocks/networks/network-with-stdlibs.zos.test.json',
           ).should.be.true;
         });
       });
@@ -94,8 +94,8 @@ describe('Dependency', function() {
         it('returns false', function() {
           Dependency.hasDependenciesForDeploy(
             'test',
-            'test/mocks/packages/package-with-stdlib.zos.json',
-            'test/mocks/networks/network-with-stdlibs.zos.test.json',
+            'mocks/packages/package-with-stdlib.zos.json',
+            'mocks/networks/network-with-stdlibs.zos.test.json',
           ).should.be.false;
         });
       });
@@ -104,8 +104,8 @@ describe('Dependency', function() {
         it('returns true', function() {
           Dependency.hasDependenciesForDeploy(
             'test',
-            'test/mocks/packages/package-with-stdlib.zos.json',
-            'test/mocks/networks/network-with-older-stdlibs.zos.test.json',
+            'mocks/packages/package-with-stdlib.zos.json',
+            'mocks/networks/network-with-older-stdlibs.zos.test.json',
           ).should.be.true;
         });
       });

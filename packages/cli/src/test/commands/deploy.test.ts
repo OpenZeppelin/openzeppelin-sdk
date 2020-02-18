@@ -23,7 +23,7 @@ describe('deploy (action)', function() {
   let networkFile: NetworkFile;
 
   beforeEach(function() {
-    projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
+    projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
     networkFile = new NetworkFile(projectFile, network);
   });
 

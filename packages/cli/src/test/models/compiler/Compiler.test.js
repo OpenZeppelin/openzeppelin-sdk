@@ -20,7 +20,7 @@ describe('Compiler', function() {
     );
     this.truffleCompile = sinon.stub(Compiler, 'compileWithTruffle');
     this.isTruffleConfig = sinon.stub(Truffle, 'isTruffleProject').returns(false);
-    this.projectFile = new ProjectFile('test/mocks/packages/package-empty-lite.zos.json');
+    this.projectFile = new ProjectFile('mocks/packages/package-empty-lite.zos.json');
     this.compile = (opts, force) => Compiler.compile(opts, this.projectFile, force);
   });
 

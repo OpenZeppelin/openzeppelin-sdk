@@ -14,7 +14,7 @@ describe('add script', function() {
   const contractsData = [{ name: contractName, alias: contractAlias }];
 
   beforeEach('setup', async function() {
-    this.projectFile = new ProjectFile('test/mocks/packages/package-with-stdlib.zos.json');
+    this.projectFile = new ProjectFile('mocks/packages/package-with-stdlib.zos.json');
     sinon.stub(this.projectFile, 'root').get(() => process.cwd());
   });
 

@@ -23,7 +23,7 @@ describe('publish script', function() {
   const dependencyName = 'mock-stdlib-undeployed';
 
   beforeEach('pushing package', async function() {
-    const projectFile = new ProjectFile('test/mocks/packages/package-with-contracts-and-stdlib.zos.json');
+    const projectFile = new ProjectFile('mocks/packages/package-with-contracts-and-stdlib.zos.json');
     projectFile.publish = false;
     this.networkFile = new NetworkFile(projectFile, network);
 

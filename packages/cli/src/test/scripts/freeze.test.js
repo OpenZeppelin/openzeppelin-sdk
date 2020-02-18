@@ -16,7 +16,7 @@ describe('freeze script', function() {
   const txParams = { from: owner };
 
   beforeEach('init package file', async function() {
-    this.projectFile = new ProjectFile('test/mocks/packages/package-with-contracts.zos.json');
+    this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
   });
 
   describe('for an unpublished app', function() {

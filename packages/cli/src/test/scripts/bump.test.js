@@ -11,7 +11,7 @@ describe('bump script', function() {
 
   describe('on app', function() {
     beforeEach(function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
     });
 
     it('should update the app version in the main package file', async function() {

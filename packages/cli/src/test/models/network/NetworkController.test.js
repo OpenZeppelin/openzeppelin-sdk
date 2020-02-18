@@ -23,7 +23,7 @@ describe('NetworkController', function() {
   describe('_getAllSolidityLibNames()', () => {
     let controllerMock;
     beforeEach(() => {
-      projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
+      projectFile = new ProjectFile('mocks/mock-stdlib/zos.json');
       networkFile = new NetworkFile(projectFile, 'test');
       controller = new NetworkController('test', {}, networkFile);
       controllerMock = sinon.mock(controller);
@@ -143,7 +143,7 @@ describe('NetworkController', function() {
   describe('_solidityLibsForPush()', () => {
     describe('with one public library', () => {
       beforeEach(() => {
-        projectFile = new ProjectFile('test/mocks/mock-stdlib/zos.json');
+        projectFile = new ProjectFile('mocks/mock-stdlib/zos.json');
         networkFile = new NetworkFile(projectFile, 'test');
         controller = new NetworkController('test', {}, networkFile);
       });
@@ -156,7 +156,7 @@ describe('NetworkController', function() {
 
     describe('with libraries depending on libs', () => {
       beforeEach(() => {
-        projectFile = new ProjectFile('test/mocks/mock-stdlib-libdeps/zos.json');
+        projectFile = new ProjectFile('mocks/mock-stdlib-libdeps/zos.json');
         networkFile = new NetworkFile(projectFile, 'test');
         controller = new NetworkController('test', {}, networkFile);
       });
@@ -173,7 +173,7 @@ describe('NetworkController', function() {
     let networkFileMock;
 
     beforeEach(() => {
-      projectFile = new ProjectFile('test/mocks/mock-stdlib-libdeps/zos.json');
+      projectFile = new ProjectFile('mocks/mock-stdlib-libdeps/zos.json');
       networkFile = new NetworkFile(projectFile, 'test');
       controller = new NetworkController('test', {}, networkFile);
       controller.project = {

@@ -20,7 +20,7 @@ describe('SolidityProjectCompiler', function() {
   describe('in mock-stdlib project', function() {
     this.timeout(20000);
 
-    const inputDir = `${rootDir}/test/mocks/mock-stdlib/contracts`;
+    const inputDir = `${rootDir}/mocks/mock-stdlib/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-stdlib`;
     const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
     beforeEach('compiling', async function() {
@@ -42,7 +42,7 @@ describe('SolidityProjectCompiler', function() {
         schema.fileName.should.be.eq(`${contractName}.sol`);
         schema.contractName.should.be.eq(contractName);
         schema.source.should.be.eq(fs.readFileSync(contractPath, 'utf8'));
-        schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib/contracts/${contractName}.sol`);
+        schema.sourcePath.should.be.eq(`mocks/mock-stdlib/contracts/${contractName}.sol`);
         schema.sourceMap.should.not.be.null;
         schema.abi.should.not.be.null;
         schema.ast.should.not.be.null;
@@ -153,7 +153,7 @@ describe('SolidityProjectCompiler', function() {
   describe('in mock-stdlib-with-spaces project', function() {
     this.timeout(20000);
 
-    const inputDir = `${rootDir}/test/mocks/mock-stdlib with spaces/contracts`;
+    const inputDir = `${rootDir}/mocks/mock-stdlib with spaces/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-stdlib with spaces`;
     const greeterArtifactPath = `${outputDir}/GreeterImpl.json`;
 
@@ -165,14 +165,14 @@ describe('SolidityProjectCompiler', function() {
       fs.existsSync(greeterArtifactPath).should.be.true;
       const schema = fs.readJsonSync(greeterArtifactPath);
       schema.bytecode.should.not.be.null;
-      schema.sourcePath.should.be.eq(`test/mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`);
+      schema.sourcePath.should.be.eq(`mocks/mock-stdlib with spaces/contracts/GreeterImpl.sol`);
     });
   });
 
   describe('in mock-stdlib-empty project', function() {
     this.timeout(20000);
 
-    const inputDir = `${rootDir}/test/mocks/mock-stdlib-empty/contracts`;
+    const inputDir = `${rootDir}/mocks/mock-stdlib-empty/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-stdlib-empty`;
 
     it('compiles without errors', async function() {
@@ -180,7 +180,7 @@ describe('SolidityProjectCompiler', function() {
     });
 
     it('compiles without errors if input dir does not exist', async function() {
-      const inputDir = `${rootDir}/test/mocks/mock-stdlib-empty/not-exists`;
+      const inputDir = `${rootDir}/mocks/mock-stdlib-empty/not-exists`;
       await compileProject({ inputDir, outputDir, version: '0.5.9' });
     });
   });
@@ -188,8 +188,8 @@ describe('SolidityProjectCompiler', function() {
   describe('in mock-project-to-compile project', function() {
     this.timeout(20000);
 
-    const workingDir = `${rootDir}/test/mocks/mock-project-to-compile`;
-    const inputDir = `${rootDir}/test/mocks/mock-project-to-compile/contracts`;
+    const workingDir = `${rootDir}/mocks/mock-project-to-compile`;
+    const inputDir = `${rootDir}/mocks/mock-project-to-compile/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-project-to-compile`;
 
     it('compiles without errors', async function() {
@@ -224,8 +224,8 @@ describe('SolidityProjectCompiler', function() {
   describe('in mock-project-with-repeated-names project', function() {
     this.timeout(20000);
 
-    const workingDir = `${rootDir}/test/mocks/mock-project-with-repeated-names`;
-    const inputDir = `${rootDir}/test/mocks/mock-project-with-repeated-names/contracts`;
+    const workingDir = `${rootDir}/mocks/mock-project-with-repeated-names`;
+    const inputDir = `${rootDir}/mocks/mock-project-with-repeated-names/contracts`;
     const outputDir = `${baseTestBuildDir}/mock-project-with-repeated-names`;
     const greeterArtifactPath = `${outputDir}/Greeter.json`;
 

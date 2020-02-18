@@ -190,7 +190,7 @@ describe('prompt', function() {
 
     describe('#methodsList', function() {
       beforeEach('initialize projectFile', function() {
-        this.projectFile = new ProjectFile('test/mocks/mock-stdlib-2/zos.json');
+        this.projectFile = new ProjectFile('mocks/mock-stdlib-2/zos.json');
       });
 
       context('when providing an unexistent contract in the package', function() {
@@ -238,7 +238,7 @@ describe('prompt', function() {
 
     describe('#argsList', function() {
       beforeEach('initialize projectFile', function() {
-        this.projectFile = new ProjectFile('test/mocks/mock-stdlib-2/zos.json');
+        this.projectFile = new ProjectFile('mocks/mock-stdlib-2/zos.json');
       });
 
       context('when providing an unexistent contract in the package', function() {

@@ -50,7 +50,7 @@ const expectToBehaveLikeConfig = configFileDir => {
 };
 
 describe('ConfigManager', function() {
-  const configFileDir = `${process.cwd()}/test/mocks/config-files`;
+  const configFileDir = `${process.cwd()}/mocks/config-files`;
   beforeEach('clean config manager and set stubs', function() {
     // restore config after each test
     this.originalConfig = ConfigManager.config;

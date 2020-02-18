@@ -632,7 +632,7 @@ describe('update script', function() {
 
   describe('on application contract', function() {
     beforeEach('setup package', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
       this.projectFile.version = version1;
     });
 
@@ -642,7 +642,7 @@ describe('update script', function() {
 
   describe('on application contract in unpublished mode', function() {
     beforeEach('setup package', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
       this.projectFile.publish = false;
       this.projectFile.version = version1;
     });
@@ -653,7 +653,7 @@ describe('update script', function() {
 
   describe('on dependency contract', function() {
     beforeEach('setup package', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-undeployed-stdlib.zos.json');
       this.projectFile.version = version1;
     });
 
@@ -662,7 +662,7 @@ describe('update script', function() {
 
   describe('on dependency contract in unpublished mode', function() {
     beforeEach('setup package', async function() {
-      this.projectFile = new ProjectFile('test/mocks/packages/package-with-undeployed-stdlib.zos.json');
+      this.projectFile = new ProjectFile('mocks/packages/package-with-undeployed-stdlib.zos.json');
       this.projectFile.publish = false;
       this.projectFile.version = version1;
     });

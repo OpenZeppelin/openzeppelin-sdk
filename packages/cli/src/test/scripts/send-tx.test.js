@@ -21,7 +21,7 @@ describe('send-tx script', function() {
 
   beforeEach('setup', async function() {
     this.logs = new CaptureLogs();
-    this.projectFile = new ProjectFile('test/mocks/packages/package-empty.zos.json');
+    this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
 
     this.networkFile = new NetworkFile(this.projectFile, network);
 

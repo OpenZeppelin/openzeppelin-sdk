@@ -58,7 +58,7 @@ describe('ContractManager', function() {
         const testReturnsContracts = function(description, sourcePath) {
           context(description, function() {
             beforeEach(function() {
-              this.testDir = `${process.cwd()}/test/mocks/mock-stdlib`;
+              this.testDir = `${process.cwd()}/mocks/mock-stdlib`;
               const builtContract = {
                 sourcePath: sourcePath || `${this.testDir}/contracts/Foo.sol`,
                 bytecode: '0x124',
