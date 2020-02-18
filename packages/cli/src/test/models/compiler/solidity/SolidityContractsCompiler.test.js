@@ -7,6 +7,7 @@ import { setSolcCachePath, setSolcBinEnv } from '../../../../models/compiler/sol
 import sinon from 'sinon';
 import axios from 'axios';
 import path from 'path';
+import fs from 'fs-extra';
 
 describe('SolidityContractsCompiler', function() {
   const contract_Solc04 = {
@@ -73,7 +74,7 @@ describe('SolidityContractsCompiler', function() {
     sinon
       .stub(axios, 'get')
       .withArgs('https://solc-bin.ethereum.org/bin/list.json')
-      .resolves({ data: require('../../../../solc/list.json') });
+      .resolves({ data: fs.readJsonSync(require.resolve('../../../../../solc/list.json')) });
   });
 
   after('clear stubs', function() {
