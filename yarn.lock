@@ -5051,6 +5051,11 @@ fetch-ponyfill@^4.0.0:
   dependencies:
     node-fetch "~1.7.1"
 
+fgbg@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/fgbg/-/fgbg-0.1.4.tgz#ddb3fd83828e360b3888e7f20fe4fa951dfca9a2"
+  integrity sha512-HzjEYeL4RH0/xqrUu6q9KGR2OssdhDFAsb19tyyEYDEE4gWJKM/BuIdoJ3staEJ/5gjhZVCC+ZUu49uY7ShnDg==
+
 figgy-pudding@^3.4.1, figgy-pudding@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.1.tgz#862470112901c727a0e495a80744bd5baa1d6790"
