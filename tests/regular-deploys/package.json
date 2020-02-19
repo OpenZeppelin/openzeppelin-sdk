@@ -1,13 +1,13 @@
 {
   "name": "regular-deploys",
-  "version": "2.8.0-rc.1",
+  "version": "2.8.0-rc.2",
   "scripts": {
     "test": "node test.js"
   },
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@openzeppelin/cli": "2.8.0-rc.1",
+    "@openzeppelin/cli": "2.8.0-rc.2",
     "@openzeppelin/test-environment": "^0.1.2"
   }
 }

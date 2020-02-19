@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/cli",
-  "version": "2.8.0-rc.1",
+  "version": "2.8.0-rc.2",
   "description": "Command-line interface for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -15,8 +15,7 @@
     "gen-docs": "./scripts/gen-docs.sh",
     "watch": "tsc -w",
     "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-    "lint:check": "eslint '*/**/*.{js,ts}' --quiet",
-    "version": "oz-docs update-version --exact"
+    "lint:check": "eslint '*/**/*.{js,ts}' --quiet"
   },
   "lint-staged": {
     "gitDir": "../../",

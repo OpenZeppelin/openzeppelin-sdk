@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/upgrades",
-  "version": "2.8.0-rc.1",
+  "version": "2.8.0-rc.2",
   "description": "JavaScript library for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -14,8 +14,7 @@
     "prepare-docs": "bash scripts/prepare-docs.sh",
     "prepublishOnly": "echo 'Removing mock contracts...' && grep -hoP '^\\s*contract \\K(\\w+)' contracts/mocks/*.sol | sort | uniq | xargs -t -I% rm build/contracts/%.json",
     "test": "TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register --recursive test",
-    "watch": "tsc -w",
-    "version": "oz-docs update-version --exact"
+    "watch": "tsc -w"
   },
   "lint-staged": {
     "gitDir": "../../",

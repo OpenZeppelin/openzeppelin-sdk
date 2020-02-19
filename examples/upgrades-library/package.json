@@ -1,6 +1,6 @@
 {
   "name": "example-openzeppelin-upgrades-simple",
-  "version": "2.8.0-rc.1",
+  "version": "2.8.0-rc.2",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "@openzeppelin/upgrades": "2.8.0-rc.1"
   },
   "devDependencies": {
-    "@openzeppelin/cli": "2.8.0-rc.1",
+    "@openzeppelin/cli": "2.8.0-rc.2",
     "@openzeppelin/test-environment": "^0.1.2",
     "chai": "^4.1.2",
     "mocha": "^6.2.2"
