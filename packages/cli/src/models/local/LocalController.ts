@@ -55,7 +55,7 @@ export default class LocalController {
       __filename,
       'initProjectFile',
       'init-project-file',
-      `Project initialized. Write a new contract in the contracts folder and run 'openzeppelin create' to deploy it.`,
+      `Project initialized. Write a new contract in the contracts folder and run 'openzeppelin deploy' to deploy it.`,
     );
   }
 

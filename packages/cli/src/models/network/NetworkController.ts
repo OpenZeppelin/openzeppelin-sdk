@@ -692,7 +692,9 @@ export default class NetworkController {
     const contract = this.contractManager.getContractClass(packageName, contractAlias);
     await this._setSolidityLibs(contract);
 
+    Loggy.spin(__filename, 'createInstance', 'create-instance', `Deploying an instance of ${contractAlias}`);
     const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
+    Loggy.succeed('create-instance', `Deployed instance of ${contractAlias}`);
 
     if (packageName === this.projectFile.name) {
       await this._updateTruffleDeployedInformation(contractAlias, instance);
