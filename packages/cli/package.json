@@ -27,12 +27,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/zeppelinos/zos.git"
+    "url": "git+ssh://git@github.com/OpenZeppelin/openzeppelin-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/zeppelinos/zos/issues"
+    "url": "https://github.com/OpenZeppelin/openzeppelin-sdk/issues"
   },
-  "homepage": "https://github.com/zeppelinos/zos/tree/master/packages/cli#readme",
+  "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
     "@openzeppelin/resolver-engine-core": "^0.3.3",
     "@openzeppelin/resolver-engine-imports-fs": "^0.3.3",
