@@ -786,7 +786,10 @@ export default class NetworkController {
         address: instance.address,
         version: semanticVersionToString(packageVersion),
         implementation: implementationAddress,
-        admin: admin || this.networkFile.proxyAdminAddress || (await this.project.getAdminAddress()),
+        admin:
+          admin ||
+          this.networkFile.proxyAdminAddress ||
+          (await this.project.getAdminAddress()),
         kind,
       });
       return instance;
