@@ -45,22 +45,16 @@ export const args: Arg[] = [
     name: 'arguments',
     variadic: true,
     async details(params: Options & Args): Promise<ParamDetails[]> {
-      // If the user requests an upgradeable deploy, we will internally call
-      // the create command and let it handle its own argument parsing.
-      if (params.kind && params.kind !== 'regular') {
-        return [];
-      }
-
       const { fromContractFullName } = await import('../../utils/naming');
       const { default: ContractManager } = await import('../../models/local/ContractManager');
       const { argLabelWithIndex } = await import('../../prompts/prompt');
       const { parseArg, getSampleInput } = await import('../../utils/input');
       const { getConstructorInputs } = await import('@openzeppelin/upgrades');
 
-      const contractName = params.contract;
+      const fullContractName = params.contract;
 
-      const { package: packageName, contractName: contractAlias } = fromContractFullName(contractName);
-      const contract = new ContractManager().getContractClass(packageName, contractAlias);
+      const { package: packageName, contractName } = fromContractFullName(fullContractName);
+      const contract = new ContractManager().getContractClass(packageName, contractName);
       const constructorInputs = getConstructorInputs(contract);
 
       return constructorInputs.map((arg, index) => ({
@@ -127,8 +121,7 @@ export const options: Option[] = [
     async after(options: Options) {
       // Once we have all required params (network, timeout, from) we initialize the config.
       // We need to do this because it's necessary for the details of 'arguments' later.
-      // We skip it for regular deploys because the create command action will take care of it.
-      if (process.env.NODE_ENV !== 'test' && options.kind === 'regular') {
+      if (process.env.NODE_ENV !== 'test') {
         const { default: ConfigManager } = await import('../../models/config/ConfigManager');
         const config = await ConfigManager.initNetworkConfiguration(options);
         Object.assign(options, config);

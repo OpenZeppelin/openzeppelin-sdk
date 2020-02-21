@@ -7532,7 +7532,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-libdeps@file:./packages/cli/test/mocks/mock-stdlib-libdeps":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
@@ -7545,9 +7545,6 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
-  version "1.1.0"
-
-"mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":

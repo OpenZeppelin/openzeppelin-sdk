@@ -15,12 +15,6 @@ import promptForMethodParams from '../prompts/method-params';
 import { ProxyType, CreateParams } from '../scripts/interfaces';
 import Telemetry from '../telemetry';
 
-interface PropsParams {
-  contractFullName?: string;
-  methodName?: string;
-  methodArgs?: string[];
-}
-
 const name = 'create';
 const signature = `${name} [contract]`;
 const description =
@@ -59,7 +53,7 @@ export async function createAction(contractFullName: string, options: any): Prom
 
   await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
-  await push.runActionIfNeeded(promptedContractFullName, network, {
+  await push.runActionIfNeeded(promptedContractFullName, {
     ...options,
     network: promptedNetwork,
   });
