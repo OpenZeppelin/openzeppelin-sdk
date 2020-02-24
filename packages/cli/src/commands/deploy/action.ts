@@ -4,6 +4,9 @@ import link from '../link';
 import add from '../add';
 import push from '../../scripts/push';
 
+import ConfigManager from '../../models/config/ConfigManager';
+
+import { transpileAndSave } from '../../transpiler';
 import { ProxyType } from '../../scripts/interfaces';
 import { hasToMigrateProject } from '../../prompts/migrations';
 import Session from '../../models/network/Session';
@@ -61,19 +64,26 @@ async function deployRegular(params: Options & Args): Promise<void> {
 
 async function deployProxy(params: Options & Args): Promise<void> {
   const { network, txParams, contract: fullContractName } = params;
-
-  await link.runActionIfNeeded(fullContractName, params);
-  await add.runActionIfNeeded(fullContractName, params);
-  await push({ contracts: [fullContractName], network, txParams, networkFile: params.networkFile });
-
   const { contractName, package: packageName } = fromContractFullName(fullContractName);
+
+  // transpile contract to upgradable version and save it contracs folder
+  await transpileAndSave([contractName], ConfigManager.getBuildDir());
+  // compile produced result
+  await compile();
+
+  const fullContractNameUpgradable = `${fullContractName}Upgradable`;
+  const contractNameUpgradable = `${contractName}Upgradable`;
+
+  await link.runActionIfNeeded(fullContractNameUpgradable, params);
+  await add.runActionIfNeeded(fullContractNameUpgradable, params);
+  await push({ contracts: [fullContractNameUpgradable], network, txParams, networkFile: params.networkFile });
 
   const controller = new NetworkController(network, txParams, params.networkFile);
   try {
-    await controller.throwOrLogErrorForPackageContract(packageName, contractName, false);
+    await controller.throwOrLogErrorForPackageContract(packageName, contractNameUpgradable, false);
     const proxy = await controller.createProxy(
       packageName,
-      contractName,
+      contractNameUpgradable,
       undefined,
       undefined,
       undefined,
