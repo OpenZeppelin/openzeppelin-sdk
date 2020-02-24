@@ -128,13 +128,12 @@ export default class NetworkController {
   ): Promise<void | never> {
     const changedLibraries = this.solidityLibsForPush(!reupload);
     const contractObjects = this.contractsListForPush(
-      contracts.map(name => transpiledContracts[name] ?? name),
+      contracts ? contracts.map(name => transpiledContracts[name] ?? name) : undefined,
       !reupload,
       changedLibraries,
     );
     const buildArtifacts = getBuildArtifacts();
 
-    console.log(transpiledContracts);
     // ValidateContracts also extends each contract class with validation errors and storage info
     if (!this.validateContracts(contractObjects, buildArtifacts) && !force) {
       throw Error(
