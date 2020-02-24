@@ -108,6 +108,7 @@ export interface PushParams extends Network {
   deployDependencies?: boolean;
   deployProxyAdmin?: boolean;
   deployProxyFactory?: boolean;
+  transpiledContracts?: Record<string, string>;
 }
 
 export interface SetAdminParams extends Network, PackageArgs {

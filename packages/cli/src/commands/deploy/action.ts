@@ -66,30 +66,38 @@ async function deployProxy(params: Options & Args): Promise<void> {
   const { network, txParams, contract: fullContractName } = params;
   const { contractName, package: packageName } = fromContractFullName(fullContractName);
 
+  const isMinimal = params.kind === 'minimal';
+
+  const transpiledContractName = `${contractName}Upgradable`;
+
   // transpile contract to upgradable version and save it contracs folder
   await transpileAndSave([contractName], ConfigManager.getBuildDir());
   // compile produced result
   await compile();
 
-  const fullContractNameUpgradable = `${fullContractName}Upgradable`;
-  const contractNameUpgradable = `${contractName}Upgradable`;
-
-  await link.runActionIfNeeded(fullContractNameUpgradable, params);
-  await add.runActionIfNeeded(fullContractNameUpgradable, params);
-  await push({ contracts: [fullContractNameUpgradable], network, txParams, networkFile: params.networkFile });
+  await link.runActionIfNeeded(fullContractName, params);
+  await add.runActionIfNeeded(fullContractName, params);
+  await push({
+    contracts: [fullContractName],
+    transpiledContracts: { [fullContractName]: transpiledContractName },
+    network,
+    txParams,
+    networkFile: params.networkFile,
+  });
 
   const controller = new NetworkController(network, txParams, params.networkFile);
   try {
-    await controller.throwOrLogErrorForPackageContract(packageName, contractNameUpgradable, false);
+    await controller.throwOrLogErrorForPackageContract(packageName, contractName, false);
     const proxy = await controller.createProxy(
       packageName,
-      contractNameUpgradable,
+      contractName,
       undefined,
       undefined,
       undefined,
       undefined,
       undefined,
-      params.kind === 'minimal' ? ProxyType.Minimal : ProxyType.Upgradeable,
+      isMinimal ? ProxyType.Minimal : ProxyType.Upgradeable,
+      transpiledContractName,
     );
     stdout(proxy.address);
   } finally {

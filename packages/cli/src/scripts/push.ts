@@ -11,6 +11,7 @@ export default async function push({
   force = false,
   txParams = {},
   networkFile,
+  transpiledContracts,
 }: PushParams): Promise<void | never> {
   const controller = new NetworkController(network, txParams, networkFile);
 
@@ -18,7 +19,7 @@ export default async function push({
     if (deployDependencies) await controller.deployDependencies();
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
-    await controller.push(contracts, { reupload, force });
+    await controller.push(contracts, { reupload, force, transpiledContracts });
   } finally {
     controller.writeNetworkPackageIfNeeded();
   }

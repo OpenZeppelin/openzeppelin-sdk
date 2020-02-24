@@ -122,11 +122,19 @@ export default class NetworkController {
   }
 
   // DeployerController
-  public async push(contracts: string[] | undefined, { reupload = false, force = false } = {}): Promise<void | never> {
+  public async push(
+    contracts: string[] | undefined,
+    { reupload = false, force = false, transpiledContracts = {} } = {},
+  ): Promise<void | never> {
     const changedLibraries = this.solidityLibsForPush(!reupload);
-    const contractObjects = this.contractsListForPush(contracts, !reupload, changedLibraries);
+    const contractObjects = this.contractsListForPush(
+      contracts.map(name => transpiledContracts[name] ?? name),
+      !reupload,
+      changedLibraries,
+    );
     const buildArtifacts = getBuildArtifacts();
 
+    console.log(transpiledContracts);
     // ValidateContracts also extends each contract class with validation errors and storage info
     if (!this.validateContracts(contractObjects, buildArtifacts) && !force) {
       throw Error(
@@ -631,19 +639,21 @@ export default class NetworkController {
     salt?: string,
     signature?: string,
     kind?: ProxyType,
+    transpiledContractName?: string,
   ): Promise<Contract> {
     try {
+      console.log(transpiledContractName);
       await this.migrateManifestVersionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
       if (!packageName) packageName = this.projectFile.name;
-      const contract = this.contractManager.getContractClass(packageName, contractName);
+      const contract = this.contractManager.getContractClass(packageName, transpiledContractName ?? contractName);
       await this.setSolidityLibs(contract);
       this.checkInitialization(contract, initMethod);
       if (salt) await this.checkDeploymentAddress(salt);
 
       const createArgs = {
         packageName,
-        contractName: contractName,
+        contractName: transpiledContractName ?? contractName,
         initMethod,
         initArgs,
         admin,
