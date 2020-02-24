@@ -641,7 +641,6 @@ export default class NetworkController {
     transpiledContractName?: string,
   ): Promise<Contract> {
     try {
-      console.log(transpiledContractName);
       await this.migrateManifestVersionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
       if (!packageName) packageName = this.projectFile.name;
