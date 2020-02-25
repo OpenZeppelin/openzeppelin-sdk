@@ -409,26 +409,26 @@ export default class NetworkController {
   }
 
   // Contract model
-  public throwOrLogErrorForPackageContract(packageName: string, contractName: string, throwIfFail = false): void {
+  public logErrorForPackageContract(packageName: string, contractName: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
-    const err = this.getErrorForPackageContract(packageName, contractName);
-    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+    const err = this.getPackageContractError(packageName, contractName);
+    if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public throwOrLogErrorForProjectContracts(throwIfFail = false): void {
-    const err = this.getErrorForProjectContracts();
-    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+  public logErrorForProjectContracts(throwIfFail = false): void {
+    const err = this.getDeploymentErrorForProject();
+    if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public throwOrLogErrorForContract(contractName: string, throwIfFail = false): void {
-    const err = this.getErrorForContract(contractName);
-    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+  public logErrorIfContractDeploymentIsInvalid(contractName: string, throwIfFail = false): void {
+    const err = this.getContractDeploymentError(contractName);
+    if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  private getErrorForProjectContracts(): string {
+  private getDeploymentErrorForProject(): string {
     const contractsMissing = this.projectFile.contracts.filter(
       o => this.isProjectFileContract(o) && !this.isNetworkFileContract(o),
     );
@@ -443,7 +443,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  private getErrorForContract(contractName: string): string {
+  private getContractDeploymentError(contractName: string): string {
     if (!this.isProjectFileContract(contractName)) {
       return `Contract ${contractName} not found in this project`;
     } else if (!this.isNetworkFileContract(contractName)) {
@@ -454,7 +454,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private throwOrLogErrorMessage(msg: string, throwIfFail = false): void | never {
+  private logErrorMessage(msg: string, throwIfFail = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
@@ -1084,9 +1084,9 @@ export default class NetworkController {
   }
 
   // Contract model
-  private getErrorForPackageContract(packageName: string, contractName: string): string {
+  private getPackageContractError(packageName: string, contractName: string): string {
     if (packageName === this.projectFile.name) {
-      return this.getErrorForContract(contractName);
+      return this.getContractDeploymentError(contractName);
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {
