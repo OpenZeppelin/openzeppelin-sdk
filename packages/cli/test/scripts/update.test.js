@@ -369,7 +369,7 @@ describe('update script', function() {
         });
         await push({ network, txParams, networkFile: this.networkFile });
 
-        const UnmigratableImplV2 = this.networkFile.contract('UnmigratableImplV2').address;
+        const unmigratableImplV2 = this.networkFile.contract('UnmigratableImplV2').address;
 
         restoreUpdate();
         stubUpdate(
