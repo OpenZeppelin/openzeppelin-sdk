@@ -1,6 +1,6 @@
 {
   "name": "example-cli-create2",
-  "version": "2.7.0-rc.2",
+  "version": "2.7.0",
   "private": true,
   "description": "Example project for using create2",
   "main": "index.js",
@@ -10,8 +10,8 @@
   "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/cli": "2.7.0-rc.2",
-    "@openzeppelin/upgrades": "2.7.0-rc.2",
+    "@openzeppelin/cli": "2.7.0",
+    "@openzeppelin/upgrades": "2.7.0",
     "web3": "1.2.2"
   },
   "devDependencies": {

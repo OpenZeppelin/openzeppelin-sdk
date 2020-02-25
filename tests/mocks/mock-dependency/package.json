@@ -1,6 +1,6 @@
 {
   "name": "mock-dependency",
-  "version": "2.7.0-rc.2",
+  "version": "2.7.0",
   "description": "Mock dependency for tests in zos-lib",
   "private": true,
   "author": "facundo@zeppelin.solutions",
