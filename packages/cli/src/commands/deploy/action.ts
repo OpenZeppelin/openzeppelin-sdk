@@ -5,6 +5,7 @@ import add from '../add';
 import push from '../../scripts/push';
 
 import ConfigManager from '../../models/config/ConfigManager';
+import ContractManager from '../../models/local/ContractManager';
 
 import { transpileAndSave } from '../../transpiler';
 import { ProxyType } from '../../scripts/interfaces';
@@ -30,6 +31,18 @@ export async function action(params: Options & Args): Promise<void> {
   }
 }
 
+function getConstructorArgs(
+  packageName: string,
+  contractName: string,
+  args: string[],
+  contractManager: ContractManager,
+): unknown[] {
+  const contract = contractManager.getContractClass(packageName, contractName);
+  const constructorInputs = getConstructorInputs(contract);
+
+  return parseMultipleArgs(args, constructorInputs);
+}
+
 async function deployRegular(params: Options & Args): Promise<void> {
   const { contract: fullContractName, arguments: deployArgs } = params;
 
@@ -49,10 +62,7 @@ async function deployRegular(params: Options & Args): Promise<void> {
 
   const controller = new NetworkController(network, txParams, params.networkFile);
 
-  const contract = controller.contractManager.getContractClass(packageName, contractName);
-  const constructorInputs = getConstructorInputs(contract);
-
-  const args = parseMultipleArgs(deployArgs, constructorInputs);
+  const args = getConstructorArgs(packageName, contractName, deployArgs, controller.contractManager);
 
   try {
     const instance = await controller.createInstance(packageName, contractName, args);
@@ -63,7 +73,8 @@ async function deployRegular(params: Options & Args): Promise<void> {
 }
 
 async function deployProxy(params: Options & Args): Promise<void> {
-  const { network, txParams, contract: fullContractName } = params;
+  const { network, txParams, contract: fullContractName, arguments: deployArgs } = params;
+
   const { contractName, package: packageName } = fromContractFullName(fullContractName);
 
   const isMinimal = params.kind === 'minimal';
@@ -86,13 +97,16 @@ async function deployProxy(params: Options & Args): Promise<void> {
   });
 
   const controller = new NetworkController(network, txParams, params.networkFile);
+
+  const args = getConstructorArgs(packageName, contractName, deployArgs, controller.contractManager);
+
   try {
     await controller.throwOrLogErrorForPackageContract(packageName, contractName, false);
     const proxy = await controller.createProxy(
       packageName,
       contractName,
-      undefined,
-      undefined,
+      'initialize',
+      args as string[],
       undefined,
       undefined,
       undefined,
