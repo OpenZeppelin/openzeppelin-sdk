@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/upgrades",
-  "version": "2.7.0",
+  "version": "2.8.0-rc.0",
   "description": "JavaScript library for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -73,7 +73,7 @@
     "web3-utils": "1.2.2"
   },
   "devDependencies": {
-    "@openzeppelin/test-environment": "^0.1.0",
+    "@openzeppelin/test-environment": "^0.1.2",
     "@openzeppelin/test-helpers": "^0.5.4",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.5",
@@ -91,6 +91,7 @@
     "mocha": "^6.2.2",
     "mock-dependency": "file:../../tests/mocks/mock-dependency",
     "mock-solc-0.6": "file:../../tests/mocks/mock-solc-0.6",
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "prettier": "^1.19.1",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.3.0",

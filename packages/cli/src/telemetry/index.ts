@@ -38,9 +38,8 @@ export default {
     if (telemetryOptions === undefined || !telemetryOptions.optIn) return;
 
     // normalize network name
-    const { ZWeb3 } = await import('@openzeppelin/upgrades');
-    let network = await ZWeb3.getNetworkName();
-    if (network.match(/dev-/)) {
+    let network = params.network as string | undefined;
+    if (network !== undefined && network.match(/dev-/)) {
       network = 'development';
     }
 

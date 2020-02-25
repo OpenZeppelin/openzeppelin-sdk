@@ -108,7 +108,7 @@ export const options: Option[] = [
       const networks = ConfigManager.getNetworkNamesFromConfig();
       const { network: lastNetwork, expired } = Session.getNetwork();
 
-      if (expired) {
+      if (expired || lastNetwork === undefined) {
         return {
           prompt: 'Pick a network',
           choices: networks,

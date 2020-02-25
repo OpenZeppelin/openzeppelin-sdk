@@ -3,7 +3,6 @@ import { getConstructorInputs } from '@openzeppelin/upgrades';
 import Session from '../../models/network/Session';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
-import ConfigManager from '../../models/config/ConfigManager';
 import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
@@ -61,6 +60,9 @@ export async function action(params: Options & Args): Promise<void> {
 }
 
 async function runCreate(params: Options & Args): Promise<void> {
+  // The syntax params['key'] is used to circumvent the type checker.
+  // This hack is temporary and should be removed once we remove the create command.
+
   if (params.arguments.length > 0) {
     // Translate arguments to syntax expected by create.
     params['args'] = params.arguments.join(',');
@@ -71,6 +73,7 @@ async function runCreate(params: Options & Args): Promise<void> {
   }
 
   params.skipCompile = true;
+  params['noDeprecationWarning'] = true;
 
   await createAction(params.contract, params);
 }

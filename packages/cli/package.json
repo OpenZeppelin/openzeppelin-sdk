@@ -1,6 +1,6 @@
 {
   "name": "@openzeppelin/cli",
-  "version": "2.7.0",
+  "version": "2.8.0-rc.0",
   "description": "Command-line interface for the OpenZeppelin smart contract platform",
   "main": "./lib/index.js",
   "private": false,
@@ -58,8 +58,7 @@
   "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme",
   "dependencies": {
     "@openzeppelin/fuzzy-solidity-import-parser": "^0.1.2",
-    "@openzeppelin/test-environment": "^0.1.0",
-    "@openzeppelin/upgrades": "2.7.0",
+    "@openzeppelin/upgrades": "2.8.0-rc.0",
     "@types/fs-extra": "^7.0.0",
     "@types/npm": "^2.0.29",
     "@types/semver": "^5.5.0",
@@ -72,7 +71,7 @@
     "env-paths": "^2.2.0",
     "ethereumjs-util": "^6.1.0",
     "find-up": "^3.0.0",
-    "firebase": "^6.6.0",
+    "firebase": "^7.8.0",
     "fs-extra": "^7.0.1",
     "glob": "^7.1.6",
     "inquirer": "^6.4.1",
@@ -98,6 +97,7 @@
     "web3-utils": "1.2.2"
   },
   "devDependencies": {
+    "@openzeppelin/test-environment": "^0.1.2",
     "@types/chai-as-promised": "^7.1.2",
     "@types/lodash": "^4.14.119",
     "@types/mocha": "^5.2.5",
@@ -123,6 +123,7 @@
     "mock-stdlib-undeployed-2": "file:./test/mocks/mock-stdlib-undeployed-2",
     "mock-stdlib-unpublished": "file:./test/mocks/mock-stdlib-unpublished",
     "mock-stdlib-unsupported": "file:./test/mocks/mock-stdlib-unsupported",
+    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
     "prettier": "^1.19.1",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
