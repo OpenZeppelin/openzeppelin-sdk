@@ -409,14 +409,14 @@ export default class NetworkController {
   }
 
   // Contract model
-  public logErrorForPackageContract(packageName: string, contractName: string, throwIfFail = false): void {
+  public logErrorIfContractPacakgeIsInvalid(packageName: string, contractName: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
     const err = this.getPackageContractError(packageName, contractName);
     if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public logErrorForProjectContracts(throwIfFail = false): void {
+  public logErrorIfProjectDeploymentIsInvalid(throwIfFail = false): void {
     const err = this.getDeploymentErrorForProject();
     if (err) this.logErrorMessage(err, throwIfFail);
   }
@@ -643,7 +643,7 @@ export default class NetworkController {
 
       const createArgs = {
         packageName,
-        contractName: contractName,
+        contractName,
         initMethod,
         initArgs,
         admin,
@@ -762,7 +762,7 @@ export default class NetworkController {
     const contract = this.contractManager.getContractClass(packageName, contractName);
     const args = {
       packageName,
-      contractName: contractName,
+      contractName,
       initMethod,
       initArgs,
       admin,

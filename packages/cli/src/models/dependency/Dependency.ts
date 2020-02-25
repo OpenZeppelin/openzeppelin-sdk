@@ -108,9 +108,9 @@ export default class Dependency {
     );
 
     await Promise.all(
-      map(contracts, async ([contract, contractAlias]) => {
+      map(contracts, async ([contract, contractName]) => {
         contract.link(libraries);
-        await project.setImplementation(contract, contractAlias);
+        await project.setImplementation(contract, contractName);
       }),
     );
 
