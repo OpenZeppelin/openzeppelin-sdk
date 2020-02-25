@@ -374,7 +374,7 @@ describe('update script', function() {
         restoreUpdate();
         stubUpdate(
           { ImplV1: 'UnmigratableImplV2', WithLibraryImplV1: 'WithLibraryImplV2' },
-          { ImplV1: UnmigratableImplV2, WithLibraryImplV1: this.withLibraryImplV2Address },
+          { ImplV1: unmigratableImplV2, WithLibraryImplV1: this.withLibraryImplV2Address },
         );
 
         await update({
