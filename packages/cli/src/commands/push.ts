@@ -78,7 +78,7 @@ async function action(options: any): Promise<void> {
     ...promptDeployDependencies,
   };
 
-  if (contracts) pushArguments.contracts = [contracts];
+  if (contracts) pushArguments.contracts = contracts;
 
   if (!options.skipTelemetry)
     await Telemetry.report('push', (pushArguments as unknown) as Record<string, unknown>, interactive);
