@@ -820,20 +820,25 @@ export default class NetworkController {
 
   // Proxy model
   private async updateTruffleDeployedInformation(contractName: string, implementation: Contract): Promise<void> {
-    const path = Contracts.getLocalPath(contractName);
-    const data = fs.readJsonSync(path);
-    if (!data.networks) {
-      data.networks = {};
+    try {
+      const path = Contracts.getLocalPath(contractName);
+      const data = fs.readJsonSync(path);
+      if (!data.networks) {
+        data.networks = {};
+      }
+      const networkId = await ZWeb3.getNetwork();
+      data.networks[networkId] = {
+        links: {},
+        events: {},
+        address: implementation.address,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        updated_at: Date.now(),
+      };
+      fs.writeJsonSync(path, data, { spaces: 2 });
+    } catch (error) {
+      error.message = `$Could not find ${contractName} in contracts directory. Error: ${error.message}.`;
+      throw error;
     }
-    const networkId = await ZWeb3.getNetwork();
-    data.networks[networkId] = {
-      links: {},
-      events: {},
-      address: implementation.address,
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      updated_at: Date.now(),
-    };
-    fs.writeJsonSync(path, data, { spaces: 2 });
   }
 
   // Proxy model
