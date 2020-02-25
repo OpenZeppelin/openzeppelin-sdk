@@ -17,5 +17,5 @@ export function parseContractReference(contractReference: string): ParsedContrac
     ({ contractName, package: packageName } = fromContractFullName(contractReference));
   }
 
-  return { proxyAddress, contractName: contractName, packageName };
+  return { proxyAddress, contractName, packageName };
 }

@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { pickBy, isEqual, isEmpty } from 'lodash';
+import { pull, pickBy, isEqual, isEmpty } from 'lodash';
 
 import { Loggy } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
@@ -264,10 +264,7 @@ export default class ProjectFile {
   }
 
   public removeContract(contract: string): void {
-    const index = this.data.contracts.indexOf(contract);
-    if (index > -1) {
-      this.data.contracts.splice(index, 1);
-    } else throw new Error(`Failed to remove ${contract} from project ${this.data.name} because it is not present.`);
+    pull(this.data.contracts, contract);
   }
 
   public write(): void {

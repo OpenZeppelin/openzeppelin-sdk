@@ -416,26 +416,26 @@ export default class NetworkController {
   }
 
   // Contract model
-  public throwOrLogErrorForPackageContract(packageName: string, contractName: string, throwIfFail = false): void {
+  public logErrorIfContractPacakgeIsInvalid(packageName: string, contractName: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
-    const err = this.getErrorForPackageContract(packageName, contractName);
-    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+    const err = this.getPackageContractError(packageName, contractName);
+    if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public throwOrLogErrorForProjectContracts(throwIfFail = false): void {
-    const err = this.getErrorForProjectContracts();
-    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+  public logErrorIfProjectDeploymentIsInvalid(throwIfFail = false): void {
+    const err = this.getDeploymentErrorForProject();
+    if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  public throwOrLogErrorForContract(contractName: string, throwIfFail = false): void {
-    const err = this.getErrorForContract(contractName);
-    if (err) this.throwOrLogErrorMessage(err, throwIfFail);
+  public logErrorIfContractDeploymentIsInvalid(contractName: string, throwIfFail = false): void {
+    const err = this.getContractDeploymentError(contractName);
+    if (err) this.logErrorMessage(err, throwIfFail);
   }
 
   // Contract model
-  private getErrorForProjectContracts(): string {
+  private getDeploymentErrorForProject(): string {
     const contractsMissing = this.projectFile.contracts.filter(
       o => this.isProjectFileContract(o) && !this.isNetworkFileContract(o),
     );
@@ -450,7 +450,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  private getErrorForContract(contractName: string): string {
+  private getContractDeploymentError(contractName: string): string {
     if (!this.isProjectFileContract(contractName)) {
       return `Contract ${contractName} not found in this project`;
     } else if (!this.isNetworkFileContract(contractName)) {
@@ -461,7 +461,7 @@ export default class NetworkController {
   }
 
   // TODO: move to utils folder or somewhere else
-  private throwOrLogErrorMessage(msg: string, throwIfFail = false): void | never {
+  private logErrorMessage(msg: string, throwIfFail = false): void | never {
     if (throwIfFail) {
       throw Error(msg);
     } else {
@@ -692,7 +692,9 @@ export default class NetworkController {
     const contract = this.contractManager.getContractClass(packageName, contractName);
     await this.setSolidityLibs(contract);
 
+    Loggy.spin(__filename, 'createInstance', 'create-instance', `Deploying an instance of ${contractName}`);
     const instance = await Transactions.deployContract(contract, initArgs, this.txParams);
+    Loggy.succeed('create-instance', `Deployed instance of ${contractName}`);
 
     if (packageName === this.projectFile.name) {
       await this.updateTruffleDeployedInformation(contractName, instance);
@@ -770,7 +772,7 @@ export default class NetworkController {
     const contract = this.contractManager.getContractClass(packageName, contractName);
     const args = {
       packageName,
-      contractName: contractName,
+      contractName,
       initMethod,
       initArgs,
       admin,
@@ -828,20 +830,25 @@ export default class NetworkController {
 
   // Proxy model
   private async updateTruffleDeployedInformation(contractName: string, implementation: Contract): Promise<void> {
-    const path = Contracts.getLocalPath(contractName);
-    const data = fs.readJsonSync(path);
-    if (!data.networks) {
-      data.networks = {};
+    try {
+      const path = Contracts.getLocalPath(contractName);
+      const data = fs.readJsonSync(path);
+      if (!data.networks) {
+        data.networks = {};
+      }
+      const networkId = await ZWeb3.getNetwork();
+      data.networks[networkId] = {
+        links: {},
+        events: {},
+        address: implementation.address,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        updated_at: Date.now(),
+      };
+      fs.writeJsonSync(path, data, { spaces: 2 });
+    } catch (error) {
+      error.message = `$Could not find ${contractName} in contracts directory. Error: ${error.message}.`;
+      throw error;
     }
-    const networkId = await ZWeb3.getNetwork();
-    data.networks[networkId] = {
-      links: {},
-      events: {},
-      address: implementation.address,
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      updated_at: Date.now(),
-    };
-    fs.writeJsonSync(path, data, { spaces: 2 });
   }
 
   // Proxy model
@@ -1092,9 +1099,9 @@ export default class NetworkController {
   }
 
   // Contract model
-  private getErrorForPackageContract(packageName: string, contractName: string): string {
+  private getPackageContractError(packageName: string, contractName: string): string {
     if (packageName === this.projectFile.name) {
-      return this.getErrorForContract(contractName);
+      return this.getContractDeploymentError(contractName);
     } else if (!this.projectFile.hasDependency(packageName)) {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {

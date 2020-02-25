@@ -54,7 +54,7 @@ export default class LocalController {
       __filename,
       'initProjectFile',
       'init-project-file',
-      `Project initialized. Write a new contract in the contracts folder and run 'openzeppelin create' to deploy it.`,
+      `Project initialized. Write a new contract in the contracts folder and run 'openzeppelin deploy' to deploy it.`,
     );
   }
 
@@ -121,9 +121,14 @@ export default class LocalController {
 
   // Contract model
   public getContractSourcePath(contractName: string): { sourcePath: string; compilerVersion: string } | never {
-    const contractDataPath = Contracts.getLocalPath(contractName);
-    const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
-    return { sourcePath, compilerVersion: compiler.version };
+    try {
+      const contractDataPath = Contracts.getLocalPath(contractName);
+      const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
+      return { sourcePath, compilerVersion: compiler.version };
+    } catch (error) {
+      error.message = `$Could not find ${contractName} in contracts directory. Error: ${error.message}.`;
+      throw error;
+    }
   }
 
   public writePackage(): void {

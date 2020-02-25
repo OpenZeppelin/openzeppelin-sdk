@@ -101,7 +101,7 @@ async function deployProxy(params: Options & Args): Promise<void> {
   const args = getConstructorArgs(packageName, contractName, deployArgs, controller.contractManager);
 
   try {
-    await controller.throwOrLogErrorForPackageContract(packageName, contractName, false);
+    await controller.logErrorIfContractPacakgeIsInvalid(packageName, contractName, false);
     const proxy = await controller.createProxy(
       packageName,
       contractName,

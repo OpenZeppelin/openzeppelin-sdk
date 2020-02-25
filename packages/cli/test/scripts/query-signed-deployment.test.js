@@ -77,7 +77,7 @@ describe('query-signed-deployment script', function() {
       const address = await querySignedDeployment({
         signature,
         salt,
-        contractName: contractName,
+        contractName,
         methodName: 'initialize',
         methodArgs: [30],
         admin,

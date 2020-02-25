@@ -55,6 +55,7 @@ export const args: Arg[] = [
 
       const { package: packageName, contractName } = fromContractFullName(fullContractName);
       const contract = new ContractManager().getContractClass(packageName, contractName);
+
       const constructorInputs = getConstructorInputs(contract);
 
       return constructorInputs.map((arg, index) => ({
@@ -102,7 +103,7 @@ export const options: Option[] = [
       const networks = ConfigManager.getNetworkNamesFromConfig();
       const { network: lastNetwork, expired } = Session.getNetwork();
 
-      if (expired) {
+      if (expired || lastNetwork === undefined) {
         return {
           prompt: 'Pick a network',
           choices: networks,

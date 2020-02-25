@@ -22,7 +22,7 @@ export default async function update({
   const controller = new NetworkController(network, txParams, networkFile);
 
   try {
-    await controller.throwOrLogErrorForProjectContracts(!force);
+    await controller.logErrorIfProjectDeploymentIsInvalid(!force);
     const proxies = await controller.upgradeProxies(packageName, contractName, proxyAddress, methodName, methodArgs);
   } finally {
     controller.writeNetworkPackageIfNeeded();

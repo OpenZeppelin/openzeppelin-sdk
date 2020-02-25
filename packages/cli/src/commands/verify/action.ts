@@ -1,16 +1,17 @@
 import NetworkController from '../../models/network/NetworkController';
 import { Options, Args } from './spec';
-import ConfigManager from '../../models/config/ConfigManager';
 
 export async function action(params: Options & Args & { dontExitProcess: boolean }): Promise<void> {
-  if (process.env.NODE_ENV !== 'test') {
-    const { network } = await ConfigManager.initNetworkConfiguration(params);
-    Object.assign(params, { network });
-  }
-
   const controller = new NetworkController(params.network, params.txParams, params.networkFile);
 
-  controller.throwOrLogErrorForContract(params.contract, true);
+  try {
+    controller.logErrorIfContractDeploymentIsInvalid(params.contract, true);
+  } catch (e) {
+    if (!e.message.includes('has changed locally')) {
+      e.message += '\n\nVerification of regular instances is not yet supported.';
+    }
+    throw e;
+  }
 
   await controller.verifyAndPublishContract(
     params.contract,

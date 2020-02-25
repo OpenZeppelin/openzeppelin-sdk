@@ -151,6 +151,13 @@ jobs:
           workspace: tests/kits/test
           run-yarn: true
 
+  integration-cli-deploy:
+    <<: *integration
+    steps:
+      - test:
+          workspace: tests/deploy
+          run-yarn: true
+
 workflows:
   version: 2
   test:
@@ -173,4 +180,6 @@ workflows:
       - integration-cli-hdwallet:
           requires: [test-lib, test-cli]
       - integration-cli-kits:
+          requires: [test-lib, test-cli]
+      - integration-cli-deploy:
           requires: [test-lib, test-cli]
