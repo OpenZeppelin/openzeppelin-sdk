@@ -451,7 +451,9 @@ export default class NetworkController {
       o => this.isProjectFileContract(o) && !this.isNetworkFileContract(o),
     );
     const contractsDeployed = this.projectFile.contracts.filter(o => this.isNetworkFileContract(o));
-    const contractsChanged = filter(contractsDeployed, contractName => this.hasContractChanged(contractName));
+    const contractsChanged = filter(contractsDeployed, contractName =>
+      this.hasContractChanged(contractName, Contracts.getFromLocal(contractName)),
+    );
 
     if (!isEmpty(contractsMissing)) {
       return `Contracts ${contractsMissing.join(', ')} are not deployed.`;
@@ -466,7 +468,7 @@ export default class NetworkController {
       return `Contract ${contractName} not found in this project`;
     } else if (!this.isNetworkFileContract(contractName)) {
       return `Contract ${contractName} is not deployed to ${this.network}.`;
-    } else if (this.hasContractChanged(contractName)) {
+    } else if (this.hasContractChanged(contractName, Contracts.getFromLocal(contractName))) {
       return `Contract ${contractName} has changed locally since the last deploy, consider running 'openzeppelin push'.`;
     }
   }
@@ -490,9 +492,6 @@ export default class NetworkController {
     if (!this.isProjectFileContract(contractName)) return false;
     if (this.isProjectFileContract(contractName) && !this.isNetworkFileContract(contractName)) return true;
 
-    if (!contract) {
-      contract = Contracts.getFromLocal(contractName);
-    }
     return !this.networkFile.hasSameBytecode(contractName, contract);
   }
 
