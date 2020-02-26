@@ -382,11 +382,11 @@ export default class NetworkFile {
     return this.dependencyHasCustomDeploy(name) && this.dependencySatisfiesVersionRequirement(name);
   }
 
-  public hasSameBytecode(contractName: string, klass: any): boolean {
-    const contract = this.contract(contractName) || this.solidityLib(contractName);
-    if (contract) {
-      const localBytecode = contract.localBytecodeHash;
-      const currentBytecode = bytecodeDigest(klass.schema.bytecode);
+  public hasSameBytecode(contractName: string, contract: Contract): boolean {
+    const contractDeploymentInfo = this.contract(contractName) || this.solidityLib(contractName);
+    if (contractDeploymentInfo) {
+      const localBytecode = contractDeploymentInfo.localBytecodeHash;
+      const currentBytecode = bytecodeDigest(contract.schema.bytecode);
       return currentBytecode === localBytecode;
     }
   }
