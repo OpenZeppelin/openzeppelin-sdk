@@ -23,7 +23,7 @@ export default async function createProxy({
 
   const controller = new NetworkController(network, txParams, networkFile);
   try {
-    await controller.logErrorIfContractPacakgeIsInvalid(packageName, contractName, !force);
+    await controller.logErrorIfContractPackageIsInvalid(packageName, contractName, !force);
     const proxy = await controller.createProxy(
       packageName,
       contractName,

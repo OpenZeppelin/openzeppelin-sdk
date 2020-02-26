@@ -639,6 +639,7 @@ export default class NetworkController {
     signature?: string,
     kind?: ProxyType,
     transpiledContractName?: string,
+    transpilerVersion?: string,
   ): Promise<Contract> {
     try {
       await this.migrateManifestVersionIfNeeded();
@@ -670,6 +671,7 @@ export default class NetworkController {
         implementation: implementationAddress,
         admin: admin || this.networkFile.proxyAdminAddress || (await this.project.getAdminAddress()),
         kind,
+        transpilerVersion,
       });
       return instance;
     } finally {

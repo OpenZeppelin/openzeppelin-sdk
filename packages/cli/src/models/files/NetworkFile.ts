@@ -44,6 +44,7 @@ export interface ProxyInterface {
   implementation?: string;
   admin?: string;
   kind?: ProxyType;
+  transpilerVersion?: string;
   bytecodeHash?: string; // Only used for non-proxies from regulear deploys.
 }
 

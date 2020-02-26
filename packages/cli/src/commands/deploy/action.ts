@@ -101,7 +101,7 @@ async function deployProxy(params: Options & Args): Promise<void> {
   const args = getConstructorArgs(packageName, contractName, deployArgs, controller.contractManager);
 
   try {
-    await controller.logErrorIfContractPacakgeIsInvalid(packageName, contractName, false);
+    await controller.logErrorIfContractPackageIsInvalid(packageName, contractName, false);
     const proxy = await controller.createProxy(
       packageName,
       contractName,
@@ -112,6 +112,7 @@ async function deployProxy(params: Options & Args): Promise<void> {
       undefined,
       isMinimal ? ProxyType.Minimal : ProxyType.Upgradeable,
       transpiledContractName,
+      '0.1.0',
     );
     stdout(proxy.address);
   } finally {
