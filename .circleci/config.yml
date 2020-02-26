@@ -176,6 +176,8 @@ workflows:
           requires: [setup]
       - test-cli:
           requires: [setup]
+      - test-transpiler:
+          requires: [setup]
       - example-upgrades-library:
           requires: [test-lib]
       - example-create-instances-from-solidity:
