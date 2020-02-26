@@ -416,7 +416,7 @@ export default class NetworkController {
   }
 
   // Contract model
-  public logErrorIfContractPacakgeIsInvalid(packageName: string, contractName: string, throwIfFail = false): void {
+  public logErrorIfContractPackageIsInvalid(packageName: string, contractName: string, throwIfFail = false): void {
     if (!packageName) packageName = this.projectFile.name;
     const err = this.getPackageContractError(packageName, contractName);
     if (err) this.logErrorMessage(err, throwIfFail);
