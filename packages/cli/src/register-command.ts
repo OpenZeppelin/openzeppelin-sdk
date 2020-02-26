@@ -64,7 +64,7 @@ export function register(program: Command, spec: CommandSpec, getAction: () => P
   const signature = generateSignature(spec.name, spec.args);
 
   const command = program
-    .command(signature)
+    .command(signature, undefined, { noHelp: true })
     .description(spec.description)
     .action(async (...actionArgs: unknown[]) => {
       const { preAction, action }: Action = await getAction();
