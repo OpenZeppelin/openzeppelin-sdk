@@ -47,6 +47,17 @@ import { ProxyType } from '../../scripts/interfaces';
 type Project = ProxyAdminProject | AppProject;
 type ProjectDeployer = ProxyAdminProjectDeployer | AppProjectDeployer;
 
+export interface CreateProxyOptions {
+  initMethod: string;
+  initArgs: string[];
+  admin: string;
+  salt: string;
+  signature: string;
+  packageName: string;
+  transpiledContractName: string;
+  transpilerVersion: string;
+}
+
 export default class NetworkController {
   public localController: LocalController;
   public txParams: TxParams;
@@ -630,21 +641,25 @@ export default class NetworkController {
 
   // Proxy model
   public async createProxy(
-    packageName: string,
     contractName: string,
-    initMethod: string,
-    initArgs: string[],
-    admin?: string,
-    salt?: string,
-    signature?: string,
-    kind?: ProxyType,
-    transpiledContractName?: string,
-    transpilerVersion?: string,
+    kind: ProxyType,
+    options: Partial<CreateProxyOptions> = {},
   ): Promise<Contract> {
+    if (!options.packageName) options.packageName = this.projectFile.name;
+
+    const {
+      signature,
+      packageName,
+      transpiledContractName,
+      transpilerVersion,
+      salt,
+      admin,
+      initArgs,
+      initMethod,
+    } = options;
     try {
       await this.migrateManifestVersionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
-      if (!packageName) packageName = this.projectFile.name;
       const contract = this.contractManager.getContractClass(packageName, transpiledContractName ?? contractName);
       await this.setSolidityLibs(contract);
       this.checkInitialization(contract, initMethod);

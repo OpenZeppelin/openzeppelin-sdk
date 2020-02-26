@@ -24,16 +24,14 @@ export default async function createProxy({
   const controller = new NetworkController(network, txParams, networkFile);
   try {
     await controller.logErrorIfContractPackageIsInvalid(packageName, contractName, !force);
-    const proxy = await controller.createProxy(
+    const proxy = await controller.createProxy(contractName, kind, {
       packageName,
-      contractName,
-      methodName,
-      methodArgs,
+      initMethod: methodName,
+      initArgs: methodArgs,
       admin,
       salt,
       signature,
-      kind,
-    );
+    });
     stdout(proxy.address);
 
     return proxy;
