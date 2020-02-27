@@ -70,7 +70,7 @@ describe('SolidityContractsCompiler', function() {
   };
 
   before('stub solc list', function() {
-    setSolcCachePath(path.resolve(__dirname, '../../../../solc/'));
+    setSolcCachePath(path.resolve(__dirname, '../../../../../solc/'));
     sinon
       .stub(axios, 'get')
       .withArgs('https://solc-bin.ethereum.org/bin/list.json')
@@ -100,7 +100,7 @@ describe('SolidityContractsCompiler', function() {
   describe('version 0.5.x binary', function() {
     beforeEach(function() {
       setSolcBinEnv({
-        PATH: `${process.env.PATH}${path.delimiter}${path.resolve(__dirname, '../../../../solc/')}`,
+        PATH: `${process.env.PATH}${path.delimiter}${path.resolve(__dirname, '../../../../../solc/')}`,
       });
     });
 
