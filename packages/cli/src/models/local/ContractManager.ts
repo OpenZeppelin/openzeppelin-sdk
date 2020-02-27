@@ -41,7 +41,8 @@ export default class ContractManager {
           return (
             this.isLocalContract(contractsDir, contract, root) &&
             !this.isLibrary(contract) &&
-            !this.isAbstractContract(contract)
+            !this.isAbstractContract(contract) &&
+            !this.isUpgradable(contract)
           );
         })
         .map(({ contractName }) => contractName);
@@ -64,5 +65,9 @@ export default class ContractManager {
       contract.ast &&
       !!contract.ast.nodes.find(node => node.contractKind === 'library' && node.name === contract.contractName)
     );
+  }
+
+  private isUpgradable(contract: { [key: string]: any }): boolean {
+    return contract && contract.contractName.includes('Upgradable') && contract.sourcePath.includes('__upgradable__');
   }
 }
