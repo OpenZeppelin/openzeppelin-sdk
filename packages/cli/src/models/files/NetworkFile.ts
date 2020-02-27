@@ -385,9 +385,9 @@ export default class NetworkFile {
   public hasSameBytecode(contractName: string, contract: Contract): boolean {
     const contractDeploymentInfo = this.contract(contractName) || this.solidityLib(contractName);
     if (contractDeploymentInfo) {
-      const localBytecode = contractDeploymentInfo.localBytecodeHash;
-      const currentBytecode = bytecodeDigest(contract.schema.bytecode);
-      return currentBytecode === localBytecode;
+      const deployedBytecode = contractDeploymentInfo.localBytecodeHash;
+      const artifactBytecode = bytecodeDigest(contract.schema.bytecode);
+      return artifactBytecode === deployedBytecode;
     }
   }
 

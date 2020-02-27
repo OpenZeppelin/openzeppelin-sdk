@@ -138,11 +138,7 @@ export default class NetworkController {
     { reupload = false, force = false, transpiledContracts = {} } = {},
   ): Promise<void | never> {
     const changedLibraries = this.solidityLibsForPush(!reupload);
-    const contractObjects = this.contractsListForPush(
-      contracts ? contracts.map(name => transpiledContracts[name] ?? name) : undefined,
-      !reupload,
-      changedLibraries,
-    );
+    const contractObjects = this.contractsListForPush(contracts, !reupload, changedLibraries, transpiledContracts);
     const buildArtifacts = getBuildArtifacts();
 
     // ValidateContracts also extends each contract class with validation errors and storage info
@@ -201,12 +197,16 @@ export default class NetworkController {
     contracts: string[] | undefined,
     onlyChanged = false,
     changedLibraries: Contract[] = [],
+    transpiledContracts = {},
   ): [string, Contract][] {
     const newVersion = this.isNewVersionRequired();
 
     contracts = contracts || this.projectFile.contracts;
     return contracts
-      .map((contractName): [string, Contract] => [contractName, Contracts.getFromLocal(contractName)])
+      .map((contractName): [string, Contract] => [
+        contractName,
+        Contracts.getFromLocal(transpiledContracts[contractName] ?? contractName),
+      ])
       .filter(
         ([contractName, contract]) =>
           newVersion ||
@@ -930,7 +930,10 @@ export default class NetworkController {
   private async upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contractName };
-      const contract = this.contractManager.getContractClass(proxy.package, proxy.contractName);
+      const contract = this.contractManager.getContractClass(
+        proxy.package,
+        proxy.transpilerVersion ? `${proxy.contractName}Upgradable` : proxy.contractName,
+      );
       await this.setSolidityLibs(contract);
       const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);
