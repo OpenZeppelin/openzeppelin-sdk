@@ -1098,7 +1098,7 @@ export default class NetworkController {
       return `Dependency ${packageName} not found in project.`;
     } else if (!this.networkFile.hasDependency(packageName)) {
       return `Dependency ${packageName} has not been linked yet. Please run 'openzeppelin push'.`;
-    } else if (!new Dependency(packageName).projectFile.contracts.includes(contractName)) {
+    } else if (!new Dependency(packageName).projectFile.hasContract(contractName)) {
       return `Contract ${contractName} is not provided by ${packageName}.`;
     }
   }

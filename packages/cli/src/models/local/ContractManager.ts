@@ -22,10 +22,10 @@ export default class ContractManager {
 
   public hasContract(packageName: string, contractName: string): boolean {
     if (!packageName || packageName === this.projectFile.name) {
-      return !!this.projectFile.contracts.includes(contractName);
+      return !!this.projectFile.hasContract(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      return !!dependency.projectFile.contracts.includes(contractName);
+      return !!dependency.projectFile.hasContract(contractName);
     }
   }
 
