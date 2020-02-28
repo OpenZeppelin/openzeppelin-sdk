@@ -21,7 +21,7 @@ export default async function push({
     if (deployProxyFactory) await controller.deployProxyFactory();
 
     const localContractAliases = contractAliases
-      .map(fromContractFullName)
+      ?.map(fromContractFullName)
       .filter(({ package: packageName }) => packageName === undefined || packageName === controller.projectFile.name)
       .map(({ contract }) => contract);
 
