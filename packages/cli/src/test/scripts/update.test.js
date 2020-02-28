@@ -1,7 +1,7 @@
 'use strict';
 require('../setup');
 
-import { mapKeys, omit } from 'lodash';
+import { mapKeys } from 'lodash';
 import sinon from 'sinon';
 
 import { Contracts, Proxy, ProxyAdminProject, AppProject } from '@openzeppelin/upgrades';
@@ -9,6 +9,7 @@ import { accounts } from '@openzeppelin/test-environment';
 
 import CaptureLogs from '../helpers/captureLogs';
 
+import ContractManager from '../../models/local/ContractManager';
 import add from '../../scripts/add';
 import push from '../../scripts/push';
 import bump from '../../scripts/bump';
