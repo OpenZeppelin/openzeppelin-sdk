@@ -8,6 +8,6 @@
   "private": true,
   "dependencies": {
     "@openzeppelin/cli": "2.8.0-rc.0",
-    "@openzeppelin/test-environment": "^0.1.2"
+    "@openzeppelin/test-environment": "^0.1.3"
   }
 }
