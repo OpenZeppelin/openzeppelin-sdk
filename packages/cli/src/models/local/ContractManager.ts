@@ -25,7 +25,7 @@ export default class ContractManager {
       return !!this.projectFile.hasContract(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      return !!dependency.projectFile.hasContract(contractName);
+      return dependency.projectFile.hasContract(contractName);
     }
   }
 
