@@ -11,7 +11,7 @@
   "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.8.0-rc.1"
+    "@openzeppelin/upgrades": "2.8.0-rc.2"
   },
   "devDependencies": {
     "@openzeppelin/cli": "2.8.0-rc.2",

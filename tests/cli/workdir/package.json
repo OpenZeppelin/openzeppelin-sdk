@@ -6,7 +6,7 @@
   "author": "santiago@openzeppelin.com",
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.8.0-rc.1",
+    "@openzeppelin/upgrades": "2.8.0-rc.2",
     "bignumber.js": "^7.2.0",
     "mock-stdlib": "file:../dependencies/mock-stdlib-1.1.0",
     "truffle-hdwallet-provider": "0.0.6"
