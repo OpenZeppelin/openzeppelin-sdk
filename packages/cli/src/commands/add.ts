@@ -15,7 +15,7 @@ const description = 'add contract to your project. Provide a list of whitespace-
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .usage('[contractName1 ... contractNameN [options]')
+    .usage('[contractName1 ... contractNameN] [options]')
     .description(description)
     .option('--all', 'add all contracts in your build directory')
     .withPushOptions()
