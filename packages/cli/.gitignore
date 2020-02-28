@@ -2,6 +2,7 @@ node_modules
 .zos.session
 zos.*
 build
+/test-build
 /lib
 .node-xmlhttprequest-sync-*
 

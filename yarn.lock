@@ -1088,44 +1088,19 @@
     fs-extra "^8.1.0"
     try-require "^1.2.1"
 
-"@openzeppelin/contract-loader@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contract-loader/-/contract-loader-0.6.1.tgz#fa0fbddf78d1ec8e6c9bbe25d8e5d646274541f9"
-  integrity sha512-vYNapuK6THq5ueOReFkMfW4Ajk4gZ8jdf1AeoFUyD/U4gQyIedROU0/GB9J93mQ1hb8wVrxiWjGq6Ou3OVbjVg==
-  dependencies:
-    find-up "^4.1.0"
-    fs-extra "^8.1.0"
-    try-require "^1.2.1"
-
 "@openzeppelin/fuzzy-solidity-import-parser@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@openzeppelin/fuzzy-solidity-import-parser/-/fuzzy-solidity-import-parser-0.1.2.tgz#3b9f524d6028ca73df60474a313e0295e5610c51"
   integrity sha512-leqEwfs8GlrPDrVcVc8Hv6LJ62ZzR0RgjwQNCkpT6H5jW9RB8YdR0a3inHoricSvw+sKI1b1hOqsCtPPZNnhng==
 
-"@openzeppelin/test-environment@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/test-environment/-/test-environment-0.1.2.tgz#62fa8d1b00d45a8c7a0e7de20e230abef3fb1178"
-  integrity sha512-dgtpN6voS1UmTvV3qwymZDiVRhRDxI+Fl9UQciTFvvpgsSSPL4jVwaKoYSCO/IMcYynzQJvrQtw6LT5wI2Ayjg==
+"@openzeppelin/test-environment@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/test-environment/-/test-environment-0.1.3.tgz#2ac7a6f436fef3345796b2d4d8f4e0cad7a6af12"
+  integrity sha512-joYTi4hFbXjKEWvgtitQm43q5HtnQvPnz8eBoqHg+fijNi2v8HqC76Id+m2yOtXtDwG0XSvNzbiJaT1lxNBc1w==
   dependencies:
     "@openzeppelin/contract-loader" "^0.6.1"
     "@truffle/contract" "^4.0.38"
-    ansi-colors "^4.1.1"
-    ethereumjs-wallet "^0.6.3"
-    find-up "^4.1.0"
-    ganache-core "^2.8.0"
-    lodash.merge "^4.6.2"
-    p-queue "^6.2.0"
-    semver "^6.3.0"
-    try-require "^1.2.1"
-    web3 "1.2.2"
-
-"@openzeppelin/test-environment@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/test-environment/-/test-environment-0.1.2.tgz#62fa8d1b00d45a8c7a0e7de20e230abef3fb1178"
-  integrity sha512-dgtpN6voS1UmTvV3qwymZDiVRhRDxI+Fl9UQciTFvvpgsSSPL4jVwaKoYSCO/IMcYynzQJvrQtw6LT5wI2Ayjg==
-  dependencies:
-    "@openzeppelin/contract-loader" "^0.6.1"
-    "@truffle/contract" "^4.0.38"
+    "@types/web3" "1.0.19"
     ansi-colors "^4.1.1"
     ethereumjs-wallet "^0.6.3"
     find-up "^4.1.0"
@@ -1332,6 +1307,13 @@
   dependencies:
     bignumber.js "*"
 
+"@types/bn.js@*":
+  version "4.11.6"
+  resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.6.tgz#c306c70d9358aaea33cd4eda092a742b9505967c"
+  integrity sha512-pqr857jrp2kPuO9uRjZ3PwnJTjoQy+fcdxvBTvHm6dkmEL9q+hDD/2j/0ELOBPtPnS8LjCX0gI9nbl8lVkadpg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/bn.js@^4.11.4":
   version "4.11.5"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.5.tgz#40e36197433f78f807524ec623afcf0169ac81dc"
@@ -1461,6 +1443,19 @@
 "@types/semver@^5.5.0":
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-5.5.0.tgz#146c2a29ee7d3bae4bf2fcb274636e264c813c45"
+
+"@types/underscore@*":
+  version "1.9.4"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.9.4.tgz#22d1a3e6b494608e430221ec085fa0b7ccee7f33"
+  integrity sha512-CjHWEMECc2/UxOZh0kpiz3lEyX2Px3rQS9HzD20lxMvx571ivOBQKeLnqEjxUY0BMgp6WJWo/pQLRBwMW5v4WQ==
+
+"@types/web3@1.0.19":
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.19.tgz#46b85d91d398ded9ab7c85a5dd57cb33ac558924"
+  integrity sha512-fhZ9DyvDYDwHZUp5/STa9XW2re0E8GxoioYJ4pEUZ13YHpApSagixj7IAdoYH5uAK+UalGq6Ml8LYzmgRA/q+A==
+  dependencies:
+    "@types/bn.js" "*"
+    "@types/underscore" "*"
 
 "@typescript-eslint/eslint-plugin@^1.11.0":
   version "1.13.0"
@@ -5077,6 +5072,11 @@ fetch-ponyfill@^4.0.0:
   dependencies:
     node-fetch "~1.7.1"
 
+fgbg@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/fgbg/-/fgbg-0.1.4.tgz#ddb3fd83828e360b3888e7f20fe4fa951dfca9a2"
+  integrity sha512-HzjEYeL4RH0/xqrUu6q9KGR2OssdhDFAsb19tyyEYDEE4gWJKM/BuIdoJ3staEJ/5gjhZVCC+ZUu49uY7ShnDg==
+
 figgy-pudding@^3.4.1, figgy-pudding@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.1.tgz#862470112901c727a0e495a80744bd5baa1d6790"
@@ -7603,37 +7603,37 @@ mocha@^6.2.2:
     yargs-unparser "1.6.0"
 
 "mock-dependency@file:tests/mocks/mock-dependency":
-  version "2.7.0"
+  version "2.8.0-rc.0"
 
 mock-fs@^4.1.0:
   version "4.10.2"
   resolved "https://registry.yarnpkg.com/mock-fs/-/mock-fs-4.10.2.tgz#ee11e5a3288b0235fb345efe8b25610f7dd397b8"
 
 "mock-solc-0.6@file:tests/mocks/mock-solc-0.6":
-  version "2.7.0"
+  version "2.8.0-rc.0"
 
-"mock-stdlib-2@file:./packages/cli/test/mocks/mock-stdlib-2":
+"mock-stdlib-2@file:./packages/cli/mocks/mock-stdlib-2":
   version "1.2.0"
 
-"mock-stdlib-invalid@file:./packages/cli/test/mocks/mock-stdlib-invalid":
+"mock-stdlib-invalid@file:./packages/cli/mocks/mock-stdlib-invalid":
   version "1.1.0"
 
-"mock-stdlib-libdeps@file:./packages/cli/test/mocks/mock-stdlib-libdeps":
+"mock-stdlib-libdeps@file:./packages/cli/mocks/mock-stdlib-libdeps":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/test/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/test/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/mocks/mock-stdlib":
   version "1.1.0"
 
-"mock-stdlib-undeployed-2@file:./packages/cli/test/mocks/mock-stdlib-undeployed-2":
+"mock-stdlib-undeployed-2@file:./packages/cli/mocks/mock-stdlib-undeployed-2":
   version "1.2.0"
 
-"mock-stdlib-undeployed@file:./packages/cli/test/mocks/mock-stdlib-undeployed":
+"mock-stdlib-undeployed@file:./packages/cli/mocks/mock-stdlib-undeployed":
   version "1.1.0"
 
-"mock-stdlib-unpublished@file:./packages/cli/test/mocks/mock-stdlib-unpublished":
+"mock-stdlib-unpublished@file:./packages/cli/mocks/mock-stdlib-unpublished":
   version "1.1.0"
 
-"mock-stdlib-unsupported@file:./packages/cli/test/mocks/mock-stdlib-unsupported":
+"mock-stdlib-unsupported@file:./packages/cli/mocks/mock-stdlib-unsupported":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
@@ -9219,6 +9219,13 @@ rimraf@2, rimraf@^2.2.8, rimraf@^2.5.4, rimraf@^2.6.1, rimraf@^2.6.2, rimraf@^2.
 rimraf@2.6.3:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.3.tgz#b2d104fe0d8fb27cf9e0a1cda8262dd3833c6cab"
+  dependencies:
+    glob "^7.1.3"
+
+rimraf@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
+  integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
   dependencies:
     glob "^7.1.3"
 

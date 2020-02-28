@@ -2,3 +2,4 @@ lerna-debug.log
 .vscode
 node_modules
 build
+*.tsbuildinfo
