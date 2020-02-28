@@ -1,9 +1,12 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "allowJs": true
+    "outDir": "test-build",
+    "allowJs": true,
+    "noEmitOnError": false
   },
   "include": [
     "./src"
-  ]
+  ],
+  "exclude": []
 }
