@@ -1,5 +1,6 @@
 import NetworkController from '../models/network/NetworkController';
 import { PushParams } from './interfaces';
+import { fromContractFullName } from '../utils/naming';
 
 export default async function push({
   contractAliases,
@@ -18,7 +19,13 @@ export default async function push({
     if (deployDependencies) await controller.deployDependencies();
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
-    await controller.push(contractAliases, { reupload, force });
+
+    const localContractAliases = contractAliases
+      ?.map(fromContractFullName)
+      .filter(({ package: packageName }) => packageName === undefined || packageName === controller.projectFile.name)
+      .map(({ contract }) => contract);
+
+    await controller.push(localContractAliases, { reupload, force });
     const { appAddress } = controller;
   } finally {
     controller.writeNetworkPackageIfNeeded();
