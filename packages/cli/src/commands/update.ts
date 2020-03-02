@@ -42,7 +42,6 @@ const register: (program: any) => any = program =>
     .action(commandActions);
 
 async function commandActions(proxyReference: string, options: any): Promise<void> {
-  console.log('commandActions:proxyReference:', proxyReference);
   const { network: promptedNetwork } = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
@@ -59,14 +58,11 @@ async function commandActions(proxyReference: string, options: any): Promise<voi
 }
 
 async function action(proxyReference: string, options: any): Promise<void> {
-  console.log('proxyReference:', proxyReference);
-
   const { network, txParams, force, interactive, all, init: rawInitMethod } = options;
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
   const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
-  console.log('promptedProxyInfo:', promptedProxyInfo);
 
   const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
@@ -78,8 +74,6 @@ async function action(proxyReference: string, options: any): Promise<void> {
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all
       ? await promptForMethodParams(promptedProxyInfo.contractFullName, options, additionalOpts)
       : {};
-
-  console.log('parsedContractReference:', parsedContractReference);
 
   const args = pickBy({
     all: promptedProxyInfo.all,
@@ -95,11 +89,8 @@ async function promptForProxies(proxyReference: string, network: string, options
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
   const args = { pickProxyBy, proxy: proxyReference };
-  console.log('args', args);
   const props = getCommandProps({ proxyReference, network, all });
-  console.log('props', props);
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
-  console.log('promptedProxy', promptedProxy);
   return {
     ...promptedProxy,
     all: promptedPickProxyBy === 'all',

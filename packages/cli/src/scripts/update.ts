@@ -19,8 +19,6 @@ export default async function update({
     );
   }
 
-  console.log('update:contractName:', contractName);
-
   const controller = new NetworkController(network, txParams, networkFile);
 
   try {
