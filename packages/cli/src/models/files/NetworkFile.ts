@@ -37,9 +37,8 @@ interface SolidityLibInterface {
 }
 
 export interface ProxyInterface {
-  alias?: string;
+  contractName?: string;
   package?: string;
-  contract?: any;
   address?: string;
   version?: string;
   implementation?: string;
@@ -60,8 +59,8 @@ interface AddressWrapper {
 }
 
 interface NetworkFileData {
-  contracts: { [contractAlias: string]: ContractInterface };
-  solidityLibs: { [libAlias: string]: SolidityLibInterface };
+  contracts: { [name: string]: ContractInterface };
+  solidityLibs: { [name: string]: SolidityLibInterface };
   proxies: { [contractName: string]: ProxyInterface[] };
   manifestVersion?: string;
   zosversion?: string;
@@ -137,19 +136,19 @@ export default class NetworkFile {
     return this.data.version;
   }
 
-  public set contracts(contracts: { [contractAlias: string]: ContractInterface }) {
+  public set contracts(contracts: { [name: string]: ContractInterface }) {
     this.data.contracts = contracts;
   }
 
-  public get contracts(): { [contractAlias: string]: ContractInterface } {
+  public get contracts(): { [name: string]: ContractInterface } {
     return this.data.contracts || {};
   }
 
-  public set solidityLibs(solidityLibs: { [libAlias: string]: SolidityLibInterface }) {
+  public set solidityLibs(solidityLibs: { [name: string]: SolidityLibInterface }) {
     this.data.solidityLibs = solidityLibs;
   }
 
-  public get solidityLibs(): { [libAlias: string]: SolidityLibInterface } {
+  public get solidityLibs(): { [name: string]: SolidityLibInterface } {
     return this.data.solidityLibs || {};
   }
 
@@ -225,7 +224,7 @@ export default class NetworkFile {
     return this.projectFile.isPublished;
   }
 
-  public get contractAliases(): string[] {
+  public get contractNames(): string[] {
     return Object.keys(this.contracts);
   }
 
@@ -243,16 +242,16 @@ export default class NetworkFile {
     delete this.data.solidityLibs[libName];
   }
 
-  public setSolidityLib(alias: string, value: SolidityLibInterface): void {
+  public setSolidityLib(contractName: string, value: SolidityLibInterface): void {
     if (!this.data.solidityLibs) this.data.solidityLibs = {};
-    this.data.solidityLibs[alias] = value;
+    this.data.solidityLibs[contractName] = value;
   }
 
   public solidityLib(libName: string): SolidityLibInterface {
     return this.data.solidityLibs[libName];
   }
 
-  public getSolidityLibs(libs: string[]): { [libAlias: string]: string } {
+  public getSolidityLibs(libs: string[]): { [name: string]: string } {
     const { solidityLibs } = this.data;
 
     return Object.keys(solidityLibs)
@@ -272,22 +271,22 @@ export default class NetworkFile {
     return difference(Object.keys(this.solidityLibs), libs);
   }
 
-  public getSolidityLibOrContract(aliasOrName: string): ContractInterface | SolidityLibInterface {
-    return this.data.solidityLibs[aliasOrName] || this.data.contracts[aliasOrName];
+  public getSolidityLibOrContract(contractName: string): ContractInterface | SolidityLibInterface {
+    return this.data.solidityLibs[contractName] || this.data.contracts[contractName];
   }
 
-  public hasSolidityLibOrContract(aliasOrName: string): boolean {
-    return this.hasSolidityLib(aliasOrName) || this.hasContract(aliasOrName);
+  public hasSolidityLibOrContract(contractName: string): boolean {
+    return this.hasSolidityLib(contractName) || this.hasContract(contractName);
   }
 
   public updateImplementation(
-    aliasOrName: string,
+    contractName: string,
     fn: (source: ContractInterface | SolidityLibInterface) => ContractInterface | SolidityLibInterface,
   ): void {
-    if (this.hasContract(aliasOrName))
-      this.data.contracts[aliasOrName] = fn(this.data.contracts[aliasOrName]) as ContractInterface;
-    else if (this.hasSolidityLib(aliasOrName))
-      this.data.solidityLibs[aliasOrName] = fn(this.data.solidityLibs[aliasOrName]) as SolidityLibInterface;
+    if (this.hasContract(contractName))
+      this.data.contracts[contractName] = fn(this.data.contracts[contractName]) as ContractInterface;
+    else if (this.hasSolidityLib(contractName))
+      this.data.solidityLibs[contractName] = fn(this.data.solidityLibs[contractName]) as SolidityLibInterface;
     else return;
   }
 
@@ -312,7 +311,7 @@ export default class NetworkFile {
     return !isEmpty(this.dependencies);
   }
 
-  public getProxies({ package: packageName, contract, address, kind }: ProxyInterface = {}): ProxyInterface[] {
+  public getProxies({ package: packageName, contractName, address, kind }: ProxyInterface = {}): ProxyInterface[] {
     if (isEmpty(this.data.proxies)) return [];
     const allProxies = flatMap(this.data.proxies || {}, (proxiesList, fullname) =>
       map(proxiesList, proxyInfo => ({
@@ -325,7 +324,7 @@ export default class NetworkFile {
       allProxies,
       proxy =>
         (!packageName || proxy.package === packageName) &&
-        (!contract || proxy.contract === contract) &&
+        (!contractName || proxy.contractName === contractName) &&
         (!address || proxy.address === address) &&
         (!kind || proxy.kind === kind),
     );
@@ -336,20 +335,20 @@ export default class NetworkFile {
     return find(allProxies, { address });
   }
 
-  public contract(alias: string): ContractInterface {
-    return this.data.contracts[alias];
+  public contract(contractName: string): ContractInterface {
+    return this.data.contracts[contractName];
   }
 
-  public contractAliasesMissingFromPackage(): any[] {
-    return difference(this.contractAliases, this.projectFile.contractAliases);
+  public contractsMissingFromPackage(): string[] {
+    return difference(this.contractNames, this.projectFile.contracts);
   }
 
   public isCurrentVersion(version: string): boolean {
     return this.version === version;
   }
 
-  public hasContract(alias: string): boolean {
-    return !isEmpty(this.contract(alias));
+  public hasContract(contractName: string): boolean {
+    return !isEmpty(this.contract(contractName));
   }
 
   public hasContracts(): boolean {
@@ -382,8 +381,8 @@ export default class NetworkFile {
     return this.dependencyHasCustomDeploy(name) && this.dependencySatisfiesVersionRequirement(name);
   }
 
-  public hasSameBytecode(alias: string, klass: any): boolean {
-    const contract = this.contract(alias) || this.solidityLib(alias);
+  public hasSameBytecode(contractName: string, klass: any): boolean {
+    const contract = this.contract(contractName) || this.solidityLib(contractName);
     if (contract) {
       const localBytecode = contract.localBytecodeHash;
       const currentBytecode = bytecodeDigest(klass.schema.bytecode);
@@ -414,11 +413,11 @@ export default class NetworkFile {
   }
 
   public addContract(
-    alias: string,
+    contractName: string,
     instance: Contract,
     { warnings, types, storage }: { warnings?: any; types?: any; storage?: any } = {},
   ): void {
-    this.setContract(alias, {
+    this.setContract(contractName, {
       address: instance.address,
       constructorCode: constructorCode(instance),
       bodyBytecodeHash: bytecodeDigest(bodyCode(instance)),
@@ -430,27 +429,27 @@ export default class NetworkFile {
     });
   }
 
-  public setContract(alias: string, value: ContractInterface): void {
-    this.data.contracts[alias] = value;
+  public setContract(contractName: string, value: ContractInterface): void {
+    this.data.contracts[contractName] = value;
   }
 
-  public unsetContract(alias: string): void {
-    delete this.data.contracts[alias];
+  public unsetContract(contractName: string): void {
+    delete this.data.contracts[contractName];
   }
 
-  public setProxies(packageName: string, alias: string, value: ProxyInterface[]): void {
-    const fullname = toContractFullName(packageName, alias);
+  public setProxies(packageName: string, contractName: string, value: ProxyInterface[]): void {
+    const fullname = toContractFullName(packageName, contractName);
     this.data.proxies[fullname] = value;
   }
 
-  public addProxy(thepackage: string, alias: string, info: ProxyInterface): void {
-    const fullname = toContractFullName(thepackage, alias);
+  public addProxy(thepackage: string, contractName: string, info: ProxyInterface): void {
+    const fullname = toContractFullName(thepackage, contractName);
     if (!this.data.proxies[fullname]) this.data.proxies[fullname] = [];
     this.data.proxies[fullname].push(info);
   }
 
-  public removeProxy(thepackage: string, alias: string, address: string): void {
-    const fullname = toContractFullName(thepackage, alias);
+  public removeProxy(thepackage: string, contractName: string, address: string): void {
+    const fullname = toContractFullName(thepackage, contractName);
     const index = this._indexOfProxy(fullname, address);
     if (index < 0) return;
     this.data.proxies[fullname].splice(index, 1);
@@ -458,7 +457,7 @@ export default class NetworkFile {
   }
 
   public updateProxy(
-    { package: proxyPackageName, contract: proxyContractName, address: proxyAddress }: ProxyInterface,
+    { package: proxyPackageName, contractName: proxyContractName, address: proxyAddress }: ProxyInterface,
     fn: (...args: any[]) => any,
   ): void {
     const fullname = toContractFullName(proxyPackageName, proxyContractName);

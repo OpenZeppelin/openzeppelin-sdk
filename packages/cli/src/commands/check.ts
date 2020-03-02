@@ -15,11 +15,11 @@ const register: (program: any) => any = program =>
     .option('--skip-compile', 'skips contract compilation')
     .action(action);
 
-async function action(contractAlias: string, options: any): Promise<void> {
+async function action(contractName: string, options: any): Promise<void> {
   ConfigManager.initStaticConfiguration();
   if (!options.skipCompile) await compile();
-  await Telemetry.report('check', { contractAlias }, options.interactive);
-  check({ contractAlias });
+  await Telemetry.report('check', { contractName }, options.interactive);
+  check({ contractName });
 }
 
 export default { name, signature, description, register, action };

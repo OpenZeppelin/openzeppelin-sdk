@@ -12,23 +12,20 @@ export default class ContractManager {
     this.projectFile = projectFile;
   }
 
-  public getContractClass(packageName: string, contractAlias: string): Contract {
+  public getContractClass(packageName: string, contractName: string): Contract {
     if (!packageName || packageName === this.projectFile.name) {
-      const contractName = this.projectFile.normalizeContractAlias(contractAlias);
       return Contracts.getFromLocal(contractName);
     } else {
-      const dependency = new Dependency(packageName);
-      const contractName = dependency.projectFile.normalizeContractAlias(contractAlias);
       return Contracts.getFromNodeModules(packageName, contractName);
     }
   }
 
-  public hasContract(packageName: string, contractAlias: string): boolean {
+  public hasContract(packageName: string, contractName: string): boolean {
     if (!packageName || packageName === this.projectFile.name) {
-      return !!this.projectFile.contract(contractAlias);
+      return !!this.projectFile.hasContract(contractName);
     } else {
       const dependency = new Dependency(packageName);
-      return !!dependency.projectFile.contract(contractAlias);
+      return dependency.projectFile.hasContract(contractName);
     }
   }
 

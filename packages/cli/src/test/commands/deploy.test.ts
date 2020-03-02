@@ -36,7 +36,7 @@ describe('deploy (action)', function() {
       txParams,
       networkFile,
     });
-    const instances = networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(1);
 
     const instanceInfo = instances[0];
@@ -54,7 +54,7 @@ describe('deploy (action)', function() {
       txParams,
       networkFile,
     });
-    const instances = networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(1);
 
     const instanceInfo = instances[0];
@@ -87,7 +87,7 @@ describe('deploy (action)', function() {
     await deploy(params);
     await deploy(params);
 
-    const instances = networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(3);
   });
 
@@ -100,7 +100,7 @@ describe('deploy (action)', function() {
       txParams,
       networkFile,
     }).should.be.rejectedWith('Expected 3 values but got 0');
-    const instances = networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(0);
   });
 
@@ -113,7 +113,7 @@ describe('deploy (action)', function() {
       txParams,
       networkFile,
     });
-    const instances = networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(1);
   });
 
@@ -125,7 +125,7 @@ describe('deploy (action)', function() {
       txParams,
       networkFile,
     });
-    const instances = networkFile.getProxies({ contract: 'GreeterBase' });
+    const instances = networkFile.getProxies({ contractName: 'GreeterBase' });
     instances.should.have.lengthOf(1);
   });
 
@@ -138,7 +138,7 @@ describe('deploy (action)', function() {
     await deploy(options);
     await deploy(options);
 
-    const instances = networkFile.getProxies({ contract });
+    const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(2);
 
     spy.callCount.should.equal(3); // 1 for each contract deploy, only 1 for the library (reused the second time)
@@ -146,7 +146,6 @@ describe('deploy (action)', function() {
   });
 
   // see push tests for reference
-  // test with alias
   // custom gasprice in txparams
   // saved in truffle artifact
 });

@@ -13,14 +13,14 @@ import ConfigManager from '../models/config/ConfigManager';
 import Telemetry from '../telemetry';
 
 const name = 'create2';
-const signature = `${name} [alias]`;
+const signature = `${name} [contract]`;
 const description =
-  'deploys a new upgradeable contract instance using CREATE2 at a predetermined address given a numeric <salt> and a <from> address. Provide the <alias> you added your contract with, or <package>/<alias> to create a contract from a linked package. A <signature> can be provided to derive the deployment address from a signer different to the <from> address. Warning: support for this feature is experimental.';
+  'deploys a new upgradeable contract instance using CREATE2 at a predetermined address given a numeric <salt> and a <from> address. Provide the <contract> you added your contract with, or <package>/<contract> to create a contract from a linked package. A <signature> can be provided to derive the deployment address from a signer different to the <from> address. Warning: support for this feature is experimental.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
-    .usage('[alias] --network <network> --salt <salt> [options]')
+    .usage('[contract] --network <network> --salt <salt> [options]')
     .description(description)
     .option('--salt <salt>', `salt used to determine the deployment address (required)`)
     .option(
@@ -47,12 +47,12 @@ async function action(contractFullName: string, options: any): Promise<void> {
   if (!options.salt) throw new Error("option `--salt' is required");
 
   const { methodName, methodArgs } = parseMethodParams(options, 'initialize');
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const { contractName, package: packageName } = fromContractFullName(contractFullName);
   const opts = {
     ...options,
     methodName,
     methodArgs,
-    contractAlias,
+    contractName,
     packageName,
   };
 
@@ -77,18 +77,18 @@ async function runSignatureQuery(options: any, network: string, txParams: TxPara
     query,
     methodName,
     methodArgs,
-    contractAlias,
+    contractName,
     packageName,
     force,
     salt,
     signature: signatureOption,
     admin,
   } = options;
-  if (!contractAlias) throw new Error('missing required argument: alias');
+  if (!contractName) throw new Error('missing required argument: contractName');
   if (typeof query === 'string') throw new Error("cannot specify argument `sender' as it is inferred from `signature'");
   const args = pickBy({
     packageName,
-    contractAlias,
+    contractName,
     methodName,
     methodArgs,
     force,
@@ -100,20 +100,11 @@ async function runSignatureQuery(options: any, network: string, txParams: TxPara
 }
 
 async function runCreate(options: any, network: string, txParams: TxParams) {
-  const {
-    methodName,
-    methodArgs,
-    contractAlias,
-    packageName,
-    force,
-    salt,
-    signature: signatureOption,
-    admin,
-  } = options;
-  if (!contractAlias) throw new Error('missing required argument: alias');
+  const { methodName, methodArgs, contractName, packageName, force, salt, signature: signatureOption, admin } = options;
+  if (!contractName) throw new Error('missing required argument: contractName');
   const args = pickBy({
     packageName,
-    contractAlias,
+    contractName,
     methodName,
     methodArgs,
     force,

@@ -57,10 +57,10 @@ export const args: Arg[] = [
       const { parseArg, getSampleInput } = await import('../../utils/input');
       const { getConstructorInputs } = await import('@openzeppelin/upgrades');
 
-      const contractName = params.contract;
+      const contractFullName = params.contract;
 
-      const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
-      const contract = new ContractManager().getContractClass(packageName, contractAlias);
+      const { package: packageName, contractName } = fromContractFullName(contractFullName);
+      const contract = new ContractManager().getContractClass(packageName, contractName);
       const constructorInputs = getConstructorInputs(contract);
 
       return constructorInputs.map((arg, index) => ({

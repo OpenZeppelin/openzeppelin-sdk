@@ -28,7 +28,7 @@ export async function action(params: Options & Args): Promise<void> {
     return runCreate(params);
   }
 
-  const { contract: contractName, arguments: deployArgs } = params;
+  const { contract: fullContractName, arguments: deployArgs } = params;
 
   if (params.network === undefined) {
     const { network: lastNetwork, expired } = Session.getNetwork();
@@ -42,17 +42,17 @@ export async function action(params: Options & Args): Promise<void> {
   // Used for network preselection in subsequent runs.
   Session.setDefaultNetworkIfNeeded(network);
 
-  const { package: packageName, contract: contractAlias } = fromContractFullName(contractName);
+  const { package: packageName, contractName } = fromContractFullName(fullContractName);
 
   const controller = new NetworkController(network, txParams, params.networkFile);
 
-  const contract = controller.contractManager.getContractClass(packageName, contractAlias);
+  const contract = controller.contractManager.getContractClass(packageName, contractName);
   const constructorInputs = getConstructorInputs(contract);
 
   const args = parseMultipleArgs(deployArgs, constructorInputs);
 
   try {
-    const instance = await controller.createInstance(packageName, contractAlias, args);
+    const instance = await controller.createInstance(packageName, contractName, args);
     stdout(instance.address);
   } finally {
     controller.writeNetworkPackageIfNeeded();

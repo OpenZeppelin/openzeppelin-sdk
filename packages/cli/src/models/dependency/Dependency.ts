@@ -1,14 +1,13 @@
 import fs from 'fs';
-import { map, uniq, flatten, fromPairs, toPairs } from 'lodash';
+import { map, uniq, flatten, fromPairs } from 'lodash';
 import semver from 'semver';
 import npm from 'npm-programmatic';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 import { TxParams, PackageProject, Contracts, Contract, getSolidityLibNames, Loggy } from '@openzeppelin/upgrades';
-import ProjectFile, { LEGACY_PROJECT_FILE_NAME, PROJECT_FILE_PATH } from '../files/ProjectFile';
+import ProjectFile from '../files/ProjectFile';
 import NetworkFile from '../files/NetworkFile';
-import { OPEN_ZEPPELIN_FOLDER } from '../files/constants';
 import { dirname } from 'path';
 
 export default class Dependency {
@@ -89,9 +88,9 @@ export default class Dependency {
     // this should all be handled at the Project level. Consider adding a setImplementations (plural) method
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
-    const contracts = toPairs(this.projectFile.contracts).map(([contractAlias, contractName]): [Contract, string] => [
+    const contracts = this.projectFile.contracts.map((contractName): [Contract, string] => [
       Contracts.getFromNodeModules(this.name, contractName),
-      contractAlias,
+      contractName,
     ]);
 
     const libraryNames = uniq(flatten(contracts.map(([contract]) => getSolidityLibNames(contract.schema.bytecode))));
@@ -109,9 +108,9 @@ export default class Dependency {
     );
 
     await Promise.all(
-      map(contracts, async ([contract, contractAlias]) => {
+      map(contracts, async ([contract, contractName]) => {
         contract.link(libraries);
-        await project.setImplementation(contract, contractAlias);
+        await project.setImplementation(contract, contractName);
       }),
     );
 

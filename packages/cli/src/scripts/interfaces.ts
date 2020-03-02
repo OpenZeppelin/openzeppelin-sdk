@@ -3,11 +3,6 @@ import { TxParams } from '@openzeppelin/upgrades';
 import ProjectFile from '../models/files/ProjectFile';
 import NetworkFile from '../models/files/NetworkFile';
 
-export interface ContractData {
-  name: string;
-  alias: string;
-}
-
 interface Dependencies {
   dependencies?: string[];
   installDependencies?: boolean;
@@ -15,7 +10,7 @@ interface Dependencies {
 
 interface PackageArgs {
   packageName?: string;
-  contractAlias?: string;
+  contractName?: string;
 }
 
 interface Network {
@@ -107,7 +102,7 @@ export interface UnpackParams {
 }
 
 export interface PushParams extends Network {
-  contractAliases?: string[];
+  contracts?: string[];
   force?: boolean;
   reupload?: boolean;
   deployDependencies?: boolean;
@@ -121,7 +116,7 @@ export interface SetAdminParams extends Network, PackageArgs {
 }
 
 export interface AddParams {
-  contractsData: ContractData[];
+  contracts: string[];
   projectFile?: ProjectFile;
 }
 
@@ -145,7 +140,7 @@ export interface RemoveParams {
 }
 
 export interface CheckParams {
-  contractAlias: string;
+  contractName: string;
   projectFile?: ProjectFile;
 }
 

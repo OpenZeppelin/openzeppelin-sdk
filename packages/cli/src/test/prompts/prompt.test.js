@@ -129,7 +129,7 @@ describe('prompt', function() {
       beforeEach('set stub and initialize', function() {
         sinon.stub(ContractManager.prototype, 'getContractNames').returns(['Foo', 'Bar', 'Buz']);
         sinon.stub(ProjectFile.prototype, 'dependencies').get(() => ({ 'mock-stdlib': '1.1.0' }));
-        sinon.stub(ProjectFile.prototype, 'contracts').get(() => ({ Foo: 'Foo', BarAlias: 'Bar' }));
+        sinon.stub(ProjectFile.prototype, 'contracts').get(() => ['Foo', 'Bar']);
       });
 
       afterEach('restore stub', function() {
@@ -162,7 +162,7 @@ describe('prompt', function() {
           });
           contracts.keyName.choices.should.deep.include.members([
             { name: 'Foo', value: 'Foo' },
-            { name: 'BarAlias[Bar]', value: 'BarAlias' },
+            { name: 'Bar', value: 'Bar' },
           ]);
         });
       });
@@ -170,8 +170,8 @@ describe('prompt', function() {
       context('when looking for not yet added but built contracts', function() {
         it('returns an object with not added contracts', function() {
           const contracts = contractsList('keyName', 'Im a message', 'listy', 'notAdded');
-          contracts.keyName.choices.should.include.members(['Bar', 'Buz']);
-          contracts.keyName.choices.should.not.include('Foo');
+          contracts.keyName.choices.should.include.members(['Buz']);
+          contracts.keyName.choices.should.not.include.members(['Foo', 'Bar']);
         });
       });
 
@@ -183,7 +183,7 @@ describe('prompt', function() {
           contracts.keyName.should.be.an('object').that.has.all.keys('type', 'message', 'choices');
           contracts.keyName.type.should.eq('listy');
           contracts.keyName.message.should.eq('Im a message');
-          contracts.keyName.choices.should.include.members(['Foo', 'Bar', 'mock-stdlib/Foo', 'mock-stdlib/BarAlias']);
+          contracts.keyName.choices.should.include.members(['Foo', 'Bar', 'mock-stdlib/Foo', 'mock-stdlib/Bar']);
         });
       });
     });
@@ -203,7 +203,7 @@ describe('prompt', function() {
       context('when providing an existent contract', function() {
         context('when querying constant methods', function() {
           beforeEach(function() {
-            this.methods = methodsList('Greeter', Mutability.Constant, this.projectFile);
+            this.methods = methodsList('GreeterImpl', Mutability.Constant, this.projectFile);
           });
 
           it('returns an array of constant methods', function() {
@@ -225,7 +225,7 @@ describe('prompt', function() {
 
         context('when querying non-constant methods', function() {
           it('returns an array of non-constant methods', function() {
-            const methods = methodsList('Greeter', Mutability.NotConstant, this.projectFile);
+            const methods = methodsList('GreeterImpl', Mutability.NotConstant, this.projectFile);
             methods.should.be.an('array');
             methods.should.have.lengthOf(1);
             methods[0].should.be.an('object').that.has.all.keys('name', 'value');
@@ -250,7 +250,7 @@ describe('prompt', function() {
 
       context('when providing an existent contract but an existent identifier', function() {
         it('returns an empty array', function() {
-          const args = argsList('Greeter', 'foo(string)', Mutability.NotConstant, this.projectFile);
+          const args = argsList('GreeterImpl', 'foo(string)', Mutability.NotConstant, this.projectFile);
           args.should.be.an('array').that.is.empty;
         });
       });
@@ -258,7 +258,7 @@ describe('prompt', function() {
       context('when providing an existent contract and identifier', function() {
         context('when the argument has an explicit name', function() {
           it('returns an array of method arguments names', function() {
-            const args = argsList('Greeter', 'greet(string)', Mutability.NotConstant, this.projectFile);
+            const args = argsList('GreeterImpl', 'greet(string)', Mutability.NotConstant, this.projectFile);
             args.should.be.an('array');
             args[0].should.deep.include({ name: 'who', type: 'string' });
           });
@@ -266,7 +266,7 @@ describe('prompt', function() {
 
         context('when the argument has no name', function() {
           it('returns an array of method arguments names', function() {
-            const args = argsList('Greeter', 'greetings(uint256)', Mutability.Constant, this.projectFile);
+            const args = argsList('GreeterImpl', 'greetings(uint256)', Mutability.Constant, this.projectFile);
             args.should.be.an('array');
             args[0].should.deep.include({ name: '#0', type: 'uint256' });
           });

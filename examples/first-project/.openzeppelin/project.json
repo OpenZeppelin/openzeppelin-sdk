@@ -1,8 +1,8 @@
 {
   "manifestVersion": "2.2",
-  "contracts": {
-    "Counter": "Counter"
-  },
+  "contracts": [
+    "Counter"
+  ],
   "dependencies": {},
   "name": "example-first-project",
   "version": "1.0.0",
@@ -14,7 +14,9 @@
         "enabled": false,
         "runs": "200"
       }
-    }
+    },
+    "artifactsDir": "build/contracts",
+    "contractsDir": "contracts"
   },
   "telemetryOptIn": false
 }

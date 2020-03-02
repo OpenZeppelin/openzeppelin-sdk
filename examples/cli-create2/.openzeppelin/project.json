@@ -2,8 +2,6 @@
   "manifestVersion": "2.2",
   "name": "example-cli-create2",
   "version": "1.0.0",
-  "contracts": {
-    "Sample": "Sample"
-  },
+  "contracts": ["Sample"],
   "dependencies": {}
 }

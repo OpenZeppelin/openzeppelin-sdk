@@ -20,7 +20,7 @@ describe('NetworkController', function() {
     sinon.restore();
   });
 
-  describe('_getAllSolidityLibNames()', () => {
+  describe('getAllSolidityLibNames()', () => {
     let controllerMock;
     beforeEach(() => {
       projectFile = new ProjectFile('mocks/mock-stdlib/zos.json');
@@ -51,56 +51,56 @@ describe('NetworkController', function() {
        */
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('0')
         .returns(['A', 'B', 'C']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('A')
         .returns(['D', 'E', 'F']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('B')
         .returns(['C', 'E', 'F', 'G']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('C')
         .returns(['D', 'G']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('Y')
         .returns(['Z']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('Z')
         .returns([]);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('D')
         .returns([]);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('E')
         .returns(['D', 'Y']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('F')
         .returns(['G']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('G')
         .returns(['E']);
 
-      const result = controller._getAllSolidityLibNames(['0']);
+      const result = controller.getAllSolidityLibNames(['0']);
 
       assert.deepEqual(result, ['Z', 'Y', 'D', 'E', 'G', 'F', 'C', 'B', 'A']);
     });
@@ -115,32 +115,32 @@ describe('NetworkController', function() {
        */
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('0')
         .returns(['A']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('A')
         .returns(['B']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('B')
         .returns(['C']);
 
       controllerMock
-        .expects('_getContractDependencies')
+        .expects('getContractDependencies')
         .withArgs('C')
         .returns(['A']);
 
       expect(() => {
-        controller._getAllSolidityLibNames(['0']);
+        controller.getAllSolidityLibNames(['0']);
       }).to.throw(/Cyclic/);
     });
   });
 
-  describe('_solidityLibsForPush()', () => {
+  describe('solidityLibsForPush()', () => {
     describe('with one public library', () => {
       beforeEach(() => {
         projectFile = new ProjectFile('mocks/mock-stdlib/zos.json');
@@ -149,7 +149,7 @@ describe('NetworkController', function() {
       });
 
       it('should retrieve the library', () => {
-        const libs = controller._solidityLibsForPush();
+        const libs = controller.solidityLibsForPush();
         libs.length.should.eq(1);
       });
     });
@@ -162,7 +162,7 @@ describe('NetworkController', function() {
       });
 
       it('should retrieve the library', () => {
-        const libs = controller._solidityLibsForPush();
+        const libs = controller.solidityLibsForPush();
 
         libs.length.should.eq(2);
       });
@@ -185,7 +185,7 @@ describe('NetworkController', function() {
     });
 
     it('set dependencies', () => {
-      const libs = controller._solidityLibsForPush();
+      const libs = controller.solidityLibsForPush();
 
       networkFileMock.expects('addSolidityLib').withArgs('GreeterLibLib', '42');
       networkFileMock.expects('addSolidityLib').withArgs('GreeterLibWithLib', '42');

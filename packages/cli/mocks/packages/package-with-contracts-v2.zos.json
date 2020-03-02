@@ -3,8 +3,5 @@
   "manifestVersion": "2.2",
   "publish": true,
   "version": "1.2.0",
-  "contracts": {
-    "Impl": "ImplV1",
-    "WithLibraryImpl": "WithLibraryImplV1"
-  }
+  "contracts": ["ImplV1", "WithLibraryImplV1"]
 }

@@ -10,8 +10,7 @@ import ProjectFile from '../../models/files/ProjectFile';
 
 describe('add script', function() {
   const contractName = 'ImplV1';
-  const contractAlias = 'Impl';
-  const contractsData = [{ name: contractName, alias: contractAlias }];
+  const contracts = [contractName];
 
   beforeEach('setup', async function() {
     this.projectFile = new ProjectFile('mocks/packages/package-with-stdlib.zos.json');
@@ -22,88 +21,56 @@ describe('add script', function() {
     sinon.restore();
   });
 
-  it('should add a logic contract an alias and a filename', function() {
-    add({ contractsData, projectFile: this.projectFile });
+  it('should add a contract name and a filename', function() {
+    add({ contracts, projectFile: this.projectFile });
 
-    this.projectFile.contract(contractAlias).should.eq(contractName);
+    this.projectFile.contracts.should.include(contractName);
   });
 
   it('should add a logic contract for a lib', function() {
     this.projectFile.lib = true;
 
-    add({ contractsData, projectFile: this.projectFile });
+    add({ contracts, projectFile: this.projectFile });
 
-    this.projectFile.contract(contractAlias).should.eq(contractName);
-  });
-
-  it('should allow to change an existing logic contract', function() {
-    add({ contractsData, projectFile: this.projectFile });
-
-    const customContractName = 'ImplV2';
-    const customContractsData = [{ name: customContractName, alias: contractAlias }];
-    add({ contractsData: customContractsData, projectFile: this.projectFile });
-
-    this.projectFile.contract(contractAlias).should.eq(customContractName);
-  });
-
-  it('should allow contractsData to be an array of contract names instead of an object', function() {
-    add({ contractsData: [contractName], projectFile: this.projectFile });
-
-    this.projectFile.contract(contractName).should.not.be.null;
-    this.projectFile.contract(contractName).should.eq(contractName);
+    this.projectFile.contracts.should.include(contractName);
   });
 
   it('should handle multiple contracts', function() {
-    const customContractAlias = 'Impl';
     const customContractName = 'ImplV1';
-    const anotherCustomContractAlias = 'WithLibraryImpl';
     const anotherCustomContractName = 'WithLibraryImplV1';
-    const customContractsData = [
-      { name: customContractName, alias: customContractAlias },
-      { name: anotherCustomContractName, alias: anotherCustomContractAlias },
-    ];
-    add({ contractsData: customContractsData, projectFile: this.projectFile });
+    const customContractsData = [customContractName, anotherCustomContractName];
+    add({ contracts: customContractsData, projectFile: this.projectFile });
 
-    this.projectFile.contract(customContractAlias).should.eq(customContractName);
-    this.projectFile.contract(anotherCustomContractAlias).should.eq(anotherCustomContractName);
-  });
-
-  it('should use a default alias if one is not provided', function() {
-    const contractsData = [{ name: contractName }];
-    add({ contractsData, projectFile: this.projectFile });
-
-    this.projectFile.contract(contractName).should.eq(contractName);
+    this.projectFile.contracts.should.include(customContractName);
+    this.projectFile.contracts.should.include(anotherCustomContractName);
   });
 
   it('should add all contracts in build contracts dir', function() {
     addAll({ projectFile: this.projectFile });
 
-    this.projectFile.contract('ImplV1').should.eq('ImplV1');
-    this.projectFile.contract('ImplV2').should.eq('ImplV2');
+    this.projectFile.contracts.should.include('ImplV1');
+    this.projectFile.contracts.should.include('ImplV2');
   });
 
   it('should not add solidity libraries or contracts from external packages when adding all', function() {
     addAll({ projectFile: this.projectFile });
 
-    expect(this.projectFile.contract('Initializable')).to.be.undefined;
-    expect(this.projectFile.contract('GreeterImpl')).to.be.undefined;
-    expect(this.projectFile.contract('GreeterLib')).to.be.undefined;
-    expect(this.projectFile.contract('UintLib')).to.be.undefined;
-    this.projectFile.contracts.should.have.property('WithExternalContractImplV1');
-    this.projectFile.contracts.should.have.property('WithExternalContractImplV2');
+    this.projectFile.contracts.should.not.include('Initializable');
+    this.projectFile.contracts.should.not.include('GreeterImpl');
+    this.projectFile.contracts.should.not.include('GreeterLib');
+    this.projectFile.contracts.should.not.include('UintLib');
+
+    this.projectFile.contracts.should.include('WithExternalContractImplV1');
+    this.projectFile.contracts.should.include('WithExternalContractImplV2');
   });
 
   describe('failures', function() {
     it('should fail to add a contract that does not exist', function() {
-      const contractsData = [{ name: 'NonExists', alias: contractAlias }];
-      expect(() => add({ contractsData, projectFile: this.projectFile })).to.throw(/not found/);
+      expect(() => add({ contracts: ['NonExists'], projectFile: this.projectFile })).to.throw(/not found/);
     });
 
     it('should fail to add an abstract contract', function() {
-      const contractsData = [{ name: 'Impl', alias: contractAlias }];
-      expect(() => add({ contractsData, projectFile: this.projectFile })).to.throw(/abstract/);
+      expect(() => add({ contracts: ['Impl'], projectFile: this.projectFile })).to.throw(/abstract/);
     });
-
-    xit('should fail to add a contract with an invalid alias');
   });
 });

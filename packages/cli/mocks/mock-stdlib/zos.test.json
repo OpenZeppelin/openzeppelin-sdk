@@ -8,7 +8,7 @@
     "address": "0x0000000000000000000000000000000000000080"
   },
   "contracts": {
-    "Greeter": {
+    "GreeterImpl": {
       "address": "0x1020",
       "bytecodeHash": "0x0001"
     }

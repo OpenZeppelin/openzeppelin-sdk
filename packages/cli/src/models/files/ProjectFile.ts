@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { pickBy, isEqual, isEmpty } from 'lodash';
+import { pull, pickBy, isEqual, isEmpty } from 'lodash';
 
 import { Loggy } from '@openzeppelin/upgrades';
 import Dependency from '../dependency/Dependency';
@@ -33,7 +33,7 @@ interface ProjectFileData {
   manifestVersion?: string;
   zosversion?: string;
   dependencies: { [name: string]: string };
-  contracts: { [alias: string]: string };
+  contracts: string[];
   publish: boolean;
   compiler: Partial<ConfigFileCompilerOptions>;
   telemetryOptIn?: boolean;
@@ -99,7 +99,7 @@ export default class ProjectFile {
     this.filePath = this.filePath || PROJECT_FILE_PATH;
     this.data = this.data || defaultData;
     checkVersion(this.data.manifestVersion || this.data.zosversion, this.filePath);
-    if (!this.data.contracts) this.data.contracts = {};
+    if (!this.data.contracts) this.data.contracts = [];
     if (!this.data.dependencies) this.data.dependencies = {};
   }
 
@@ -143,11 +143,11 @@ export default class ProjectFile {
     return this.data.version;
   }
 
-  public set contracts(contracts: { [alias: string]: string }) {
+  public set contracts(contracts: string[]) {
     this.data.contracts = contracts;
   }
-  public get contracts(): { [alias: string]: string } {
-    return this.data.contracts || {};
+  public get contracts(): string[] {
+    return this.data.contracts;
   }
 
   public get dependencies(): { [name: string]: string } {
@@ -168,14 +168,6 @@ export default class ProjectFile {
 
   public hasDependencies(): boolean {
     return !isEmpty(this.dependencies);
-  }
-
-  public get contractAliases(): string[] {
-    return Object.keys(this.contracts);
-  }
-
-  public get contractNames(): string[] {
-    return Object.values(this.contracts);
   }
 
   public get isPublished(): boolean {
@@ -237,16 +229,6 @@ export default class ProjectFile {
         : pickBy({ ...this.data.compiler, ...configOptions } as ConfigFileCompilerOptions);
   }
 
-  // If the argument is an existing contract alias, return its corresponding
-  // contract name. Otherwise, assume it's a contract name and return it as is.
-  public normalizeContractAlias(nameOrAlias: string): string {
-    return this.contracts[nameOrAlias] ?? nameOrAlias;
-  }
-
-  public contract(alias: string): string {
-    return this.contracts[alias];
-  }
-
   public hasName(name: string): boolean {
     return this.name === name;
   }
@@ -259,8 +241,8 @@ export default class ProjectFile {
     return this.version === version;
   }
 
-  public hasContract(alias: string): boolean {
-    return !!this.contract(alias);
+  public hasContract(contract: string): boolean {
+    return this.contracts.includes(contract);
   }
 
   public hasContracts(): boolean {
@@ -277,12 +259,12 @@ export default class ProjectFile {
     delete this.data.dependencies[name];
   }
 
-  public addContract(alias: string, name: string | undefined): void {
-    this.data.contracts[alias] = name || alias;
+  public addContract(contract: string): void {
+    if (!this.hasContract(contract)) this.data.contracts.push(contract);
   }
 
-  public unsetContract(alias: string): void {
-    delete this.data.contracts[alias];
+  public removeContract(contract: string): void {
+    pull(this.data.contracts, contract);
   }
 
   public write(): void {

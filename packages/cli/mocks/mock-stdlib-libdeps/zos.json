@@ -2,7 +2,5 @@
   "name": "mock-stdlib-libdeps",
   "manifestVersion": "2.2",
   "version": "1.1.0",
-  "contracts": {
-    "GreeterLibWithLibImpl": "GreeterLibWithLibImpl"
-  }
+  "contracts": ["GreeterLibWithLibImpl"]
 }

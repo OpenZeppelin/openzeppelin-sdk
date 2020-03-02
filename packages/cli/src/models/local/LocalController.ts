@@ -49,7 +49,6 @@ export default class LocalController {
     }
     this.projectFile.name = name;
     this.projectFile.version = version || DEFAULT_VERSION;
-    this.projectFile.contracts = {};
     if (publish) this.projectFile.publish = publish;
     Loggy.noSpin(
       __filename,
@@ -63,34 +62,29 @@ export default class LocalController {
     this.projectFile.version = version;
   }
 
-  public add(contractAlias: string, contractName: string): void {
-    Loggy.spin(
-      __filename,
-      'add',
-      `add-${contractAlias}`,
-      `Adding ${contractAlias === contractName ? contractAlias : `${contractAlias}:${contractName}`}`,
-    );
-    this.projectFile.addContract(contractAlias, contractName);
-    Loggy.succeed(`add-${contractAlias}`, `Added contract ${contractAlias}`);
+  public add(contractName: string): void {
+    Loggy.spin(__filename, 'add', `add-${contractName}`, `Adding ${contractName}`);
+    this.projectFile.addContract(contractName);
+    Loggy.succeed(`add-${contractName}`, `Added contract ${contractName}`);
   }
 
   public addAll(): void {
     const manager = new ContractManager(this.projectFile);
-    manager.getContractNames().forEach(name => this.add(name, name));
+    manager.getContractNames().forEach(name => this.add(name));
   }
 
-  public remove(contractAlias: string): void {
-    if (!this.projectFile.hasContract(contractAlias)) {
+  public remove(contractName: string): void {
+    if (!this.projectFile.hasContract(contractName)) {
       Loggy.noSpin.error(
         __filename,
         'remove',
-        `remove-${contractAlias}`,
-        `Contract ${contractAlias} to be removed was not found`,
+        `remove-${contractName}`,
+        `Contract ${contractName} to be removed was not found`,
       );
     } else {
-      Loggy.spin(__filename, 'remove', `remove-${contractAlias}`, `Removing ${contractAlias}`);
-      this.projectFile.unsetContract(contractAlias);
-      Loggy.succeed(`remove-${contractAlias}`, `Removed contract ${contractAlias}`);
+      Loggy.spin(__filename, 'remove', `remove-${contractName}`, `Removing ${contractName}`);
+      this.projectFile.removeContract(contractName);
+      Loggy.succeed(`remove-${contractName}`, `Removed contract ${contractName}`);
     }
   }
 
@@ -107,13 +101,12 @@ export default class LocalController {
   // Contract model
   public validateAll(): boolean {
     const buildArtifacts = getBuildArtifacts();
-    return every(map(this.projectFile.contractAliases, contractAlias => this.validate(contractAlias, buildArtifacts)));
+    return every(map(this.projectFile.contracts, contractName => this.validate(contractName, buildArtifacts)));
   }
 
   // Contract model
-  public validate(contractAlias: string, buildArtifacts?: BuildArtifacts): boolean {
-    const contractName = this.projectFile.contract(contractAlias);
-    const contract = Contracts.getFromLocal(contractName || contractAlias);
+  public validate(contractName: string, buildArtifacts?: BuildArtifacts): boolean {
+    const contract = Contracts.getFromLocal(contractName);
     const warnings = validateContract(contract, {}, buildArtifacts);
     new ValidationLogger(contract).log(warnings, buildArtifacts);
     return validationPasses(warnings);
@@ -127,14 +120,14 @@ export default class LocalController {
   }
 
   // Contract model
-  public getContractSourcePath(contractAlias: string): { sourcePath: string; compilerVersion: string } | never {
-    const contractName = this.projectFile.contract(contractAlias);
-    if (contractName) {
+  public getContractSourcePath(contractName: string): { sourcePath: string; compilerVersion: string } | never {
+    try {
       const contractDataPath = Contracts.getLocalPath(contractName);
       const { compiler, sourcePath } = fs.readJsonSync(contractDataPath);
       return { sourcePath, compilerVersion: compiler.version };
-    } else {
-      throw Error(`Could not find ${contractAlias} in contracts directory.`);
+    } catch (error) {
+      error.message = `$Could not find ${contractName} in contracts directory. Error: ${error.message}.`;
+      throw error;
     }
   }
 

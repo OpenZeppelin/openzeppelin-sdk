@@ -12,7 +12,7 @@ describe('update command', function() {
     'zos update Impl --network test --init initialize --args 42 --force --from 0x40',
     function(update) {
       update.should.have.been.calledWith({
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         methodName: 'initialize',
         methodArgs: ['42'],
         force: true,
@@ -26,7 +26,7 @@ describe('update command', function() {
     update,
   ) {
     update.should.have.been.calledWith({
-      contractAlias: 'Impl',
+      contractName: 'Impl',
       network: 'test',
       txParams: {},
       methodArgs: [],
@@ -40,7 +40,7 @@ describe('update command', function() {
     function(update) {
       update.should.have.been.calledWith({
         packageName: 'OpenZeppelin',
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         network: 'test',
         methodArgs: [],
         txParams: {},

@@ -113,9 +113,9 @@ export function proxiesList(
   const groupedByPackage = groupBy(proxies, 'package');
   const list = Object.keys(groupedByPackage).map(packageName => {
     const separator = packageName === projectFile.name ? 'Your contracts' : packageName;
-    const packageList = groupedByPackage[packageName].map(({ contract, address }) => {
-      const name = pickProxyBy === 'byAddress' ? `${contract} at ${address}` : contract;
-      const contractFullName = packageName === projectFile.name ? `${contract}` : `${packageName}/${contract}`;
+    const packageList = groupedByPackage[packageName].map(({ contractName, address }) => {
+      const name = pickProxyBy === 'byAddress' ? `${contractName} at ${address}` : contractName;
+      const contractFullName = packageName === projectFile.name ? `${contractName}` : `${packageName}/${contractName}`;
       const proxyReference = pickProxyBy === 'byAddress' ? address : contractFullName;
 
       return {
@@ -202,11 +202,11 @@ function contractMethods(
   constant: Mutability = Mutability.NotConstant,
   projectFile: ProjectFile,
 ): any[] {
-  const { contract: contractAlias, package: packageName } = fromContractFullName(contractFullName);
+  const { contractName, package: packageName } = fromContractFullName(contractFullName);
   const contractManager = new ContractManager(projectFile);
 
   try {
-    const contract = contractManager.getContractClass(packageName, contractAlias);
+    const contract = contractManager.getContractClass(packageName, contractName);
     return contractMethodsFromAbi(contract, constant);
   } catch (e) {
     if (e instanceof ContractNotFound) {
@@ -218,19 +218,19 @@ function contractMethods(
 }
 
 export function proxyInfo(contractInfo: any, network: string): any {
-  const { contractAlias, proxyAddress, packageName } = contractInfo;
+  const { contractName, proxyAddress, packageName } = contractInfo;
   const projectFile = new ProjectFile();
   const networkFile = new NetworkFile(projectFile, network);
   const proxyParams = {
-    contract: contractAlias,
+    contractName: contractName,
     address: proxyAddress,
     package: packageName,
   };
 
-  if (!proxyAddress && !contractAlias) {
+  if (!proxyAddress && !contractName) {
     return { proxyReference: undefined, contractFullName: undefined };
   } else if (!networkFile.hasProxies(proxyParams)) {
-    const contractFullName = toContractFullName(packageName, contractAlias);
+    const contractFullName = toContractFullName(packageName, contractName);
     return {
       proxyReference: proxyAddress || contractFullName,
       contractFullName,
@@ -238,7 +238,7 @@ export function proxyInfo(contractInfo: any, network: string): any {
   } else {
     const proxies = networkFile.getProxies(proxyParams);
     const proxy = proxies[0] || {};
-    const contractFullName = toContractFullName(proxy.package, proxy.contract);
+    const contractFullName = toContractFullName(proxy.package, proxy.contractName);
 
     return {
       contractFullName,

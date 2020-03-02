@@ -6,12 +6,9 @@ import add from '../../scripts/add';
 import push from '../../scripts/push';
 import sendTx from '../../scripts/send-tx';
 import createProxy from '../../scripts/create';
-import { Contracts } from '@openzeppelin/upgrades';
 import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
-
-const ImplV1 = Contracts.getFromLocal('ImplV1');
 
 describe('send-tx script', function() {
   const [account] = accounts;
@@ -25,11 +22,11 @@ describe('send-tx script', function() {
 
     this.networkFile = new NetworkFile(this.projectFile, network);
 
-    const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
-    await add({ contractsData, projectFile: this.projectFile });
+    const contracts = ['ImplV1'];
+    await add({ contracts, projectFile: this.projectFile });
     await push({ network, txParams, networkFile: this.networkFile });
     await createProxy({
-      contractAlias: 'Impl',
+      contractName: 'ImplV1',
       network,
       txParams,
       networkFile: this.networkFile,
@@ -63,7 +60,7 @@ describe('send-tx script', function() {
           proxyAddress,
           methodName: 'initialize',
           methodArgs: [42],
-        }).should.be.rejectedWith(`Contract at address ${proxyAddress} not found`);
+        }).should.be.rejectedWith(`Proxy at address ${proxyAddress} not found`);
       });
     });
 

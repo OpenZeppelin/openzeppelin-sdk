@@ -25,14 +25,14 @@ commands:
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-v5-{{ checksum "yarn.lock" }}
+          key: dependency-cache-v6-{{ checksum "yarn.lock" }}
       - attach_workspace:
           at: ~/openzeppelin
       - when:
           condition: << parameters.run-yarn >>
           steps:
             - restore_cache:
-                key: yarn-cache-v8-
+                key: yarn-cache-v9-
             - run:
                 command: yarn
                 working_directory: "~/openzeppelin/<< parameters.workspace >>"
@@ -54,8 +54,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - dependency-cache-v5-{{ checksum "yarn.lock" }}
-            - yarn-cache-v8-
+            - dependency-cache-v6-{{ checksum "yarn.lock" }}
+            - yarn-cache-v9-
       - run:
           name: Install dependencies and build
           command: yarn
@@ -66,13 +66,13 @@ jobs:
           name: Lint check
           command: yarn lint:check
       - save_cache:
-          key: dependency-cache-v5-{{ checksum "yarn.lock" }}
+          key: dependency-cache-v6-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/cli/node_modules
             - packages/lib/node_modules
       - save_cache:
-          key: yarn-cache-v8-{{ checksum "yarn.lock" }}
+          key: yarn-cache-v9-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn/v6
       - persist_to_workspace:

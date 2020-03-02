@@ -19,7 +19,7 @@ describe('publish script', function() {
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';
   const projectName = 'Herbs';
-  const contractAlias = 'Impl';
+  const contractName = 'ImplV1';
   const dependencyName = 'mock-stdlib-undeployed';
 
   beforeEach('pushing package', async function() {
@@ -33,7 +33,7 @@ describe('publish script', function() {
       networkFile: this.networkFile,
       deployDependencies: true,
     });
-    this.previousContractAddress = this.networkFile.contract(contractAlias).address;
+    this.previousContractAddress = this.networkFile.contract(contractName).address;
     this.previousDependencyAddress = this.networkFile.getDependency(dependencyName).package;
   });
 
@@ -64,13 +64,13 @@ describe('publish script', function() {
       (await thepackage.getDirectory(defaultVersion)).address.should.eq(this.networkFile.providerAddress);
 
       const provider = ImplementationDirectory.fetch(this.networkFile.providerAddress);
-      (await provider.getImplementation(contractAlias)).should.be.nonzeroAddress;
+      (await provider.getImplementation(contractName)).should.be.nonzeroAddress;
     });
 
     it('should reuse deployed implementations', async function() {
       const provider = ImplementationDirectory.fetch(this.networkFile.providerAddress);
-      (await provider.getImplementation(contractAlias)).should.eq(this.previousContractAddress);
-      this.networkFile.contract(contractAlias).address.should.eq(this.previousContractAddress);
+      (await provider.getImplementation(contractName)).should.eq(this.previousContractAddress);
+      this.networkFile.contract(contractName).address.should.eq(this.previousContractAddress);
     });
 
     it('should link dependencies', async function() {
@@ -81,8 +81,8 @@ describe('publish script', function() {
 
   describe('publishing with modified contracts', async function() {
     beforeEach('publishing', async function() {
-      const contractData = this.networkFile.contract(contractAlias);
-      this.networkFile.setContract(contractAlias, {
+      const contractData = this.networkFile.contract(contractName);
+      this.networkFile.setContract(contractName, {
         ...contractData,
         bytecodeHash: '0xabcdef',
       });
@@ -91,8 +91,8 @@ describe('publish script', function() {
 
     it('should not redeploy modified contract on app', async function() {
       const app = await App.fetch(this.networkFile.appAddress);
-      const newImplFromApp = await app.getImplementation(projectName, contractAlias);
-      const newImplFromFile = this.networkFile.contract(contractAlias).address;
+      const newImplFromApp = await app.getImplementation(projectName, contractName);
+      const newImplFromFile = this.networkFile.contract(contractName).address;
 
       newImplFromApp.should.eq(newImplFromFile);
       newImplFromApp.should.eq(this.previousContractAddress);
@@ -103,7 +103,7 @@ describe('publish script', function() {
     context('for implementation proxy', function() {
       it('should be owned by proxyAdmin', async function() {
         this.ownProxy = await create({
-          contractAlias: 'Impl',
+          contractName: 'ImplV1',
           network,
           txParams,
           networkFile: this.networkFile,
@@ -117,7 +117,7 @@ describe('publish script', function() {
       it('should be owned by proxyAdmin', async function() {
         this.dependencyProxy = await create({
           packageName: 'mock-stdlib-undeployed',
-          contractAlias: 'Greeter',
+          contractName: 'GreeterImpl',
           network,
           txParams,
           networkFile: this.networkFile,
