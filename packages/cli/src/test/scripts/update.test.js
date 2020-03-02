@@ -161,6 +161,7 @@ describe('update script', function() {
 
   const restoreUpdate = () => {
     sandbox.resetBehavior();
+    sandbox.restore();
   };
 
   const shouldHandleUpdateScript = function() {
