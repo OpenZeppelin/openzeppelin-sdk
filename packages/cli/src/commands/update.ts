@@ -42,6 +42,7 @@ const register: (program: any) => any = program =>
     .action(commandActions);
 
 async function commandActions(proxyReference: string, options: any): Promise<void> {
+  console.log('commandActions:proxyReference:', proxyReference);
   const { network: promptedNetwork } = await promptForNetwork(options, () => getCommandProps());
   const { network, txParams } = await ConfigManager.initNetworkConfiguration({
     ...options,
@@ -58,6 +59,8 @@ async function commandActions(proxyReference: string, options: any): Promise<voi
 }
 
 async function action(proxyReference: string, options: any): Promise<void> {
+  console.log('proxyReference:', proxyReference);
+
   const { network, txParams, force, interactive, all, init: rawInitMethod } = options;
 
   if (!(await hasToMigrateProject(network))) process.exit(0);
@@ -73,6 +76,8 @@ async function action(proxyReference: string, options: any): Promise<void> {
     promptedProxyInfo.proxyReference && !promptedProxyInfo.all
       ? await promptForMethodParams(promptedProxyInfo.contractFullName, options, additionalOpts)
       : {};
+
+  console.log('parsedContractReference:', parsedContractReference);
 
   const args = pickBy({
     all: promptedProxyInfo.all,
