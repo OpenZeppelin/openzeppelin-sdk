@@ -896,7 +896,10 @@ export default class NetworkController {
     if (proxies.length === 0) return [];
     await this.fetchOrDeploy(this.currentVersion);
 
+    console.log('packageName', packageName, 'contractName', contractName, 'proxyAddress', proxyAddress);
     console.log('proxies', proxies);
+    console.log('projectFile', this.projectFile);
+    console.log('networkFile', this.networkFile);
 
     // Update all out of date proxies
     await allPromisesOrError(map(proxies, proxy => this.upgradeProxy(proxy, initMethod, initArgs)));
