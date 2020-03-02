@@ -219,10 +219,11 @@ function contractMethods(
 
 export function proxyInfo(contractInfo: any, network: string): any {
   const { contractName, proxyAddress, packageName } = contractInfo;
+  console.log('contractInfo', contractInfo);
   const projectFile = new ProjectFile();
   const networkFile = new NetworkFile(projectFile, network);
   const proxyParams = {
-    contract: contractName,
+    contractName: contractName,
     address: proxyAddress,
     package: packageName,
   };
