@@ -66,6 +66,8 @@ async function action(proxyReference: string, options: any): Promise<void> {
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
   const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
+  console.log('promptedProxyInfo:', promptedProxyInfo);
+
   const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
   const additionalOpts = {
@@ -93,9 +95,11 @@ async function promptForProxies(proxyReference: string, network: string, options
   const { all, interactive } = options;
   const pickProxyBy = all ? 'all' : undefined;
   const args = { pickProxyBy, proxy: proxyReference };
+  console.log('args', args);
   const props = getCommandProps({ proxyReference, network, all });
+  console.log('props', props);
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
-
+  console.log('promptedProxy', promptedProxy);
   return {
     ...promptedProxy,
     all: promptedPickProxyBy === 'all',
