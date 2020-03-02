@@ -15,12 +15,9 @@ export function contracts(source: ContractsSource = 'built'): Choice[] {
   const contractManager = new ContractManager(localProjectFile);
 
   const contractsFromBuild: Choice[] = contractManager.getContractNames();
-  const contractsFromLocal = Object.keys(localProjectFile.contracts)
-    .map(alias => ({ name: localProjectFile.contracts[alias], alias }))
-    .map(({ name: contractName, alias }) => {
-      const label = contractName === alias ? alias : `${alias}[${contractName}]`;
-      return { name: label, value: alias };
-    });
+  const contractsFromLocal = localProjectFile.contracts.map(contractName => {
+    return { name: contractName, value: contractName };
+  });
 
   // get contracts from build/contracts
   if (source === 'built') {
@@ -43,7 +40,7 @@ export function contracts(source: ContractsSource = 'built'): Choice[] {
   // generate a list of built contracts and package contracts
   if (source === 'all') {
     const packageContracts = Object.keys(localProjectFile.dependencies).map(dependencyName => {
-      const contractNames: Choice[] = new Dependency(dependencyName).projectFile.contractAliases.map(
+      const contractNames: Choice[] = new Dependency(dependencyName).projectFile.contracts.map(
         contractName => `${dependencyName}/${contractName}`,
       );
 

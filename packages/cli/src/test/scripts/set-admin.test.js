@@ -37,19 +37,19 @@ describe('set-admin script', function() {
       await push({ network, txParams, networkFile: this.networkFile });
 
       this.impl1 = await createProxy({
-        contractAlias: 'Impl',
+        contractName: 'ImplV1',
         network,
         txParams,
         networkFile: this.networkFile,
       });
       this.impl2 = await createProxy({
-        contractAlias: 'Impl',
+        contractName: 'ImplV1',
         network,
         txParams,
         networkFile: this.networkFile,
       });
       this.withLibraryImpl = await createProxy({
-        contractAlias: 'WithLibraryImpl',
+        contractName: 'WithLibraryImplV1',
         network,
         txParams,
         networkFile: this.networkFile,
@@ -83,7 +83,7 @@ describe('set-admin script', function() {
 
     it('changes admin of several proxies given name', async function() {
       await setAdmin({
-        contractAlias: 'Impl',
+        contractName: 'ImplV1',
         newAdmin,
         network,
         txParams,
@@ -104,7 +104,7 @@ describe('set-admin script', function() {
         networkFile: this.networkFile,
       });
       await setAdmin({
-        contractAlias: 'Impl',
+        contractName: 'ImplV1',
         newAdmin: anotherNewAdmin,
         network,
         txParams,
@@ -140,14 +140,14 @@ describe('set-admin script', function() {
 
       this.greeter1 = await createProxy({
         packageName: 'mock-stdlib-undeployed',
-        contractAlias: 'Greeter',
+        contractName: 'GreeterImpl',
         network,
         txParams,
         networkFile: this.networkFile,
       });
       this.greeter2 = await createProxy({
         packageName: 'mock-stdlib-undeployed',
-        contractAlias: 'Greeter',
+        contractName: 'GreeterImpl',
         network,
         txParams,
         networkFile: this.networkFile,
@@ -170,7 +170,7 @@ describe('set-admin script', function() {
     it('changes admin of several proxies given package and name', async function() {
       await setAdmin({
         packageName: 'mock-stdlib-undeployed',
-        contractAlias: 'Greeter',
+        contractName: 'GreeterImpl',
         newAdmin,
         network,
         txParams,
@@ -183,7 +183,7 @@ describe('set-admin script', function() {
 
     it('changes no admins if package is missing', async function() {
       await setAdmin({
-        contractAlias: 'Greeter',
+        contractName: 'GreeterImpl',
         newAdmin,
         network,
         txParams,

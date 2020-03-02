@@ -22,13 +22,13 @@ describe('bump script', function() {
 
     it('should preserve added logic contracts', async function() {
       await add({
-        contractsData: [{ name: 'ImplV1' }],
+        contracts: ['ImplV1'],
         projectFile: this.projectFile,
       });
       await bump({ version: newVersion, projectFile: this.projectFile });
 
       this.projectFile.version.should.eq(newVersion);
-      this.projectFile.contract('ImplV1').should.eq('ImplV1');
+      this.projectFile.contracts.should.include('ImplV1');
     });
 
     it('should preserve dependencies', async function() {

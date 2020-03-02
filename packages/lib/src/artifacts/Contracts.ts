@@ -68,7 +68,7 @@ export default class Contracts {
     return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName), contractName);
   }
 
-  public static async getDefaultFromAddress() {
+  public static async getDefaultFromAddress(): Promise<string> {
     if (!Contracts.defaultFromAddress) {
       Contracts.defaultFromAddress = await ZWeb3.defaultAccount();
     }

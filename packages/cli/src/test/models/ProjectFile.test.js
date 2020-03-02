@@ -28,7 +28,7 @@ describe('ProjectFile', function() {
       file.data.manifestVersion.should.eq(MANIFEST_VERSION);
       file.name.should.eq('Herbs');
       file.version.should.eq('1.1.0');
-      file.contract('Impl').should.eq('ImplV1');
+      file.contracts.should.include('ImplV1');
     });
 
     it('fails to load unsupported manifestVersion', function() {

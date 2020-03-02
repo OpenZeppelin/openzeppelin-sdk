@@ -5,11 +5,9 @@ import remove from '../../scripts/remove';
 import ProjectFile from '../../models/files/ProjectFile';
 import CaptureLogs from '../helpers/captureLogs';
 
-const should = require('chai').should();
-
 describe('remove script', function() {
-  const contractAlias = 'Impl';
-  const anotherContractAlias = 'WithLibraryImpl';
+  const contractName = 'ImplV1';
+  const anotherContractName = 'WithLibraryImplV1';
 
   beforeEach('setup', async function() {
     this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');
@@ -24,23 +22,23 @@ describe('remove script', function() {
   });
 
   it('should remove a contract', function() {
-    remove({ contracts: [contractAlias], projectFile: this.projectFile });
-    should.not.exist(this.projectFile.contract(contractAlias));
-    this.projectFile.contract(anotherContractAlias).should.eq('WithLibraryImplV1');
+    remove({ contracts: [contractName], projectFile: this.projectFile });
+    this.projectFile.contracts.should.not.include(contractName);
+    this.projectFile.contracts.should.include('WithLibraryImplV1');
   });
 
   it('should remove multiple contracts', function() {
     remove({
-      contracts: [contractAlias, anotherContractAlias],
+      contracts: [contractName, anotherContractName],
       projectFile: this.projectFile,
     });
-    should.not.exist(this.projectFile.contract(contractAlias));
-    should.not.exist(this.projectFile.contract(anotherContractAlias));
+    this.projectFile.contracts.should.not.include(contractName);
+    this.projectFile.contracts.should.not.include(anotherContractName);
   });
 
-  it('should log an error upon missing contract alias', function() {
+  it('should log an error upon missing contract name', function() {
     remove({
-      contracts: [contractAlias, 'invalid'],
+      contracts: [contractName, 'invalid'],
       projectFile: this.projectFile,
     });
     this.logs.errors.should.have.lengthOf(1);

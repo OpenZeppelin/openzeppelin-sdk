@@ -2,8 +2,6 @@
   "manifestVersion": "2.2",
   "name": "example-truffle-migrate",
   "version": "0.1.0",
-  "contracts": {
-    "MyContract": "MyContract_v1"
-  },
+  "contracts": ["MyContract_v1"],
   "dependencies": {}
 }

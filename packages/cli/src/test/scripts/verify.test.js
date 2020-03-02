@@ -12,7 +12,7 @@ import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
 describe('verify script', function() {
-  const contract = 'Impl';
+  const contract = 'ImplV1';
   const network = 'test';
   const txParams = {};
 
@@ -26,7 +26,7 @@ describe('verify script', function() {
 
   describe('validations', function() {
     describe('with invalid package or network files', function() {
-      it('throws error if zOS project is not yet initialized', async function() {
+      it('throws error if oz project is not yet initialized', async function() {
         const projectFile = new ProjectFile('non-existent-package.zos.json');
         const networkFile = new NetworkFile(projectFile, network);
 

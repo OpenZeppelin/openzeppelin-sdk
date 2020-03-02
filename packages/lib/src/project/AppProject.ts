@@ -121,8 +121,8 @@ class BaseAppProject extends BasePackageProject {
 
     await Promise.all(
       concat<Promise<void | boolean>>(
-        map(proxyAdminProject.implementations, (contractInfo, contractAlias) =>
-          appProject.registerImplementation(contractAlias, contractInfo),
+        map(proxyAdminProject.implementations, (contractInfo, contractName) =>
+          appProject.registerImplementation(contractName, contractInfo),
         ),
         map(proxyAdminProject.dependencies, (dependencyInfo, dependencyName) =>
           appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version),
@@ -147,8 +147,8 @@ class BaseAppProject extends BasePackageProject {
 
     await Promise.all(
       concat<Promise<void | boolean>>(
-        map(simpleProject.implementations, (contractInfo, contractAlias) =>
-          appProject.registerImplementation(contractAlias, contractInfo),
+        map(simpleProject.implementations, (contractInfo, contractName) =>
+          appProject.registerImplementation(contractName, contractInfo),
         ),
         map(simpleProject.dependencies, (dependencyInfo, dependencyName) =>
           appProject.setDependency(dependencyName, dependencyInfo.package, dependencyInfo.version),

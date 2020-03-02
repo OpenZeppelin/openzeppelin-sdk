@@ -1,7 +1,6 @@
 'use strict';
 require('../setup');
 
-import utils from 'web3-utils';
 import { accounts } from '@openzeppelin/test-environment';
 
 import add from '../../scripts/add';
@@ -23,11 +22,11 @@ describe('call script', function() {
     this.logs = new CaptureLogs();
     this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
     this.networkFile = new NetworkFile(this.projectFile, network);
-    const contractsData = [{ name: 'ImplV1', alias: 'Impl' }];
-    await add({ contractsData, projectFile: this.projectFile });
-    await push({ network, txParams, networkFile: this.networkFile });
+    const contracts = ['ImplV1'];
+    await add({ contracts, projectFile: this.projectFile });
+    await push({ contracts, network, txParams, networkFile: this.networkFile });
     await createProxy({
-      contractAlias: 'Impl',
+      contractName: 'ImplV1',
       network,
       txParams,
       networkFile: this.networkFile,
@@ -61,7 +60,7 @@ describe('call script', function() {
           proxyAddress,
           methodName: 'initialize',
           methodArgs: [42],
-        }).should.be.rejectedWith(`Contract at address ${proxyAddress} not found`);
+        }).should.be.rejectedWith(`Proxy at address ${proxyAddress} not found`);
       });
     });
 
@@ -83,7 +82,7 @@ describe('call script', function() {
     context('when specifying a wrong number of method arguments', function() {
       it('throws an error', async function() {
         const proxyAddress = this.networkFile.getProxies({
-          contract: 'Impl',
+          contract: 'ImplV1',
         })[0].address;
         await call({
           network,
@@ -101,7 +100,7 @@ describe('call script', function() {
     context('when calling a variable getter', function() {
       it('calls the getter and logs the returned value', async function() {
         const proxyAddress = this.networkFile.getProxies({
-          contract: 'Impl',
+          contract: 'ImplV1',
         })[0].address;
         await sendTx({
           network,
@@ -128,7 +127,7 @@ describe('call script', function() {
       context('when the method does not return', function() {
         it('calls the method and logs that it has been returned empty', async function() {
           const proxyAddress = this.networkFile.getProxies({
-            contract: 'Impl',
+            contract: 'ImplV1',
           })[0].address;
           await call({
             network,
@@ -146,7 +145,7 @@ describe('call script', function() {
       context('when the method returns a value', function() {
         it('calls the method and logs the returned value', async function() {
           const proxyAddress = this.networkFile.getProxies({
-            contract: 'Impl',
+            contract: 'ImplV1',
           })[0].address;
           await call({
             network,
@@ -164,7 +163,7 @@ describe('call script', function() {
       context('when the method returns multiple values', function() {
         it('calls the method and logs the returned values', async function() {
           const proxyAddress = this.networkFile.getProxies({
-            contract: 'Impl',
+            contract: 'ImplV1',
           })[0].address;
           await call({
             network,
@@ -182,7 +181,7 @@ describe('call script', function() {
       context('when the method returns an array', function() {
         it('calls the method and logs an empty array', async function() {
           const proxyAddress = this.networkFile.getProxies({
-            contract: 'Impl',
+            contract: 'ImplV1',
           })[0].address;
           await call({
             network,
@@ -198,7 +197,7 @@ describe('call script', function() {
 
         it('calls the method and logs the array', async function() {
           const proxyAddress = this.networkFile.getProxies({
-            contract: 'Impl',
+            contract: 'ImplV1',
           })[0].address;
           await sendTx({
             network,
@@ -224,7 +223,7 @@ describe('call script', function() {
       context('when the method takes and returns a struct', function() {
         it('calls the method and logs the struct', async function() {
           const proxyAddress = this.networkFile.getProxies({
-            contract: 'Impl',
+            contract: 'ImplV1',
           })[0].address;
           await call({
             network,

@@ -1,8 +1,6 @@
 {
   "manifestVersion": "2.2",
-  "contracts": {
-    "Greeter": "GreeterImpl"
-  },
+  "contracts": ["GreeterImpl"],
   "dependencies": {},
   "name": "mock-project-with-root-imports",
   "version": "1.0.0",

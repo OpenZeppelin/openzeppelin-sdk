@@ -10,7 +10,6 @@ import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
-const WithLibraryImpl = Contracts.getFromLocal('WithLibraryImplV1');
 
 describe('TestHelper', function() {
   const [owner] = accounts;
@@ -62,7 +61,7 @@ describe('TestHelper', function() {
 
     it('retrieves a mock from app', async function() {
       const proxy = await this.project.createProxy(ImplV1, {
-        contractName: 'Impl',
+        contractName: 'ImplV1',
       });
       const say = await proxy.methods.say().call();
 
@@ -80,7 +79,7 @@ describe('TestHelper', function() {
 
     it('retrieves a mock from app', async function() {
       const proxy = await this.project.createProxy(ImplV1, {
-        contractName: 'Impl',
+        contractName: 'ImplV1',
       });
       const say = await proxy.methods.say().call();
       say.should.eq('V1');
@@ -88,10 +87,10 @@ describe('TestHelper', function() {
 
     it('creates two different proxies', async function() {
       const proxy1 = await this.project.createProxy(ImplV1, {
-        contractName: 'Impl',
+        contractName: 'ImplV1',
       });
       const proxy2 = await this.project.createProxy(ImplV1, {
-        contractName: 'Impl',
+        contractName: 'ImplV1',
       });
       proxy1.address.should.not.be.eq(proxy2.address);
     });

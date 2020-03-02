@@ -11,7 +11,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with proxy address',
     'setAdmin',
-    `zos set-admin 0x20 ${newAdmin} --force --network test`,
+    `oz set-admin 0x20 ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         proxyAddress: '0x20',
@@ -25,7 +25,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with network options',
     'setAdmin',
-    `zos set-admin 0x20 ${newAdmin} --force --network test --from 0x40`,
+    `oz set-admin 0x20 ${newAdmin} --force --network test --from 0x40`,
     function(update) {
       update.should.have.been.calledWith({
         proxyAddress: '0x20',
@@ -39,10 +39,10 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with contract name',
     'setAdmin',
-    `zos set-admin Impl ${newAdmin} --force --network test`,
+    `oz set-admin Impl ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         newAdmin: newAdmin,
         network: 'test',
         txParams: {},
@@ -53,11 +53,11 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin script with package name and contract name',
     'setAdmin',
-    `zos set-admin OpenZeppelin/Impl ${newAdmin} --force --network test`,
+    `oz set-admin OpenZeppelin/Impl ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         packageName: 'OpenZeppelin',
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         newAdmin: newAdmin,
         network: 'test',
         txParams: {},
@@ -68,7 +68,7 @@ describe('set-admin command', function() {
   itShouldParse(
     'should call set-admin with new proxy admin owner address',
     'setAdmin',
-    `zos set-admin ${newAdmin} --force --network test`,
+    `oz set-admin ${newAdmin} --force --network test`,
     function(update) {
       update.should.have.been.calledWith({
         newAdmin: newAdmin,

@@ -69,7 +69,7 @@ describe('push script', function() {
 
   const shouldDeployContracts = function() {
     it('should record contracts in network file', async function() {
-      const contract = this.networkFile.contract('Impl');
+      const contract = this.networkFile.contract('ImplV1');
       contract.address.should.be.nonzeroAddress;
       contract.localBytecodeHash.should.not.be.empty;
       contract.storage.should.not.be.empty;
@@ -79,7 +79,7 @@ describe('push script', function() {
     });
 
     it('should deploy contract instance', async function() {
-      const address = this.networkFile.contract('Impl').address;
+      const address = this.networkFile.contract('ImplV1').address;
       const deployed = await ImplV1.at(address);
       (await deployed.methods.say().call()).should.eq('V1');
     });
@@ -92,7 +92,7 @@ describe('push script', function() {
     });
 
     it('should deploy and link contracts that require libraries', async function() {
-      const address = this.networkFile.contract('WithLibraryImpl').address;
+      const address = this.networkFile.contract('WithLibraryImplV1').address;
       const deployed = await WithLibraryImplV1.at(address);
       const result = await deployed.methods.double(10).call();
       result.should.eq('20');
@@ -101,21 +101,21 @@ describe('push script', function() {
 
   const shouldRegisterContractsInDirectory = function() {
     it('should register instances in directory', async function() {
-      const address = this.networkFile.contract('Impl').address;
+      const address = this.networkFile.contract('ImplV1').address;
       const _package = Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation(defaultVersion, 'Impl')).should.eq(address);
+      (await _package.getImplementation(defaultVersion, 'ImplV1')).should.eq(address);
     });
   };
 
   const shouldRedeployContracts = function() {
     beforeEach('loading previous addresses', function() {
-      this.previousAddress = this.networkFile.contract('Impl').address;
-      this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address;
+      this.previousAddress = this.networkFile.contract('ImplV1').address;
+      this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImplV1').address;
     });
 
     it('should not redeploy contracts if unmodified', async function() {
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+      this.networkFile.contract('ImplV1').address.should.eq(this.previousAddress);
     });
 
     it('should redeploy unmodified contract if forced', async function() {
@@ -125,30 +125,30 @@ describe('push script', function() {
         txParams,
         reupload: true,
       });
-      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+      this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
     });
 
     it('should redeploy contracts if modified', async function() {
-      modifyBytecode.call(this, 'Impl');
+      modifyBytecode.call(this, 'ImplV1');
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+      this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
     });
 
     it('should redeploy contracts if library is modified', async function() {
       modifyLibraryBytecode.call(this, 'UintLib');
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.contract('WithLibraryImpl').address.should.not.eq(this.withLibraryPreviousAddress);
+      this.networkFile.contract('WithLibraryImplV1').address.should.not.eq(this.withLibraryPreviousAddress);
     });
 
     it('should not redeploy contracts if library is unmodified', async function() {
       await push({ networkFile: this.networkFile, network, txParams });
-      this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
+      this.networkFile.contract('WithLibraryImplV1').address.should.eq(this.withLibraryPreviousAddress);
     });
 
     context('validations', function() {
       beforeEach('modifying contracts', function() {
-        modifyBytecode.call(this, 'Impl');
-        modifyStorageInfo.call(this, 'Impl');
+        modifyBytecode.call(this, 'ImplV1');
+        modifyStorageInfo.call(this, 'ImplV1');
       });
 
       it('should refuse to redeploy a contract if storage is incompatible', async function() {
@@ -157,7 +157,7 @@ describe('push script', function() {
           network,
           txParams,
         }).should.be.rejectedWith(/have validation errors/);
-        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+        this.networkFile.contract('ImplV1').address.should.eq(this.previousAddress);
       });
 
       it('should redeploy contract ignoring warnings', async function() {
@@ -167,7 +167,7 @@ describe('push script', function() {
           network,
           txParams,
         });
-        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+        this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
       });
 
       it('should refuse to redeploy a contract if validation throws', async function() {
@@ -177,7 +177,7 @@ describe('push script', function() {
           network,
           txParams,
         }).should.be.rejectedWith(/have validation errors/);
-        this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+        this.networkFile.contract('ImplV1').address.should.eq(this.previousAddress);
       });
 
       it('should redeploy contract skipping errors', async function() {
@@ -188,7 +188,7 @@ describe('push script', function() {
           network,
           txParams,
         });
-        this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+        this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
       });
 
       afterEach(function() {
@@ -200,8 +200,8 @@ describe('push script', function() {
   const shouldDeployOnlySpecifiedContracts = function() {
     describe('when contracts specified explicitly', function() {
       beforeEach('loading previous addresses', function() {
-        this.previousAddress = this.networkFile.contract('Impl').address;
-        this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImpl').address;
+        this.previousAddress = this.networkFile.contract('ImplV1').address;
+        this.withLibraryPreviousAddress = this.networkFile.contract('WithLibraryImplV1').address;
       });
 
       describe('when a NetworkFile is empty', function() {
@@ -211,9 +211,9 @@ describe('push script', function() {
         });
 
         it('should record contracts in network file', async function() {
-          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+          await push({ contracts: ['ImplV1'], networkFile: this.networkFile, network, txParams });
 
-          const contract = this.networkFile.contract('Impl');
+          const contract = this.networkFile.contract('ImplV1');
           contract.address.should.be.nonzeroAddress;
           contract.localBytecodeHash.should.not.be.empty;
           contract.storage.should.not.be.empty;
@@ -223,22 +223,22 @@ describe('push script', function() {
         });
 
         it('should not record not specified contracts in network file', async function() {
-          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+          await push({ contracts: ['ImplV1'], networkFile: this.networkFile, network, txParams });
 
-          const contract = this.networkFile.contract('WithLibraryImpl');
+          const contract = this.networkFile.contract('WithLibraryImplV1');
           expect(contract).to.be.undefined;
         });
 
         it('should deploy contract instance', async function() {
-          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
+          await push({ contracts: ['ImplV1'], networkFile: this.networkFile, network, txParams });
 
-          const address = this.networkFile.contract('Impl').address;
+          const address = this.networkFile.contract('ImplV1').address;
           const deployed = await ImplV1.at(address);
           (await deployed.methods.say().call()).should.eq('V1');
         });
 
         it('should deploy required libraries', async function() {
-          await push({ contractAliases: ['WithLibraryImpl'], networkFile: this.networkFile, network, txParams });
+          await push({ contracts: ['WithLibraryImplV1'], networkFile: this.networkFile, network, txParams });
 
           const address = this.networkFile.solidityLib('UintLib').address;
           const code = await ZWeb3.eth.getCode(address);
@@ -247,9 +247,9 @@ describe('push script', function() {
         });
 
         it('should deploy and link contracts that require libraries', async function() {
-          await push({ contractAliases: ['WithLibraryImpl'], networkFile: this.networkFile, network, txParams });
+          await push({ contracts: ['WithLibraryImplV1'], networkFile: this.networkFile, network, txParams });
 
-          const address = this.networkFile.contract('WithLibraryImpl').address;
+          const address = this.networkFile.contract('WithLibraryImplV1').address;
           const deployed = await WithLibraryImplV1.at(address);
           const result = await deployed.methods.double(10).call();
           result.should.eq('20');
@@ -258,82 +258,82 @@ describe('push script', function() {
 
       describe('on a redeploy', function() {
         it('should not deploy contracts if unmodified', async function() {
-          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
-          this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+          await push({ contracts: ['ImplV1'], networkFile: this.networkFile, network, txParams });
+          this.networkFile.contract('ImplV1').address.should.eq(this.previousAddress);
         });
 
         it('should deploy unmodified contract if forced', async function() {
           await push({
-            contractAliases: ['Impl'],
+            contracts: ['ImplV1'],
             networkFile: this.networkFile,
             network,
             txParams,
             reupload: true,
           });
-          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+          this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
         });
 
         it('should deploy contracts if modified', async function() {
-          modifyBytecode.call(this, 'Impl');
-          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
-          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+          modifyBytecode.call(this, 'ImplV1');
+          await push({ contracts: ['ImplV1'], networkFile: this.networkFile, network, txParams });
+          this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
         });
 
         it('should not deploy contracts if library is modified', async function() {
           modifyLibraryBytecode.call(this, 'UintLib');
-          await push({ contractAliases: ['Impl'], networkFile: this.networkFile, network, txParams });
-          this.networkFile.contract('WithLibraryImpl').address.should.eq(this.withLibraryPreviousAddress);
+          await push({ contracts: ['ImplV1'], networkFile: this.networkFile, network, txParams });
+          this.networkFile.contract('WithLibraryImplV1').address.should.eq(this.withLibraryPreviousAddress);
         });
       });
 
       context('validations', function() {
         beforeEach('modifying contracts', function() {
-          modifyBytecode.call(this, 'Impl');
-          modifyStorageInfo.call(this, 'Impl');
+          modifyBytecode.call(this, 'ImplV1');
+          modifyStorageInfo.call(this, 'ImplV1');
         });
 
         it('should refuse to deploy a contract if storage is incompatible', async function() {
           await push({
-            contractAliases: ['Impl'],
+            contracts: ['ImplV1'],
             networkFile: this.networkFile,
             network,
             txParams,
           }).should.be.rejectedWith(/have validation errors/);
-          this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+          this.networkFile.contract('ImplV1').address.should.eq(this.previousAddress);
         });
 
         it('should deploy contract ignoring warnings', async function() {
           await push({
-            contractAliases: ['Impl'],
+            contracts: ['ImplV1'],
             force: true,
             networkFile: this.networkFile,
             network,
             txParams,
           });
-          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+          this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
         });
 
         it('should refuse to deploy a contract if validation throws', async function() {
           sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
           await push({
-            contractAliases: ['Impl'],
+            contracts: ['ImplV1'],
             networkFile: this.networkFile,
             network,
             txParams,
           }).should.be.rejectedWith(/have validation errors/);
-          this.networkFile.contract('Impl').address.should.eq(this.previousAddress);
+          this.networkFile.contract('ImplV1').address.should.eq(this.previousAddress);
         });
 
         it('should deploy contract skipping errors', async function() {
           sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
           await push({
-            contractAliases: ['Impl'],
+            contracts: ['ImplV1'],
             force: true,
             networkFile: this.networkFile,
             network,
             txParams,
           });
-          this.networkFile.contract('Impl').address.should.not.eq(this.previousAddress);
+          this.networkFile.contract('ImplV1').address.should.not.eq(this.previousAddress);
         });
 
         afterEach(function() {
@@ -355,7 +355,7 @@ describe('push script', function() {
 
       it('should refuse to push a contract with validation error', async function() {
         add({
-          contractsData: [{ name: 'WithConstructor' }],
+          contracts: ['WithConstructor'],
           projectFile: this.networkFile.projectFile,
         });
         await push({
@@ -370,7 +370,7 @@ describe('push script', function() {
 
       it('should push a contract with validation error if forced', async function() {
         add({
-          contractsData: [{ name: 'WithConstructor' }],
+          contracts: ['WithConstructor'],
           projectFile: this.networkFile.projectFile,
         });
         await push({
@@ -389,7 +389,7 @@ describe('push script', function() {
 
       it('should only report new validation errors', async function() {
         add({
-          contractsData: [{ name: 'WithConstructor' }],
+          contracts: ['WithConstructor'],
           projectFile: this.networkFile.projectFile,
         });
         await push({
@@ -411,7 +411,7 @@ describe('push script', function() {
 
       it('should only validate modified contracts', async function() {
         add({
-          contractsData: [{ name: 'WithConstructor' }],
+          contracts: ['WithConstructor'],
           projectFile: this.networkFile.projectFile,
         });
         await push({
@@ -420,14 +420,14 @@ describe('push script', function() {
           txParams,
           force: true,
         });
-        const previousAddress = this.networkFile.contract('Impl').address;
+        const previousAddress = this.networkFile.contract('ImplV1').address;
 
         this.logs.clear();
-        modifyBytecode.call(this, 'Impl');
+        modifyBytecode.call(this, 'ImplV1');
         await push({ networkFile: this.networkFile, network, txParams });
 
         this.logs.errors.should.have.lengthOf(0);
-        this.networkFile.contract('Impl').address.should.not.eq(previousAddress);
+        this.networkFile.contract('ImplV1').address.should.not.eq(previousAddress);
       });
     });
   };
@@ -462,9 +462,9 @@ describe('push script', function() {
         projectFile: this.networkFile.projectFile,
       });
       await push({ networkFile: this.networkFile, network, txParams });
-      const implementationAddress = this.networkFile.contract('Impl').address;
+      const implementationAddress = this.networkFile.contract('ImplV1').address;
       const _package = Package.fetch(this.networkFile.package.address);
-      (await _package.getImplementation('1.2.0', 'Impl')).should.eq(implementationAddress);
+      (await _package.getImplementation('1.2.0', 'ImplV1')).should.eq(implementationAddress);
     });
 
     it('should set frozen back to false', async function() {
@@ -481,7 +481,7 @@ describe('push script', function() {
         projectFile: this.newNetworkFile.projectFile,
       });
       await add({
-        contractsData: [{ name: 'ImplV1', alias: 'Impl' }],
+        contracts: ['ImplV1'],
         projectFile: this.newNetworkFile.projectFile,
       });
       await push({ network, txParams, networkFile: this.newNetworkFile });
@@ -492,16 +492,16 @@ describe('push script', function() {
   const shouldDeleteContracts = function({ unregisterFromDirectory }) {
     it('should delete contracts', async function() {
       await remove({
-        contracts: ['Impl'],
+        contracts: ['ImplV1'],
         projectFile: this.networkFile.projectFile,
       });
       await push({ network, txParams, networkFile: this.networkFile });
 
       if (unregisterFromDirectory) {
         const _package = Package.fetch(this.networkFile.package.address);
-        (await _package.getImplementation(defaultVersion, 'Impl')).should.be.zeroAddress;
+        (await _package.getImplementation(defaultVersion, 'ImplV1')).should.be.zeroAddress;
       }
-      should.not.exist(this.networkFile.contract('Impl'));
+      should.not.exist(this.networkFile.contract('ImplV1'));
     });
   };
 
@@ -567,7 +567,7 @@ describe('push script', function() {
   const shouldNotPushWhileFrozen = function() {
     it('should refuse to push when frozen upon modified contracts', async function() {
       await freeze({ network, txParams, networkFile: this.networkFile });
-      modifyBytecode.call(this, 'Impl');
+      modifyBytecode.call(this, 'ImplV1');
       await push({
         network,
         txParams,
@@ -842,14 +842,14 @@ describe('push script', function() {
       shouldDeleteContracts({ unregisterFromDirectory: false });
 
       it('should not reupload contracts after version bump', async function() {
-        const previousAddress = this.networkFile.contract('Impl').address;
+        const previousAddress = this.networkFile.contract('ImplV1').address;
         await bumpVersion({
           version: '1.2.0',
           projectFile: this.networkFile.projectFile,
         });
         await push({ networkFile: this.networkFile, network, txParams });
         this.networkFile.version.should.eq('1.2.0');
-        this.networkFile.contract('Impl').address.should.eq(previousAddress);
+        this.networkFile.contract('ImplV1').address.should.eq(previousAddress);
       });
     });
 
@@ -895,36 +895,31 @@ describe('push script', function() {
   });
 });
 
-async function getImplementationFromApp(contractAlias) {
-  const app = await App.fetch(this.networkFile.appAddress);
-  return await app.getImplementation(this.networkFile.projectFile.name, contractAlias);
-}
-
-function modifyBytecode(contractAlias) {
-  const contractData = this.networkFile.contract(contractAlias);
-  this.networkFile.setContract(contractAlias, {
+function modifyBytecode(contractName) {
+  const contractData = this.networkFile.contract(contractName);
+  this.networkFile.setContract(contractName, {
     ...contractData,
     localBytecodeHash: '0xabcdef',
   });
 }
 
-function modifyLibraryBytecode(contractAlias) {
-  const contractData = this.networkFile.solidityLib(contractAlias);
-  this.networkFile.setSolidityLib(contractAlias, {
+function modifyLibraryBytecode(contractName) {
+  const contractData = this.networkFile.solidityLib(contractName);
+  this.networkFile.setSolidityLib(contractName, {
     ...contractData,
     localBytecodeHash: '0xabcdef',
   });
 }
 
-function modifyStorageInfo(contractAlias) {
-  const contractData = this.networkFile.contract(contractAlias);
+function modifyStorageInfo(contractName) {
+  const contractData = this.networkFile.contract(contractName);
   const fakeVariable = {
     label: 'deleted',
     type: 't_uint256',
     contract: 'ImplV1',
   };
   const modifiedStorage = [fakeVariable, ...contractData.storage];
-  this.networkFile.setContract(contractAlias, {
+  this.networkFile.setContract(contractName, {
     ...contractData,
     storage: modifiedStorage,
   });

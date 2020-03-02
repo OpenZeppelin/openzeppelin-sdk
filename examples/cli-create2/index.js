@@ -1,11 +1,13 @@
-const { ConfigManager, files, scripts, stdout } = require('@openzeppelin/cli');
-const { helpers, Contracts } = require('@openzeppelin/upgrades');
+const { ConfigManager, files, scripts, stdout } = require("@openzeppelin/cli");
+const { helpers, Contracts } = require("@openzeppelin/upgrades");
 
 stdout.silent(true);
 
 async function setup(network) {
   // Initialize network
-  const networkConfig = await ConfigManager.initNetworkConfiguration({ network: network || process.env.NETWORK || 'local' });
+  const networkConfig = await ConfigManager.initNetworkConfiguration({
+    network: network || process.env.NETWORK || "local"
+  });
   console.log(`$ openzeppelin session --network ${networkConfig.network}`);
   console.log(`> Initialized session on network ${networkConfig.network}\n`);
 
@@ -15,8 +17,8 @@ async function setup(network) {
 async function push(networkConfig) {
   // Push contracts to the network
   await scripts.push({ deployProxyAdmin: true, ...networkConfig });
-  console.log(`$ openzeppelin push`)
-  console.log(`> Pushed logic contract to the network\n`)
+  console.log(`$ openzeppelin push`);
+  console.log(`> Pushed logic contract to the network\n`);
 }
 
 async function useCreate2(initValue, networkConfig) {
@@ -24,51 +26,94 @@ async function useCreate2(initValue, networkConfig) {
   const salt = parseInt(Math.random() * 1000);
   const address = await scripts.queryDeployment({ salt, ...networkConfig });
   console.log(`$ openzeppelin create2 --salt ${salt}`);
-  console.log(`> Instance using salt ${salt} will be deployed at ${address}\n`)
+  console.log(`> Instance using salt ${salt} will be deployed at ${address}\n`);
 
   // Actually deploy it!
-  const instance = await scripts.create({ salt, contractAlias: 'Sample', methodName: 'initialize', methodArgs: [initValue], ...networkConfig });
+  const instance = await scripts.create({
+    salt,
+    contractName: "Sample",
+    methodName: "initialize",
+    methodArgs: [initValue],
+    ...networkConfig
+  });
   const value = await instance.methods.value().call();
-  console.log(`$ openzeppelin create2 Sample --salt ${salt} --init --args ${initValue}`);
-  console.log(`> Instance deployed at ${instance.options.address} with value ${value}\n`);
-  if (value != initValue.toString()) throw new Error(`Expected value ${initValue} but got ${value}`);
+  console.log(
+    `$ openzeppelin create2 Sample --salt ${salt} --init --args ${initValue}`
+  );
+  console.log(
+    `> Instance deployed at ${instance.options.address} with value ${value}\n`
+  );
+  if (value != initValue.toString())
+    throw new Error(`Expected value ${initValue} but got ${value}`);
 
   return instance;
 }
 
-
-async function useSignedCreate2(initValue, networkConfig) {    
+async function useSignedCreate2(initValue, networkConfig) {
   // Let's now sign a deployment instead of running it ourselves
-  const signer = '0x239938d1Bd73e99a5042d29DcFFf6991e0Fe5626';
-  const signerPk = '0xbe7e12ce20410c5f0207bd6c7bcae39052679bfd401c62849657ebfe23e3711b';
+  const signer = "0x239938d1Bd73e99a5042d29DcFFf6991e0Fe5626";
+  const signerPk =
+    "0xbe7e12ce20410c5f0207bd6c7bcae39052679bfd401c62849657ebfe23e3711b";
   const salt = parseInt(Math.random() * 1000);
 
   // Calculate initialization raw data
-  const Sample = Contracts.getFromLocal('Sample');
+  const Sample = Contracts.getFromLocal("Sample");
   const initData = Sample.methods.initialize(initValue).encodeABI();
 
   // We will use the project's proxy admin as upgradeability admin of this instance
-  const networkFile = new files.NetworkFile(new files.ProjectFile(), networkConfig.network);
+  const networkFile = new files.NetworkFile(
+    new files.ProjectFile(),
+    networkConfig.network
+  );
   const admin = networkFile.proxyAdminAddress;
 
   // And will use the current implementation for Sample as logic contract
-  const logic = networkFile.contract('Sample').address;
+  const logic = networkFile.contract("Sample").address;
 
   // We now ask @openzeppelin/upgrades to sign the request for us
-  const signature = helpers.signDeploy(networkFile.proxyFactoryAddress, salt, logic, admin, initData, signerPk);
-  
+  const signature = helpers.signDeploy(
+    networkFile.proxyFactoryAddress,
+    salt,
+    logic,
+    admin,
+    initData,
+    signerPk
+  );
+
   // Query the deployment address for that signature
-  const createArgs = { salt, contractAlias: "Sample", methodName: "initialize", methodArgs: [initValue] };
-  const address = await scripts.querySignedDeployment({ signature, ... createArgs, ... networkConfig });
-  console.log(`$ openzeppelin create2 Sample --query --salt ${salt} --signature ${signature} --init --args ${initValue}`);
-  console.log(`> Instance of Sample initialized with 'initialize(${initValue})' with salt ${salt} and signature ${signature} will be deployed at ${address}\n`);
+  const createArgs = {
+    salt,
+    contractName: "Sample",
+    methodName: "initialize",
+    methodArgs: [initValue]
+  };
+  const address = await scripts.querySignedDeployment({
+    signature,
+    ...createArgs,
+    ...networkConfig
+  });
+  console.log(
+    `$ openzeppelin create2 Sample --query --salt ${salt} --signature ${signature} --init --args ${initValue}`
+  );
+  console.log(
+    `> Instance of Sample initialized with 'initialize(${initValue})' with salt ${salt} and signature ${signature} will be deployed at ${address}\n`
+  );
 
   // And deploy!
-  const instance = await scripts.create({ signature, ... createArgs, ... networkConfig });
+  const instance = await scripts.create({
+    signature,
+    ...createArgs,
+    ...networkConfig
+  });
   const value = await instance.methods.value().call();
-  console.log(`$ openzeppelin create2 Sample --salt ${salt} --signature ${signature} --init --args ${initValue}`);
-  console.log(`> Instance deployed at ${instance.options.address} with value ${value} using signature ${signature}\n`);
-  if (value != initValue.toString()) throw new Error(`Expected value ${initValue} but got ${value}`);
+  console.log(
+    `$ openzeppelin create2 Sample --salt ${salt} --signature ${signature} --init --args ${initValue}`
+  );
+  console.log(
+    `> Instance deployed at ${instance.options.address} with value ${value} using signature ${signature}\n`
+  );
+  if (value != initValue.toString())
+    throw new Error(`Expected value ${initValue} but got ${value}`);
 
   return instance;
 }
@@ -81,8 +126,10 @@ async function main() {
 }
 
 module.exports = function(cb) {
-  main().then(() => cb()).catch(cb);
-}
+  main()
+    .then(() => cb())
+    .catch(cb);
+};
 
 module.exports.setup = setup;
 module.exports.push = push;

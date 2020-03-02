@@ -11,15 +11,13 @@ import { helpers } from '@openzeppelin/upgrades';
 import push from '../../scripts/push';
 import queryDeployment from '../../scripts/query-deployment';
 
-const should = require('chai').should();
-
 describe('query-signed-deployment script', function() {
-  const [owner, another, admin] = accounts;
+  const [owner, , admin] = accounts;
 
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };
-  const contractAlias = 'Impl';
+  const contractName = 'ImplV1';
 
   const shouldHandleQuerySignedDeploymentScript = function() {
     beforeEach('setup', async function() {
@@ -40,13 +38,13 @@ describe('query-signed-deployment script', function() {
         salt,
         sender: helpers.signer,
       });
-      const implementation = this.networkFile.contract(contractAlias).address;
+      const implementation = this.networkFile.contract(contractName).address;
       const signature = helpers.signDeploy(this.networkFile.proxyFactoryAddress, this.salt, implementation, admin);
 
       const address = await querySignedDeployment({
         signature,
         salt,
-        contractAlias,
+        contractName,
         admin,
         network,
         txParams,
@@ -66,7 +64,7 @@ describe('query-signed-deployment script', function() {
         salt,
         sender: helpers.signer,
       });
-      const implementation = this.networkFile.contract(contractAlias).address;
+      const implementation = this.networkFile.contract(contractName).address;
       const initData = '0xfe4b84df000000000000000000000000000000000000000000000000000000000000001e';
       const signature = helpers.signDeploy(
         this.networkFile.proxyFactoryAddress,
@@ -79,7 +77,7 @@ describe('query-signed-deployment script', function() {
       const address = await querySignedDeployment({
         signature,
         salt,
-        contractAlias,
+        contractName,
         methodName: 'initialize',
         methodArgs: [30],
         admin,

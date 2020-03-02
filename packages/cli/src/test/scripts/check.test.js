@@ -22,24 +22,16 @@ describe('check script', function() {
 
   describe('on single contract', function() {
     it('outputs no issues found', function() {
-      const contractAlias = 'ImplV1';
-      this.projectFile.addContract(contractAlias);
-      check({ contractAlias, projectFile: this.projectFile });
+      const contractName = 'ImplV1';
+      this.projectFile.addContract(contractName);
+      check({ contractName, projectFile: this.projectFile });
       this.logs.infos[0].should.match(/No issues/);
     });
 
-    it('outputs a warning on contract found by alias', function() {
-      const contractAlias = 'MyContract';
-      this.projectFile.addContract(contractAlias, 'WithDelegateCall');
-      check({ contractAlias, projectFile: this.projectFile });
-      this.logs.infos.should.be.empty;
-      this.logs.warns[0].should.match(/delegatecall/);
-    });
-
     it('outputs a warning on contract found by name', function() {
-      this.projectFile.addContract('MyContract', 'WithDelegateCall');
+      this.projectFile.addContract('WithDelegateCall');
       check({
-        contractAlias: 'WithDelegateCall',
+        contractName: 'WithDelegateCall',
         projectFile: this.projectFile,
       });
       this.logs.infos.should.be.empty;
@@ -48,7 +40,7 @@ describe('check script', function() {
 
     it('outputs a warning on contract not added', function() {
       check({
-        contractAlias: 'WithDelegateCall',
+        contractName: 'WithDelegateCall',
         projectFile: this.projectFile,
       });
       this.logs.infos.should.be.empty;
@@ -56,7 +48,7 @@ describe('check script', function() {
     });
 
     it('fails if contract not found', function() {
-      expect(() => check({ contractAlias: 'NotExists', projectFile: this.projectFile })).to.throw();
+      expect(() => check({ contractName: 'NotExists', projectFile: this.projectFile })).to.throw();
     });
   });
 

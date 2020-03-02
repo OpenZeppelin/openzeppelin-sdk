@@ -6,7 +6,7 @@ import { validateSalt } from '../utils/input';
 
 export default async function querySignedDeployment({
   packageName,
-  contractAlias,
+  contractName,
   methodName,
   methodArgs,
   network,
@@ -24,7 +24,7 @@ export default async function querySignedDeployment({
       salt,
       signature,
       packageName,
-      contractAlias,
+      contractName,
       methodName,
       methodArgs,
       admin,

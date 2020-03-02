@@ -2,12 +2,10 @@ import NetworkController from '../../models/network/NetworkController';
 import { Options, Args } from './spec';
 
 export async function action(params: Options & Args & { dontExitProcess: boolean }): Promise<void> {
-  const { userNetworkName } = params;
-
   const controller = new NetworkController(params.network, params.txParams, params.networkFile);
 
   try {
-    controller.checkLocalContractDeployed(params.contract, true);
+    controller.logErrorIfContractDeploymentIsInvalid(params.contract, true);
   } catch (e) {
     if (!e.message.includes('has changed locally')) {
       e.message += '\n\nVerification of regular instances is not yet supported.';

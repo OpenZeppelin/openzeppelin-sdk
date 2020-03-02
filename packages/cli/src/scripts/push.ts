@@ -3,7 +3,7 @@ import { PushParams } from './interfaces';
 import { fromContractFullName } from '../utils/naming';
 
 export default async function push({
-  contractAliases,
+  contracts,
   network,
   deployDependencies,
   deployProxyAdmin,
@@ -20,12 +20,12 @@ export default async function push({
     if (deployProxyAdmin) await controller.deployProxyAdmin();
     if (deployProxyFactory) await controller.deployProxyFactory();
 
-    const localContractAliases = contractAliases
+    const projectContracts = contracts
       ?.map(fromContractFullName)
       .filter(({ package: packageName }) => packageName === undefined || packageName === controller.projectFile.name)
-      .map(({ contract }) => contract);
+      .map(({ contractName }) => contractName);
 
-    await controller.push(localContractAliases, { reupload, force });
+    await controller.push(projectContracts, { reupload, force });
     const { appAddress } = controller;
   } finally {
     controller.writeNetworkPackageIfNeeded();

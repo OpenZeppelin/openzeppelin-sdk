@@ -152,8 +152,8 @@ export class ProxyAdminProjectDeployer extends BaseProjectDeployer {
       this.networkFile.proxyFactoryAddress,
     );
     this.networkFile.version = this.requestedVersion;
-    forEach(this.networkFile.contracts, (contractInfo, contractAlias) => {
-      this.project.registerImplementation(contractAlias, {
+    forEach(this.networkFile.contracts, (contractInfo, contractName) => {
+      this.project.registerImplementation(contractName, {
         address: contractInfo.address,
         bytecodeHash: contractInfo.bodyBytecodeHash,
       });

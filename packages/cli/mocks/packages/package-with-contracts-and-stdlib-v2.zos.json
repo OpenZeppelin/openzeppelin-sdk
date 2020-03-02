@@ -3,9 +3,7 @@
   "manifestVersion": "2.2",
   "publish": true,
   "version": "1.0",
-  "contracts": {
-    "Impl": "ImplV1"
-  },
+  "contracts": ["ImplV1"],
   "dependencies": {
     "mock-stdlib-2": "1.2.0"
   }

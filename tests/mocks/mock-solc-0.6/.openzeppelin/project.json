@@ -1,6 +1,6 @@
 {
   "manifestVersion": "2.2",
-  "contracts": {},
+  "contracts": [],
   "dependencies": {},
   "name": "mock-solc-0.6",
   "version": "1.0.0",

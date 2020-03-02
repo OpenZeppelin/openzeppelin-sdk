@@ -6,7 +6,7 @@ import { validateSalt } from '../utils/input';
 
 export default async function createProxy({
   packageName,
-  contractAlias,
+  contractName,
   methodName,
   methodArgs,
   network,
@@ -18,15 +18,15 @@ export default async function createProxy({
   kind = ProxyType.Upgradeable,
   networkFile,
 }: Partial<CreateParams>): Promise<Contract | never> {
-  if (!contractAlias) throw Error('A contract alias must be provided to create a new proxy.');
+  if (!contractName) throw Error('A contract name must be provided to create a new proxy.');
   validateSalt(salt, false);
 
   const controller = new NetworkController(network, txParams, networkFile);
   try {
-    await controller.checkContractDeployed(packageName, contractAlias, !force);
+    await controller.logErrorIfContractPackageIsInvalid(packageName, contractName, !force);
     const proxy = await controller.createProxy(
       packageName,
-      contractAlias,
+      contractName,
       methodName,
       methodArgs,
       admin,

@@ -10,10 +10,10 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with options',
     'create',
-    'zos create Impl --network test --init setup --args 42 --force --from 0x40',
+    'oz create Impl --network test --init setup --args 42 --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         methodName: 'setup',
         methodArgs: ['42'],
         force: true,
@@ -26,10 +26,10 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with kind',
     'create',
-    'zos create Impl --network test --init setup --args 42 --force --from 0x40 --minimal',
+    'oz create Impl --network test --init setup --args 42 --force --from 0x40 --minimal',
     function(create) {
       create.should.have.been.calledWithExactly({
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         methodName: 'setup',
         methodArgs: ['42'],
         kind: ProxyType.Minimal,
@@ -43,10 +43,10 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with options',
     'create',
-    'zos create Boolean --network test --init initialize --args false --force --from 0x40',
+    'oz create Boolean --network test --init initialize --args false --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
-        contractAlias: 'Boolean',
+        contractName: 'Boolean',
         methodName: 'initialize',
         methodArgs: [false],
         force: true,
@@ -59,10 +59,10 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with default init method',
     'create',
-    'zos create Impl --network test --init --args 42 --force --from 0x40',
+    'oz create Impl --network test --init --args 42 --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         methodName: 'initialize',
         methodArgs: ['42'],
         force: true,
@@ -75,10 +75,10 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with init if only args is provided',
     'create',
-    'zos create Impl --network test --args 42 --force --from 0x40',
+    'oz create Impl --network test --args 42 --force --from 0x40',
     function(create) {
       create.should.have.been.calledWithExactly({
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         methodName: 'initialize',
         methodArgs: ['42'],
         force: true,
@@ -91,11 +91,11 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with contract from package',
     'create',
-    'zos create OpenZeppelin/Impl --network test',
+    'oz create OpenZeppelin/Impl --network test',
     function(create) {
       create.should.have.been.calledWithExactly({
         packageName: 'OpenZeppelin',
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         network: 'test',
         txParams: {},
         methodArgs: [],
@@ -106,11 +106,11 @@ describe('create command', function() {
   itShouldParse(
     'should call create script with contract from package with slashes',
     'create',
-    'zos create Zeppelin/OpenZeppelin/Impl --network test',
+    'oz create Zeppelin/OpenZeppelin/Impl --network test',
     function(create) {
       create.should.have.been.calledWithExactly({
         packageName: 'Zeppelin/OpenZeppelin',
-        contractAlias: 'Impl',
+        contractName: 'Impl',
         network: 'test',
         txParams: {},
         methodArgs: [],

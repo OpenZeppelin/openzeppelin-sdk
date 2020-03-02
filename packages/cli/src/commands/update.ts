@@ -19,15 +19,15 @@ import Telemetry from '../telemetry';
 import { ProxyType, UpdateParams } from '../scripts/interfaces';
 
 const name = 'upgrade';
-const signature = `${name} [alias-or-address]`;
+const signature = `${name} [contract-or-address]`;
 const description =
-  'upgrade contract to a new logic. Provide the [alias] or [package]/[alias] you added your contract with, its [address], or use --all flag to upgrade all contracts in your project.';
+  'upgrade contract to a new logic. Provide the [contract] or [package]/[contract] you added your contract with, its [address], or use --all flag to upgrade all contracts in your project.';
 
 const register: (program: any) => any = program =>
   program
     .command(signature, undefined, { noHelp: true })
     .alias('update')
-    .usage('[alias-or-address] --network <network> [options]')
+    .usage('[contract-or-address] --network <network> [options]')
     .description(description)
     .option(
       '--init [function]',
@@ -63,6 +63,7 @@ async function action(proxyReference: string, options: any): Promise<void> {
   if (!(await hasToMigrateProject(network))) process.exit(0);
 
   const promptedProxyInfo = await promptForProxies(proxyReference, network, options);
+
   const parsedContractReference = parseContractReference(promptedProxyInfo.proxyReference);
 
   const additionalOpts = {
@@ -90,7 +91,6 @@ async function promptForProxies(proxyReference: string, network: string, options
   const args = { pickProxyBy, proxy: proxyReference };
   const props = getCommandProps({ proxyReference, network, all });
   const { pickProxyBy: promptedPickProxyBy, proxy: promptedProxy } = await promptIfNeeded({ args, props }, interactive);
-
   return {
     ...promptedProxy,
     all: promptedPickProxyBy === 'all',
