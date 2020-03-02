@@ -96,7 +96,7 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
 
 async function runActionIfNeeded(contract: string, network: string, options: any): Promise<void> {
   if (!options.interactive) return;
-  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contracts: [contract] });
+  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contracts: contract ? [contract] : [] });
 }
 
 async function promptForDeployDependencies(
