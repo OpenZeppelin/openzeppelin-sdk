@@ -60,10 +60,7 @@ async function main() {
   // Add the Factory.sol and Instance.sol contracts to the OpenZeppelin SDK project.
   console.log(`Adding contracts...`);
   await add({
-    contractsData: [
-      { alias: "Factory", name: "Factory" },
-      { alias: "Instance", name: "Instance" }
-    ]
+    contracts: ["Factory", "Instance"]
   });
 
   // Push the contracts implementations to the network.
@@ -82,7 +79,7 @@ async function main() {
   console.log(`Creating proxy instance of Factory.sol...`);
   const factoryProxy = await create({
     packageName: "creating-instances-from-solidity",
-    contractAlias: "Factory",
+    contractName: "Factory",
     methodName: "initialize",
     methodArgs: [appAddress],
     network
