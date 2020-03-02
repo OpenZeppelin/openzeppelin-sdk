@@ -61,7 +61,7 @@ describe('call script', function() {
           proxyAddress,
           methodName: 'initialize',
           methodArgs: [42],
-        }).should.be.rejectedWith(`Proxy at address ${proxyAddress} not found`);
+        }).should.be.rejectedWith(`Contract at address ${proxyAddress} not found`);
       });
     });
 
