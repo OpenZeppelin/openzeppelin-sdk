@@ -280,7 +280,7 @@ describe('prompt', function() {
         this.projectFile = new ProjectFile('mocks/mock-stdlib-2/zos.json');
       });
 
-      this.afterEach('restore stubs', function() {
+      afterEach('restore stubs', function() {
         sinon.restore();
       });
 
