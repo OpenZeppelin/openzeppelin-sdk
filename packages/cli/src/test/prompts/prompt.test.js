@@ -7,12 +7,13 @@ import { expect } from 'chai';
 import * as prompt from '../../prompts/prompt';
 
 import inquirer from 'inquirer';
-import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
+import { ContractMethodMutability as Mutability, assertEvent } from '@openzeppelin/upgrades';
 
 import ContractManager from '../../models/local/ContractManager';
 import ConfigManager from '../../models/config/ConfigManager';
 import ProjectFile from '../../models/files/ProjectFile';
-import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../prompts/prompt';
+import { promptIfNeeded, contractsList, networksList, methodsList, argsList, proxyInfo } from '../../prompts/prompt';
+import NetworkFile from '../../models/files/NetworkFile';
 
 describe('prompt', function() {
   describe('functions', function() {
@@ -271,6 +272,38 @@ describe('prompt', function() {
             args[0].should.deep.include({ name: '#0', type: 'uint256' });
           });
         });
+      });
+    });
+
+    describe.only('#proxyInfo', function() {
+      beforeEach('initialize projectFile', function() {
+        this.projectFile = new ProjectFile('mocks/mock-stdlib-2/zos.json');
+      });
+
+      this.afterEach('restore stubs', function() {
+        sinon.restore();
+      });
+
+      it('gets proxy info', function() {
+        const getProxiesStub = sinon.stub(NetworkFile.prototype, 'getProxies').returns([
+          {
+            contractName: 'Foo',
+            address: '0x1',
+            package: 'box',
+          },
+        ]);
+        const info = proxyInfo(
+          {
+            contractName: 'Foo',
+            proxyAddress: '0x1',
+            packageName: 'box',
+          },
+          'test',
+        );
+
+        getProxiesStub.getCall(0).args[0].should.be.eql({ contractName: 'Foo', address: '0x1', package: 'box' });
+
+        info.should.be.eql({ contractFullName: 'box/Foo', address: '0x1', proxyReference: '0x1' });
       });
     });
   });

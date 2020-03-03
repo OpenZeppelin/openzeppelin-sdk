@@ -8,7 +8,7 @@ import Session from '../models/network/Session';
 import ConfigManager from '../models/config/ConfigManager';
 import ProjectFile from '../models/files/ProjectFile';
 import ContractManager from '../models/local/ContractManager';
-import Dependency from '../models/dependency/Dependency';
+import { ParsedContractReference } from '../utils/contract';
 import { fromContractFullName, toContractFullName } from '../utils/naming';
 import NetworkFile, { ProxyInterface } from '../models/files/NetworkFile';
 
@@ -217,10 +217,13 @@ function contractMethods(
   }
 }
 
-export function proxyInfo(contractInfo: any, network: string): any {
+export function proxyInfo(
+  contractInfo: ParsedContractReference,
+  network: string,
+  projectFile: ProjectFile = new ProjectFile(),
+  networkFile: NetworkFile = new NetworkFile(projectFile, network),
+): { contractFullName: string; address?: string; proxyReference: string } {
   const { contractName, proxyAddress, packageName } = contractInfo;
-  const projectFile = new ProjectFile();
-  const networkFile = new NetworkFile(projectFile, network);
   const proxyParams = {
     contractName: contractName,
     address: proxyAddress,
