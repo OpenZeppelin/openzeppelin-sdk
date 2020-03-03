@@ -7,6 +7,7 @@ import NetworkController from '../../models/network/NetworkController';
 import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
 import { createAction } from '../create';
+import { Loggy } from '@openzeppelin/upgrades';
 
 import { Options, Args } from './spec';
 
@@ -53,6 +54,11 @@ export async function action(params: Options & Args): Promise<void> {
 
   try {
     const instance = await controller.createInstance(packageName, contractName, args);
+
+    if (params.kind === 'upgradeable') {
+      Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
+    }
+
     stdout(instance.address);
   } finally {
     controller.writeNetworkPackageIfNeeded();

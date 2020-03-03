@@ -1,7 +1,7 @@
 import stdout from '../utils/stdout';
 import NetworkController from '../models/network/NetworkController';
 import { CreateParams, ProxyType } from './interfaces';
-import { Contract } from '@openzeppelin/upgrades';
+import { Contract, Loggy } from '@openzeppelin/upgrades';
 import { validateSalt } from '../utils/input';
 
 export default async function createProxy({
@@ -34,6 +34,9 @@ export default async function createProxy({
       signature,
       kind,
     );
+
+    Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
+
     stdout(proxy.address);
 
     return proxy;
