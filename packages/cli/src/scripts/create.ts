@@ -35,7 +35,7 @@ export default async function createProxy({
       kind,
     );
 
-    Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `Upgrade this instance using 'oz upgrade'`);
+    Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
 
     stdout(proxy.address);
 

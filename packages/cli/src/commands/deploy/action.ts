@@ -56,7 +56,7 @@ export async function action(params: Options & Args): Promise<void> {
     const instance = await controller.createInstance(packageName, contractName, args);
 
     if (params.kind === 'upgradeable') {
-      Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `Upgrade this instance using 'oz upgrade'`);
+      Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
     }
 
     stdout(instance.address);
