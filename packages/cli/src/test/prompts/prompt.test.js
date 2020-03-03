@@ -275,7 +275,7 @@ describe('prompt', function() {
       });
     });
 
-    describe.only('#proxyInfo', function() {
+    describe('#proxyInfo', function() {
       beforeEach('initialize projectFile', function() {
         this.projectFile = new ProjectFile('mocks/mock-stdlib-2/zos.json');
       });
