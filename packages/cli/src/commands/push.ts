@@ -1,6 +1,8 @@
 import { omit, isString } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
+import { transpileAndSave } from '../transpiler';
+
 import add from './add';
 import push from '../scripts/push';
 import { PushParams } from '../scripts/interfaces';
@@ -52,6 +54,9 @@ async function action(options: any): Promise<void> {
     deployProxyFactory,
     interactive,
   } = options;
+
+  if (!contracts) throw new Error('Contracts have to be provided for a push.');
+
   const { network: networkInSession, expired } = Session.getNetwork();
   const opts = {
     network: networkInOpts || (!expired ? networkInSession : undefined),
@@ -76,9 +81,13 @@ async function action(options: any): Promise<void> {
     network,
     txParams,
     ...promptDeployDependencies,
+    contracts,
   };
 
-  if (contracts) pushArguments.contracts = contracts;
+  // Transpile contract to upgradeable version and save it in contracts folder.
+  await transpileAndSave(contracts);
+  // Compile new contracts.
+  await compile(undefined, undefined, true);
 
   if (!options.skipTelemetry)
     await Telemetry.report('push', (pushArguments as unknown) as Record<string, unknown>, interactive);
