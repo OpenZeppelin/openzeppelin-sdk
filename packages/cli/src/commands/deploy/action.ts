@@ -72,7 +72,7 @@ async function deployProxy(params: Options & Args): Promise<string> {
 
   const { package: packageName, contractName } = fromContractFullName(fullContractName);
 
-  // Transpile contract to upgradable version and save it in contracts folder.
+  // Transpile contract to upgradeable version and save it in contracts folder.
   await transpileAndSave([contractName]);
   // Compile new contracts.
   await compile(undefined, undefined, true);

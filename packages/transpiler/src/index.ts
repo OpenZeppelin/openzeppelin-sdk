@@ -77,7 +77,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
       ...transformParentsNames(contractNode, source, contractsToTranspile),
       ...transformConstructor(contractNode, source, contractsToTranspile, contractsToArtifactsMap),
       ...purgeVarInits(contractNode, source),
-      transformContractName(contractNode, source, `${contractName}Upgradable`),
+      transformContractName(contractNode, source, `${contractName}Upgradeable`),
     ];
 
     return acc;
@@ -95,12 +95,12 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
     }
     const entry = acc.find(o => o.fileName === art.fileName);
     if (!entry) {
-      const path = art.sourcePath.replace('.sol', 'Upgradable.sol');
+      const path = art.sourcePath.replace('.sol', 'Upgradeable.sol');
       let patchedFilePath = path;
       if (path.startsWith('contracts')) {
         patchedFilePath = path.replace('contracts/', '');
       }
-      patchedFilePath = `./contracts/__upgradable__/${patchedFilePath}`;
+      patchedFilePath = `./contracts/__upgradeable__/${patchedFilePath}`;
       acc.push({
         source: fileTran.source,
         path: patchedFilePath,

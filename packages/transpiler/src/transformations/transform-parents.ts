@@ -20,7 +20,7 @@ export function transformParentsNames(
         return {
           start: start,
           end: start + len,
-          text: `${base.baseName.name}Upgradable`,
+          text: `${base.baseName.name}Upgradeable`,
         };
       });
   } else return [];
