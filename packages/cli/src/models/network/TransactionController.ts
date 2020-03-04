@@ -130,7 +130,7 @@ export default class TransactionController {
     address: string,
     methodName: string,
     methodArgs: string[],
-  ): { contract: Contract; method: any } | never {
+  ): { contract: Contract; method: any } {
     if (!this.networkFile.hasProxies({ address })) throw Error(`Proxy at address ${address} not found.`);
     const { package: packageName, contractName } = this.networkFile.getProxy(address);
 

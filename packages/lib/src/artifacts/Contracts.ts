@@ -3,7 +3,7 @@ import glob from 'glob';
 import path from 'path';
 import Contract, { createContract } from './Contract';
 import ZWeb3 from './ZWeb3';
-import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
+import { hasUnlinkedVariables } from '../utils/Bytecode';
 
 import { ContractNotFound } from '../errors';
 
