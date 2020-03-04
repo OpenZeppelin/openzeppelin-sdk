@@ -626,7 +626,7 @@ export default class NetworkController {
     packageName: string,
     contractName: string,
     initMethod: string,
-    initArgs: string[],
+    initArgs: any[],
     kind?: ProxyType,
     admin?: string,
     salt?: string,
