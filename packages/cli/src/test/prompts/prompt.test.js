@@ -12,13 +12,16 @@ import { ContractMethodMutability as Mutability } from '@openzeppelin/upgrades';
 import ContractManager from '../../models/local/ContractManager';
 import ConfigManager from '../../models/config/ConfigManager';
 import ProjectFile from '../../models/files/ProjectFile';
-import { promptIfNeeded, contractsList, networksList, methodsList, argsList } from '../../prompts/prompt';
+import { promptIfNeeded, contractsList, networksList, methodsList, argsList, proxyInfo } from '../../prompts/prompt';
+import NetworkFile from '../../models/files/NetworkFile';
+
+const sandbox = sinon.createSandbox();
 
 describe('prompt', function() {
   describe('functions', function() {
     describe('#promptIfNeeded', function() {
       beforeEach('set stub and initialize', function() {
-        this.stub = sinon.stub(inquirer, 'prompt').returns({});
+        this.stub = sandbox.stub(inquirer, 'prompt').returns({});
         this.props = {
           foo: { message: 'message1', type: 'input' },
           bar: { message: 'message2', type: 'input' },
@@ -29,7 +32,7 @@ describe('prompt', function() {
       });
 
       afterEach('restore stub', function() {
-        sinon.restore();
+        sandbox.restore();
         prompt.DISABLE_INTERACTIVITY = this.originalDisableInteractivity;
       });
 
@@ -105,11 +108,11 @@ describe('prompt', function() {
 
     describe('#networksList', function() {
       afterEach('restore stub', function() {
-        sinon.restore();
+        sandbox.restore();
       });
 
       it('returns an object with correct keys and values', function() {
-        this.stub = sinon.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
+        this.stub = sandbox.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(['Meinet', 'Rinkebay']);
 
         const networkList = networksList('network', 'listy');
         networkList.should.be.an('object');
@@ -120,20 +123,20 @@ describe('prompt', function() {
       });
 
       it('throws if no networks are set', function() {
-        this.stub = sinon.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(undefined);
+        this.stub = sandbox.stub(ConfigManager, 'getNetworkNamesFromConfig').returns(undefined);
         expect(() => networksList('network', 'listy')).to.throw(/No 'networks' found/);
       });
     });
 
     describe('#contractsList', function() {
       beforeEach('set stub and initialize', function() {
-        sinon.stub(ContractManager.prototype, 'getContractNames').returns(['Foo', 'Bar', 'Buz']);
-        sinon.stub(ProjectFile.prototype, 'dependencies').get(() => ({ 'mock-stdlib': '1.1.0' }));
-        sinon.stub(ProjectFile.prototype, 'contracts').get(() => ['Foo', 'Bar']);
+        sandbox.stub(ContractManager.prototype, 'getContractNames').returns(['Foo', 'Bar', 'Buz']);
+        sandbox.stub(ProjectFile.prototype, 'dependencies').get(() => ({ 'mock-stdlib': '1.1.0' }));
+        sandbox.stub(ProjectFile.prototype, 'contracts').get(() => ['Foo', 'Bar']);
       });
 
       afterEach('restore stub', function() {
-        sinon.restore();
+        sandbox.restore();
       });
 
       context('when looking for built contracts', function() {
@@ -271,6 +274,38 @@ describe('prompt', function() {
             args[0].should.deep.include({ name: '#0', type: 'uint256' });
           });
         });
+      });
+    });
+
+    describe('#proxyInfo', function() {
+      beforeEach('initialize projectFile', function() {
+        this.projectFile = new ProjectFile('mocks/mock-stdlib-2/zos.json');
+      });
+
+      afterEach('restore stubs', function() {
+        sandbox.restore();
+      });
+
+      it('gets proxy info', function() {
+        const getProxiesStub = sandbox.stub(NetworkFile.prototype, 'getProxies').returns([
+          {
+            contractName: 'Foo',
+            address: '0x1',
+            package: 'box',
+          },
+        ]);
+        const info = proxyInfo(
+          {
+            contractName: 'Foo',
+            proxyAddress: '0x1',
+            packageName: 'box',
+          },
+          'test',
+        );
+
+        getProxiesStub.getCall(0).args[0].should.be.eql({ contractName: 'Foo', address: '0x1', package: 'box' });
+
+        info.should.be.eql({ contractFullName: 'box/Foo', address: '0x1', proxyReference: '0x1' });
       });
     });
   });
