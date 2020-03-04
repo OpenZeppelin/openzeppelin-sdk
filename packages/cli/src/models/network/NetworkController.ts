@@ -627,10 +627,10 @@ export default class NetworkController {
     contractName: string,
     initMethod: string,
     initArgs: string[],
+    kind?: ProxyType,
     admin?: string,
     salt?: string,
     signature?: string,
-    kind?: ProxyType,
   ): Promise<Contract> {
     try {
       await this.migrateManifestVersionIfNeeded();

@@ -29,10 +29,10 @@ export default async function createProxy({
       contractName,
       methodName,
       methodArgs,
+      kind,
       admin,
       salt,
       signature,
-      kind,
     );
 
     Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
