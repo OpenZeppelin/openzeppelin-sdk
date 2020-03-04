@@ -106,7 +106,7 @@ export default class LocalController {
 
   // Contract model
   public validate(contractName: string, buildArtifacts?: BuildArtifacts): boolean {
-    const contract = Contracts.getFromLocal(contractName);
+    const contract = Contracts.getFromLocal(contractName).upgradeable;
     const warnings = validateContract(contract, {}, buildArtifacts);
     new ValidationLogger(contract).log(warnings, buildArtifacts);
     return validationPasses(warnings);

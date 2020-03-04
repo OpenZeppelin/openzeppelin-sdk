@@ -57,15 +57,15 @@ export default class Contracts {
   }
 
   public static getFromLocal(contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getLocalPath(contractName), contractName);
+    return Contracts.getFromPathWithUpgradeable(Contracts.getLocalPath(contractName), contractName);
   }
 
   public static getFromLib(contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getLibPath(contractName), contractName);
+    return Contracts.getFromPath(Contracts.getLibPath(contractName), contractName);
   }
 
   public static getFromNodeModules(dependency: string, contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName), contractName);
+    return Contracts.getFromPathWithUpgradeable(Contracts.getNodeModulesPath(dependency, contractName), contractName);
   }
 
   public static async getDefaultFromAddress(): Promise<string> {
@@ -99,7 +99,7 @@ export default class Contracts {
     };
   }
 
-  private static _getFromPath(targetPath: string, contractName: string): Contract {
+  private static getFromPath(targetPath: string, contractName: string): Contract {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     if (!fs.existsSync(targetPath)) {
       throw new ContractNotFound(contractName);
@@ -112,5 +112,16 @@ export default class Contracts {
       schema.linkedDeployedBytecode = schema.deployedBytecode;
     }
     return createContract(schema);
+  }
+
+  private static getFromPathWithUpgradeable(targetPath: string, contractName: string): Contract {
+    const contract = this.getFromPath(targetPath, contractName);
+    const dir = path.dirname(targetPath);
+    const upgradeableName = `${contractName}Upgradeable`;
+    const upgradeablePath = path.join(dir, `${upgradeableName}.json`);
+    if (fs.existsSync(upgradeablePath)) {
+      contract.upgradeable = this.getFromPath(upgradeablePath, upgradeableName);
+    }
+    return contract;
   }
 }

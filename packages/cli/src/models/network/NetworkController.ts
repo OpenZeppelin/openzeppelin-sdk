@@ -188,7 +188,7 @@ export default class NetworkController {
 
     contracts = contracts || this.projectFile.contracts;
     return contracts
-      .map((contractName): [string, Contract] => [contractName, Contracts.getFromLocal(contractName)])
+      .map((contractName): [string, Contract] => [contractName, Contracts.getFromLocal(contractName).upgradeable])
       .filter(
         ([contractName, contract]) =>
           newVersion ||
@@ -473,7 +473,7 @@ export default class NetworkController {
     if (this.isProjectFileContract(contractName) && !this.isNetworkFileContract(contractName)) return true;
 
     if (!contract) {
-      contract = Contracts.getFromLocal(contractName);
+      contract = Contracts.getFromLocal(contractName).upgradeable;
     }
     return !this.networkFile.hasSameBytecode(contractName, contract);
   }
@@ -636,7 +636,7 @@ export default class NetworkController {
       await this.migrateManifestVersionIfNeeded();
       await this.fetchOrDeploy(this.currentVersion);
       if (!packageName) packageName = this.projectFile.name;
-      const contract = this.contractManager.getContractClass(packageName, contractName);
+      const contract = this.contractManager.getContractClass(packageName, contractName).upgradeable;
       await this.setSolidityLibs(contract);
       this.checkInitialization(contract, initMethod);
       if (salt) await this.checkDeploymentAddress(salt);
@@ -761,7 +761,7 @@ export default class NetworkController {
     await this.migrateManifestVersionIfNeeded();
     await this.fetchOrDeploy(this.currentVersion);
     if (!packageName) packageName = this.projectFile.name;
-    const contract = this.contractManager.getContractClass(packageName, contractName);
+    const contract = this.contractManager.getContractClass(packageName, contractName).upgradeable;
     const args = {
       packageName,
       contractName,
@@ -906,7 +906,7 @@ export default class NetworkController {
   private async upgradeProxy(proxy: ProxyInterface, initMethod: string, initArgs: string[]): Promise<void | never> {
     try {
       const name = { packageName: proxy.package, contractName: proxy.contractName };
-      const contract = this.contractManager.getContractClass(proxy.package, proxy.contractName);
+      const contract = this.contractManager.getContractClass(proxy.package, proxy.contractName).upgradeable;
       await this.setSolidityLibs(contract);
       const currentImplementation = await Proxy.at(proxy.address).implementation();
       const contractImplementation = await this.project.getImplementation(name);

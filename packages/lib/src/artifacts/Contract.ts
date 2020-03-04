@@ -34,6 +34,7 @@ export default interface Contract extends Web3Contract {
     storageInfo: StorageLayoutInfo;
     warnings: any;
   } & Artifact;
+  upgradeable?: Contract;
 }
 
 export enum ContractMethodMutability {
