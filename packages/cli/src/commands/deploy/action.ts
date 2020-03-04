@@ -10,6 +10,8 @@ import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
 import { Loggy } from '@openzeppelin/upgrades';
 
+import { transpileAndSave } from '../../transpiler';
+
 import link from '../link';
 import add from '../add';
 import push from '../push';
@@ -69,6 +71,11 @@ async function deployProxy(params: Options & Args): Promise<string> {
   const { network, txParams } = params;
 
   const { package: packageName, contractName } = fromContractFullName(fullContractName);
+
+  // Transpile contract to upgradable version and save it in contracts folder.
+  await transpileAndSave([contractName]);
+  // Compile new contracts.
+  await compile(undefined, undefined, true);
 
   await link.runActionIfNeeded(fullContractName, params);
   await add.runActionIfNeeded(fullContractName, params);
