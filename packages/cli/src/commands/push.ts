@@ -3,6 +3,8 @@ import { ZWeb3 } from '@openzeppelin/upgrades';
 
 import { transpileAndSave } from '../transpiler';
 
+import ProjectFile from '../models/files/ProjectFile';
+
 import add from './add';
 import push from '../scripts/push';
 import { PushParams } from '../scripts/interfaces';
@@ -40,7 +42,8 @@ const register: (program: any) => any = program =>
 
 async function commandActions(options: any): Promise<void> {
   await add.runActionIfNeeded(null, options);
-  await action(options);
+  const projectFile = new ProjectFile();
+  await action({ ...options, contracts: projectFile.contracts });
 }
 
 async function action(options: any): Promise<void> {

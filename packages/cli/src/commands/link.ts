@@ -32,8 +32,13 @@ async function action(dependencies: string[], options: any): Promise<void> {
   const linkArguments = { ...prompted, installDependencies };
 
   if (!options.skipTelemetry) await Telemetry.report('push', linkArguments, interactive);
+
   await link(linkArguments);
-  await push.runActionIfRequested(options);
+
+  const projectFile = new ProjectFile();
+  if (projectFile.contracts.length !== 0) {
+    await push.runActionIfRequested({ ...options, contracts: projectFile.contracts });
+  }
 }
 
 async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {

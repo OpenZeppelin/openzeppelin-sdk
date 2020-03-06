@@ -47,7 +47,10 @@ async function action(projectName: string, version: string, options: any): Promi
 
   await Telemetry.report('init', initArguments, interactive);
   await init(initArguments);
-  await push.runActionIfRequested(options);
+  const projectFile = new ProjectFile();
+  if (projectFile.contracts.length !== 0) {
+    await push.runActionIfRequested({ ...options, contracts: projectFile.contracts });
+  }
 }
 
 async function runActionIfNeeded(options: any): Promise<void> {
