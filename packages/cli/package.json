@@ -126,7 +126,7 @@
     "mock-stdlib-undeployed-2": "file:./mocks/mock-stdlib-undeployed-2",
     "mock-stdlib-unpublished": "file:./mocks/mock-stdlib-unpublished",
     "mock-stdlib-unsupported": "file:./mocks/mock-stdlib-unsupported",
-    "openzeppelin-docs-utils": "github:OpenZeppelin/docs-utils",
+    "@openzeppelin/docs-utils": "^0.1.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",
     "sinon": "^9.0.0",

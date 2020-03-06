@@ -1088,6 +1088,21 @@
     fs-extra "^8.1.0"
     try-require "^1.2.1"
 
+"@openzeppelin/docs-utils@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/docs-utils/-/docs-utils-0.1.0.tgz#82126088bdc5537d3ce6a87b097464f870b8a186"
+  integrity sha512-KJigM8GDxEnUvxXgnirjTHSg2uZkmAoDXF0gOLFwbaJcBQqHbLql9HkrV/KzBKB31z4u6EM7DizTi7yUgT2ctQ==
+  dependencies:
+    chalk "^3.0.0"
+    chokidar "^3.3.0"
+    env-paths "^2.2.0"
+    find-up "^4.1.0"
+    is-port-reachable "^3.0.0"
+    js-yaml "^3.13.1"
+    live-server "^1.2.1"
+    lodash.startcase "^4.4.0"
+    minimist "^1.2.0"
+
 "@openzeppelin/fuzzy-solidity-import-parser@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@openzeppelin/fuzzy-solidity-import-parser/-/fuzzy-solidity-import-parser-0.1.2.tgz#3b9f524d6028ca73df60474a313e0295e5610c51"
@@ -7657,7 +7672,7 @@ mock-fs@^4.1.0:
 "mock-stdlib-libdeps@file:./packages/cli/mocks/mock-stdlib-libdeps":
   version "1.1.0"
 
-"mock-stdlib-root@file:./packages/cli/mocks/mock-stdlib", "mock-stdlib@file:./packages/cli/mocks/mock-stdlib":
+"mock-stdlib-root@file:./packages/cli/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib-undeployed-2@file:./packages/cli/mocks/mock-stdlib-undeployed-2":
@@ -7670,6 +7685,9 @@ mock-fs@^4.1.0:
   version "1.1.0"
 
 "mock-stdlib-unsupported@file:./packages/cli/mocks/mock-stdlib-unsupported":
+  version "1.1.0"
+
+"mock-stdlib@file:./packages/cli/mocks/mock-stdlib":
   version "1.1.0"
 
 "mock-stdlib@file:tests/cli/dependencies/mock-stdlib-1.1.0":
@@ -8143,20 +8161,6 @@ onetime@^5.1.0:
   resolved "https://registry.yarnpkg.com/onetime/-/onetime-5.1.0.tgz#fff0f3c91617fe62bb50189636e99ac8a6df7be5"
   dependencies:
     mimic-fn "^2.1.0"
-
-"openzeppelin-docs-utils@github:OpenZeppelin/docs-utils":
-  version "0.0.0"
-  resolved "https://codeload.github.com/OpenZeppelin/docs-utils/tar.gz/459f1710a07ec02cbd683cab4800c32a07aed274"
-  dependencies:
-    chalk "^3.0.0"
-    chokidar "^3.3.0"
-    env-paths "^2.2.0"
-    find-up "^4.1.0"
-    is-port-reachable "^3.0.0"
-    js-yaml "^3.13.1"
-    live-server "^1.2.1"
-    lodash.startcase "^4.4.0"
-    minimist "^1.2.0"
 
 openzeppelin-eth@^2.2.0:
   version "2.2.0"
