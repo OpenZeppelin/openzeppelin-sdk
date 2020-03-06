@@ -72,7 +72,7 @@ async function deployProxy(params: Options & Args): Promise<string> {
 
   await link.runActionIfNeeded(fullContractName, params);
   await add.runActionIfNeeded(fullContractName, params);
-  await push.runActionIfNeeded([fullContractName], params.userNetwork, { ...params, network: params.userNetwork });
+  await push.runActionIfNeeded([fullContractName], { ...params, network: params.userNetwork });
 
   const controller = new NetworkController(network, txParams, params.networkFile);
 

@@ -89,7 +89,7 @@ async function action(proxyReference: string, options: any): Promise<void> {
     kind: ProxyType.Upgradeable,
   });
 
-  await push.runActionIfNeeded(uniq(proxies.map(proxy => proxy.contractName)), network, {
+  await push.runActionIfNeeded(uniq(proxies.map(proxy => proxy.contractName)), {
     ...options,
     network: options.promptedNetwork,
   });

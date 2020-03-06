@@ -106,7 +106,7 @@ async function runActionIfRequested(externalOptions: any): Promise<void> {
   return action(options);
 }
 
-async function runActionIfNeeded(contracts: string[], network: string, options: any): Promise<void> {
+async function runActionIfNeeded(contracts: string[], options: any): Promise<void> {
   if (!options.interactive) return;
   await action({ ...options, dontExitProcess: true, skipTelemetry: true, contracts });
 }
