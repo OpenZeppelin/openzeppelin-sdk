@@ -16,7 +16,11 @@ async function setup(network) {
 
 async function push(networkConfig) {
   // Push contracts to the network
-  await scripts.push({ deployProxyAdmin: true, ...networkConfig });
+  await scripts.push({
+    contracts: ["Sample"],
+    deployProxyAdmin: true,
+    ...networkConfig
+  });
   console.log(`$ openzeppelin push`);
   console.log(`> Pushed logic contract to the network\n`);
 }
@@ -57,7 +61,7 @@ async function useSignedCreate2(initValue, networkConfig) {
   const salt = parseInt(Math.random() * 1000);
 
   // Calculate initialization raw data
-  const Sample = Contracts.getFromLocal("Sample");
+  const Sample = Contracts.getFromLocal("Sample").upgradeable;
   const initData = Sample.methods.initialize(initValue).encodeABI();
 
   // We will use the project's proxy admin as upgradeability admin of this instance

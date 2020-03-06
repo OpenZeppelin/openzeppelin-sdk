@@ -1,3 +1,6 @@
+import { transpileAndSave } from '../transpiler';
+import { compile } from '../models/compiler/Compiler';
+
 import NetworkController from '../models/network/NetworkController';
 import { PushParams } from './interfaces';
 import { fromContractFullName } from '../utils/naming';
@@ -13,6 +16,14 @@ export default async function push({
   txParams = {},
   networkFile,
 }: PushParams): Promise<void | never> {
+  if (!contracts || contracts.length === 0)
+    throw new Error('Push scripts requires at least one contract to be present.');
+
+  // Transpile contract to upgradeable version and save it in contracts folder.
+  await transpileAndSave(contracts);
+  // Compile new contracts.
+  await compile(undefined, undefined, true);
+
   const controller = new NetworkController(network, txParams, networkFile);
 
   try {

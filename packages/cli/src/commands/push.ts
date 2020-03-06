@@ -1,8 +1,6 @@
 import { omit, isString } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
-import { transpileAndSave } from '../transpiler';
-
 import ProjectFile from '../models/files/ProjectFile';
 
 import add from './add';
@@ -58,7 +56,7 @@ async function action(options: any): Promise<void> {
     interactive,
   } = options;
 
-  if (!contracts || contracts.length === 0) throw new Error('Contracts have to be provided for a push.');
+  if (!contracts || contracts.length === 0) throw new Error('Contracts have to be provided for a push command.');
 
   const { network: networkInSession, expired } = Session.getNetwork();
   const opts = {
@@ -86,11 +84,6 @@ async function action(options: any): Promise<void> {
     ...promptDeployDependencies,
     contracts,
   };
-
-  // Transpile contract to upgradeable version and save it in contracts folder.
-  await transpileAndSave(contracts);
-  // Compile new contracts.
-  await compile(undefined, undefined, true);
 
   if (!options.skipTelemetry)
     await Telemetry.report('push', (pushArguments as unknown) as Record<string, unknown>, interactive);

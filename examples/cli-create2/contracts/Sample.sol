@@ -1,11 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "@openzeppelin/upgrades/contracts/Initializable.sol";
-
-contract Sample is Initializable {
+contract Sample {
   uint256 public value;
 
-  function initialize(uint256 _value) initializer public {
+  constructor(uint256 _value) public {
     value = _value;
   }
 }
