@@ -1,7 +1,9 @@
 'use strict';
 require('../setup');
 
-import { Proxy, ProxyAdmin } from '@openzeppelin/upgrades';
+import sinon from 'sinon';
+
+import { Contracts, Proxy, ProxyAdmin } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
 import push from '../../scripts/push';
@@ -15,6 +17,19 @@ describe('set-admin script', function() {
 
   const network = 'test';
   const txParams = { from: owner };
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   const assertAdmin = async function(address, expectedAdmin, networkFile) {
     const actualAdmin = await Proxy.at(address).admin();

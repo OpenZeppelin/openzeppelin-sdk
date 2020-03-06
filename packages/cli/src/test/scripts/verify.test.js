@@ -6,6 +6,8 @@ import axios from 'axios';
 
 import CaptureLogs from '../helpers/captureLogs';
 
+import { Contracts } from '@openzeppelin/upgrades';
+
 import { action as verify } from '../../commands/verify/action';
 import push from '../../scripts/push';
 import ProjectFile from '../../models/files/ProjectFile';
@@ -15,6 +17,19 @@ describe('verify script', function() {
   const contract = 'ImplV1';
   const network = 'test';
   const txParams = {};
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   const assertVerify = async function(options, message) {
     try {

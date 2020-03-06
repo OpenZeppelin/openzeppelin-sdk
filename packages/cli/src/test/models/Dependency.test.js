@@ -5,12 +5,27 @@ require('../setup');
 import { expect } from 'chai';
 import { accounts } from '@openzeppelin/test-environment';
 
+import { Contracts } from '@openzeppelin/upgrades';
+
 import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import Dependency from '../../models/dependency/Dependency';
 
 describe('Dependency', function() {
   const [from] = accounts;
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {

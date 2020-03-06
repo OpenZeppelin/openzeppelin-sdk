@@ -1,6 +1,10 @@
 'use strict';
 require('../setup');
 
+import sinon from 'sinon';
+
+import { Contracts } from '@openzeppelin/upgrades';
+
 import { accounts } from '@openzeppelin/test-environment';
 
 import add from '../../scripts/add';
@@ -17,6 +21,19 @@ describe('call script', function() {
   const txParams = { from: account };
 
   const network = 'test';
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   beforeEach('setup', async function() {
     this.logs = new CaptureLogs();

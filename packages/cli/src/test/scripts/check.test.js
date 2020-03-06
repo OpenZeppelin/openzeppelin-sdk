@@ -1,6 +1,10 @@
 'use strict';
 require('../setup');
 
+import sinon from 'sinon';
+
+import { Contracts } from '@openzeppelin/upgrades';
+
 import CaptureLogs from '../helpers/captureLogs';
 import check from '../../scripts/check';
 import ProjectFile from '../../models/files/ProjectFile';
@@ -10,6 +14,19 @@ const expect = require('chai').expect;
 describe('check script', function() {
   beforeEach('setup', async function() {
     this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
+  });
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
   });
 
   beforeEach('capturing log output', function() {

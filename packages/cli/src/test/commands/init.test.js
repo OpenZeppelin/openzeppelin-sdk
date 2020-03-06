@@ -2,14 +2,27 @@
 require('../setup');
 
 import { stubCommands, itShouldParse } from './share';
+import ProjectFile from '../../models/files/ProjectFile';
+
+import sinon from 'sinon';
+
+const sandbox = sinon.createSandbox();
 
 describe('init command', function() {
   stubCommands();
 
+  beforeEach('stub ProjectFile#contracts', function() {
+    sandbox.stub(ProjectFile.prototype, 'contracts').get(() => ['Bar', 'Foo']);
+  });
+
+  afterEach('restore stubs', function() {
+    sandbox.restore();
+  });
+
   itShouldParse(
     'should call init script with name, version and dependencies',
     'init',
-    'zos init MyApp 0.2.0 --force --no-install --link mock-stdlib@1.1.0,mock-stdlib-2@1.2.0 --no-interactive',
+    'oz init MyApp 0.2.0 --force --no-install --link mock-stdlib@1.1.0,mock-stdlib-2@1.2.0 --no-interactive',
     function(init) {
       const dependencies = ['mock-stdlib@1.1.0', 'mock-stdlib-2@1.2.0'];
       init.should.have.been.calledWithExactly({
@@ -29,9 +42,10 @@ describe('init command', function() {
   itShouldParse(
     'should call push script when passing --push option',
     'push',
-    'zos init MyApp 0.2.0 --push test --no-interactive',
+    'oz init MyApp 0.2.0 --push test --no-interactive',
     function(push) {
       push.should.have.been.calledWithExactly({
+        contracts: ['Bar', 'Foo'],
         deployProxyAdmin: undefined,
         deployProxyFactory: undefined,
         deployDependencies: true,
@@ -46,7 +60,7 @@ describe('init command', function() {
   itShouldParse(
     'should call init script with light flag',
     'init',
-    'zos init MyApp 0.2.0 --publish --no-interactive',
+    'oz init MyApp 0.2.0 --publish --no-interactive',
     function(init) {
       init.should.have.been.calledWithExactly({
         name: 'MyApp',
@@ -65,7 +79,7 @@ describe('init command', function() {
   itShouldParse(
     'should call init script with typechain',
     'init',
-    'zos init MyApp 0.2.0 --typechain=web3-v1 --typechain-outdir=foo/bar --no-interactive',
+    'oz init MyApp 0.2.0 --typechain=web3-v1 --typechain-outdir=foo/bar --no-interactive',
     function(init) {
       init.should.have.been.calledWithExactly({
         name: 'MyApp',

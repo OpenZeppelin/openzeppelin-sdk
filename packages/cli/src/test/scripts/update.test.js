@@ -35,6 +35,19 @@ describe('update script', function() {
   const version2 = '0.2.0';
   const txParams = { from: owner };
 
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
+
   const assertProxyInfo = async function(
     networkFile,
     contractName,
@@ -167,7 +180,6 @@ describe('update script', function() {
   const shouldHandleUpdateScript = function() {
     describe('updating', function() {
       beforeEach('setup', async function() {
-        this.timeout(10000);
         await createProxies.call(this);
         await bumpVersionAndPush.call(this);
         stubUpdate(
@@ -524,13 +536,12 @@ describe('update script', function() {
           implementation: this.withLibraryImplV2Address,
         });
       });
-    }).timeout(5000);
+    });
   };
 
   const shouldHandleUpdateOnDependency = function() {
     describe('updating on dependency', function() {
       beforeEach('setup', async function() {
-        this.timeout(10000);
         this.networkFile = new NetworkFile(this.projectFile, network);
 
         await push({
@@ -680,7 +691,7 @@ describe('update script', function() {
             .call()
         ).should.eq('1.2.0');
       });
-    }).timeout(5000);
+    });
   };
 
   describe('on application contract', function() {

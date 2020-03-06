@@ -2,7 +2,10 @@
 require('../setup');
 
 import { random } from 'lodash';
+import sinon from 'sinon';
+
 import { accounts } from '@openzeppelin/test-environment';
+import { Contracts } from '@openzeppelin/upgrades';
 
 import querySignedDeployment from '../../scripts/query-signed-deployment';
 import ProjectFile from '../../models/files/ProjectFile';
@@ -18,6 +21,19 @@ describe('query-signed-deployment script', function() {
   const version = '0.4.0';
   const txParams = { from: owner };
   const contractName = 'ImplV1';
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   const shouldHandleQuerySignedDeploymentScript = function() {
     beforeEach('setup', async function() {

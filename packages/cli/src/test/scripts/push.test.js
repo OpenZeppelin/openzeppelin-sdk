@@ -31,6 +31,22 @@ describe('push script', function() {
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';
 
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(upgrades.Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = upgrades.Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [
+        targetPath,
+        contractName,
+      ]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
+
   const shouldDeployPackage = function() {
     it('should create a network file with version info', async function() {
       this.networkFile.isCurrentVersion(defaultVersion).should.be.true;

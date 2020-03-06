@@ -4,6 +4,8 @@ require('../setup');
 import { Proxy, Contracts, toSemanticVersion } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
+import sinon from 'sinon';
+
 import push from '../../scripts/push';
 import create from '../../scripts/create';
 import update from '../../scripts/update';
@@ -22,6 +24,19 @@ describe('migrate-manifest-version script', function() {
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const network = 'test';
   const txParams = { from: owner };
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   before(async function() {
     this.contentURI = '0x20';

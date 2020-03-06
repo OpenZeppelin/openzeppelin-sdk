@@ -2,6 +2,8 @@
 
 require('../setup');
 
+import sinon from 'sinon';
+
 import { Contracts } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
 
@@ -16,6 +18,19 @@ describe('TestHelper', function() {
   const txParams = { from: owner };
   const projectName = 'Herbs';
   const initialVersion = '1.1.0';
+
+  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
+    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
+      contract.upgradeable = contract;
+      return contract;
+    });
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
 
   describe('for app project', function() {
     beforeEach(async function() {
