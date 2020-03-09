@@ -13,6 +13,11 @@ import push from '../../scripts/push';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+import * as Compiler from '../../models/compiler/Compiler';
+import * as transpiler from '../../transpiler';
+
+const sandbox = sinon.createSandbox();
+
 describe('verify script', function() {
   const contract = 'ImplV1';
   const network = 'test';
@@ -20,15 +25,17 @@ describe('verify script', function() {
 
   beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
     // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
       const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
       contract.upgradeable = contract;
       return contract;
     });
+    sandbox.stub(Compiler, 'compile');
+    sandbox.stub(transpiler, 'transpileAndSave');
   });
 
   afterEach(function() {
-    sinon.restore();
+    sandbox.restore();
   });
 
   const assertVerify = async function(options, message) {
@@ -91,7 +98,7 @@ describe('verify script', function() {
 
       await push({ network, networkFile: this.networkFile, txParams });
       this.logs = new CaptureLogs();
-      this.axiosStub = sinon.stub(axios, 'request');
+      this.axiosStub = sandbox.stub(axios, 'request');
     });
 
     afterEach(function() {

@@ -17,10 +17,15 @@ import ProjectFile from '../../models/files/ProjectFile';
 import { ProxyType } from '../../scripts/interfaces';
 import NetworkFile from '../../models/files/NetworkFile';
 
+import * as Compiler from '../../models/compiler/Compiler';
+import * as transpiler from '../../transpiler';
+
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const BooleanContract = Contracts.getFromLocal('Boolean');
+
+const sandbox = sinon.createSandbox();
 
 describe('create script', function() {
   const [owner, otherAdmin] = accounts;
@@ -37,15 +42,17 @@ describe('create script', function() {
 
   beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
     // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
       const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
       contract.upgradeable = contract;
       return contract;
     });
+    sandbox.stub(Compiler, 'compile');
+    sandbox.stub(transpiler, 'transpileAndSave');
   });
 
   afterEach(function() {
-    sinon.restore();
+    sandbox.restore();
   });
 
   const assertProxy = async function(

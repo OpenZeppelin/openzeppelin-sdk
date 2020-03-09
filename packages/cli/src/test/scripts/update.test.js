@@ -21,7 +21,11 @@ import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 import { ProxyType } from '../../scripts/interfaces';
 
+import * as Compiler from '../../models/compiler/Compiler';
+import * as transpiler from '../../transpiler';
+
 const sandbox = sinon.createSandbox();
+const updateSandbox = sinon.createSandbox();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const GreeterV1 = Contracts.getFromNodeModules('mock-stdlib', 'GreeterImpl');
@@ -37,15 +41,17 @@ describe('update script', function() {
 
   beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
     // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
       const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
       contract.upgradeable = contract;
       return contract;
     });
+    sandbox.stub(Compiler, 'compile');
+    sandbox.stub(transpiler, 'transpileAndSave');
   });
 
   afterEach(function() {
-    sinon.restore();
+    sandbox.restore();
   });
 
   const assertProxyInfo = async function(
@@ -131,13 +137,13 @@ describe('update script', function() {
   };
 
   const stubUpdate = (mappingToNames, mappingToAddresses) => {
-    sandbox.stub(ContractManager.prototype, 'getContractClass').callsFake(function(packageName, contractName) {
+    updateSandbox.stub(ContractManager.prototype, 'getContractClass').callsFake(function(packageName, contractName) {
       return ContractManager.prototype.getContractClass.wrappedMethod.apply(this, [
         packageName,
         mappingToNames[contractName] ?? contractName,
       ]);
     });
-    sandbox
+    updateSandbox
       .stub(ProxyAdminProject.prototype, 'getImplementation')
       .callsFake(function({ packageName, contractName, contract }) {
         return ProxyAdminProject.prototype.getImplementation.wrappedMethod.apply(this, [
@@ -148,7 +154,7 @@ describe('update script', function() {
           },
         ]);
       });
-    sandbox
+    updateSandbox
       .stub(AppProject.prototype, 'getImplementation')
       .callsFake(function({ packageName, contractName, contract }) {
         return AppProject.prototype.getImplementation.wrappedMethod.apply(this, [
@@ -159,7 +165,7 @@ describe('update script', function() {
           },
         ]);
       });
-    sandbox
+    updateSandbox
       .stub(ProxyAdminProject.prototype, '_getOrDeployOwnImplementation')
       .callsFake(function(contract, contractName, redeployIfChanged) {
         return mappingToAddresses[contractName]
@@ -173,8 +179,8 @@ describe('update script', function() {
   };
 
   const restoreUpdate = () => {
-    sandbox.resetBehavior();
-    sandbox.restore();
+    updateSandbox.resetBehavior();
+    updateSandbox.restore();
   };
 
   const shouldHandleUpdateScript = function() {

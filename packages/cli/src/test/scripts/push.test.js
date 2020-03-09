@@ -18,11 +18,16 @@ import remove from '../../scripts/remove';
 import Dependency from '../../models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
 
+import * as Compiler from '../../models/compiler/Compiler';
+import * as transpiler from '../../transpiler';
+
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules('@openzeppelin/upgrades', 'ImplementationDirectory');
+
+const sandbox = sinon.createSandbox();
 
 describe('push script', function() {
   const [owner] = accounts;
@@ -33,7 +38,7 @@ describe('push script', function() {
 
   beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
     // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(upgrades.Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+    sandbox.stub(upgrades.Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
       const contract = upgrades.Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [
         targetPath,
         contractName,
@@ -41,10 +46,12 @@ describe('push script', function() {
       contract.upgradeable = contract;
       return contract;
     });
+    sandbox.stub(Compiler, 'compile');
+    sandbox.stub(transpiler, 'transpileAndSave');
   });
 
   afterEach(function() {
-    sinon.restore();
+    sandbox.restore();
   });
 
   const shouldDeployPackage = function() {
@@ -187,7 +194,7 @@ describe('push script', function() {
       });
 
       it('should refuse to redeploy a contract if validation throws', async function() {
-        sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+        sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           networkFile: this.networkFile,
           network,
@@ -197,7 +204,7 @@ describe('push script', function() {
       });
 
       it('should redeploy contract skipping errors', async function() {
-        sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+        sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           force: true,
           networkFile: this.networkFile,
@@ -208,7 +215,7 @@ describe('push script', function() {
       });
 
       afterEach(function() {
-        sinon.restore();
+        sandbox.restore();
       });
     });
   };
@@ -330,7 +337,7 @@ describe('push script', function() {
         });
 
         it('should refuse to deploy a contract if validation throws', async function() {
-          sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+          sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
           await push({
             contracts: ['ImplV1'],
             networkFile: this.networkFile,
@@ -341,7 +348,7 @@ describe('push script', function() {
         });
 
         it('should deploy contract skipping errors', async function() {
-          sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+          sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
           await push({
             contracts: ['ImplV1'],
             force: true,
@@ -353,7 +360,7 @@ describe('push script', function() {
         });
 
         afterEach(function() {
-          sinon.restore();
+          sandbox.restore();
         });
       });
     });
@@ -547,7 +554,7 @@ describe('push script', function() {
       beforeEach('deploying new dependency version', async function() {
         const mockStdlibPackage = new ProjectFile('mocks/mock-stdlib/zos.json');
         mockStdlibPackage.version = newVersion;
-        sinon.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
+        sandbox.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
           return mockStdlibPackage;
         });
 
@@ -607,7 +614,7 @@ describe('push script', function() {
       const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0');
       this.dependencyProject = await dependency.deploy();
       this.dependencyPackage = await this.dependencyProject.getProjectPackage();
-      this.dependencyGetNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile');
+      this.dependencyGetNetworkFileStub = sandbox.stub(Dependency.prototype, 'getNetworkFile');
       this.dependencyGetNetworkFileStub.callsFake(() => ({
         packageAddress: this.dependencyPackage.address,
         version: '1.1.0',
@@ -615,7 +622,7 @@ describe('push script', function() {
     });
 
     afterEach('unstub dependency network file stub', function() {
-      sinon.restore();
+      sandbox.restore();
     });
   };
 

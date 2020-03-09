@@ -11,6 +11,11 @@ import freeze from '../../scripts/freeze';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+import * as Compiler from '../../models/compiler/Compiler';
+import * as transpiler from '../../transpiler';
+
+const sandbox = sinon.createSandbox();
+
 describe('freeze script', function() {
   const [owner] = accounts;
 
@@ -19,15 +24,17 @@ describe('freeze script', function() {
 
   beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
     // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
       const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
       contract.upgradeable = contract;
       return contract;
     });
+    sandbox.stub(Compiler, 'compile');
+    sandbox.stub(transpiler, 'transpileAndSave');
   });
 
   afterEach(function() {
-    sinon.restore();
+    sandbox.restore();
   });
 
   beforeEach('init package file', async function() {
