@@ -29,9 +29,11 @@ contract Proxy {
    */
   function _delegate(address implementation) internal {
     (bool success, bytes memory data) = implementation.delegatecall(msg.data);
-    require(success, string(data));
     assembly {
-      return(add(data, 32), returndatasize)
+      switch success
+        // delegatecall returns 0 on error.
+        case 0 { revert(add(data, 32), returndatasize) }
+        default { return(add(data, 32), returndatasize) }
     }
   }
 
