@@ -56,7 +56,7 @@ describe(`Unpack a Tutorial Kit on the ${network}`, function() {
     });
 
     it(`Create a Counter proxy on the ${network}`, function() {
-      run(`npx oz create Counter --init initialize --args 2 --network ${network}`);
+      run(`npx oz deploy Counter 42 --network ${network} --kind upgradeable`);
     });
   });
 });
@@ -68,7 +68,7 @@ describe(`Unpack a GSN Kit on the ${network}`, function() {
     });
 
     it(`Create a Counter proxy on the ${network}`, function() {
-      run(`npx oz create Counter --init initialize --args 2 --network ${network}`);
+      run(`npx oz deploy Counter 42 --network ${network} --kind upgradeable`);
     });
   });
 });
