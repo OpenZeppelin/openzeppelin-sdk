@@ -1,7 +1,0 @@
-node_modules/*
-build/*
-zos.*
-.zos.session
-.openzeppelin/*
-
-.openzeppelin/.session

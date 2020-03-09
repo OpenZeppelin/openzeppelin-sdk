@@ -105,13 +105,6 @@ jobs:
           workspace: examples/upgrades-library
           run-yarn: true
 
-  example-create-instances-from-solidity:
-    <<: *defaults
-    steps:
-      - test:
-          workspace: examples/creating-instances-from-solidity
-          run-yarn: true
-
   example-cli-create2:
     <<: *defaults
     steps:
@@ -172,8 +165,6 @@ workflows:
           requires: [setup]
       - example-upgrades-library:
           requires: [test-lib]
-      - example-create-instances-from-solidity:
-          requires: [test-lib, test-cli]
       - example-cli-create2:
           requires: [test-lib, test-cli]
       - example-first-project:
