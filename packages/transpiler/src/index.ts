@@ -58,10 +58,10 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
 
     const contractNode = getContract(art);
 
-    if (!acc[art.fileName]) {
+    if (!acc[art.sourcePath]) {
       const directive = `\nimport "@openzeppelin/upgrades/contracts/Initializable.sol";`;
 
-      acc[art.fileName] = {
+      acc[art.sourcePath] = {
         transformations: [
           appendDirective(art.ast, directive),
           ...fixImportDirectives(art, artifacts, contractsToTranspile),
@@ -71,8 +71,8 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
       };
     }
 
-    acc[art.fileName].transformations = [
-      ...acc[art.fileName].transformations,
+    acc[art.sourcePath].transformations = [
+      ...acc[art.sourcePath].transformations,
       prependBaseClass(contractNode, source, 'Initializable'),
       ...transformParentsNames(contractNode, source, contractsToTranspile),
       ...transformConstructor(contractNode, source, contractsToTranspile, contractsToArtifactsMap),
@@ -89,11 +89,11 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
 
     const source = art.source;
 
-    const fileTran = fileTrans[art.fileName];
+    const fileTran = fileTrans[art.sourcePath];
     if (!fileTran.source) {
       fileTran.source = transpile(source, fileTran.transformations);
     }
-    const entry = acc.find(o => o.fileName === art.fileName);
+    const entry = acc.find(o => o.fileName === art.sourcePath);
     if (!entry) {
       const path = art.sourcePath.replace('.sol', 'Upgradeable.sol');
       let patchedFilePath = path;
@@ -104,7 +104,7 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
       acc.push({
         source: fileTran.source,
         path: patchedFilePath,
-        fileName: art.fileName,
+        fileName: art.sourcePath,
         contracts: [contractName],
       });
     } else {
