@@ -12,7 +12,7 @@
     "tests/kits/test",
     "tests/kits/workdir",
     "tests/mocks/*",
-    "tests/regular-deploys"
+    "tests/deploy"
   ],
   "nohoist": [
     "**/mock-stdlib"
