@@ -47,7 +47,7 @@ describe(`Unpack a Starter Kit on the ${network}`, function() {
 
 describe(`Unpack a Tutorial Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'tutorial' }, function() {
-    it('atch counter contract', function() {
+    it('Patch counter contract', function() {
       run(`patch ./contracts/Counter.sol ../test/counter.patch`);
     });
 
