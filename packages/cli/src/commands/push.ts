@@ -56,8 +56,6 @@ async function action(options: any): Promise<void> {
     interactive,
   } = options;
 
-  if (!contracts || contracts.length === 0) throw new Error('Contracts have to be provided for a push command.');
-
   const { network: networkInSession, expired } = Session.getNetwork();
   const opts = {
     network: networkInOpts || (!expired ? networkInSession : undefined),
