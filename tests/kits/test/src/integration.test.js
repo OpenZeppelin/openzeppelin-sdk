@@ -32,10 +32,6 @@ function runIntegrationTest({ kit }, action) {
     run(`npx oz init ${kit} 1.0.0 --no-interactive`);
   });
 
-  it('patch counter contract', function() {
-    run(`patch ./contracts/Counter.sol ../test/counter.patch`);
-  });
-
   action();
 
   it('build project', function() {
@@ -51,6 +47,10 @@ describe(`Unpack a Starter Kit on the ${network}`, function() {
 
 describe(`Unpack a Tutorial Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'tutorial' }, function() {
+    it('atch counter contract', function() {
+      run(`patch ./contracts/Counter.sol ../test/counter.patch`);
+    });
+
     it('Add Counter contract', function() {
       run(`npx oz add Counter`);
     });
@@ -63,6 +63,10 @@ describe(`Unpack a Tutorial Kit on the ${network}`, function() {
 
 describe(`Unpack a GSN Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'gsn' }, function() {
+    it('atch counter contract', function() {
+      run(`patch ./contracts/Counter.sol ../test/counter.patch`);
+    });
+
     it('Add Counter contract', function() {
       run(`npx oz add Counter`);
     });
