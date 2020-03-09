@@ -513,6 +513,16 @@ export default class NetworkController {
     const { compilerVersion, sourcePath } = this.localController.getContractSourcePath(contractAlias);
     const contractSource = await flattenSourceCode([sourcePath]);
     const contractAddress = this.networkFile.contracts[contractAlias].address;
+
+    if (this.networkFile.getProxies({ contract: contractName, kind: ProxyType.NonProxy }).length > 0) {
+      Loggy.noSpin(
+        __filename,
+        'verifyAndPublishContract',
+        'verify-and-publish-nonproxy',
+        `A regular instance of ${contractName} was found. Verification of regular instances is not yet supported.`,
+      );
+    }
+
     await Verifier.verifyAndPublish(remote, {
       contractName,
       compilerVersion,
