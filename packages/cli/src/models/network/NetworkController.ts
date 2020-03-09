@@ -186,7 +186,6 @@ export default class NetworkController {
   ): [string, Contract][] {
     const newVersion = this.isNewVersionRequired();
 
-    contracts = contracts || this.projectFile.contracts;
     return contracts
       .map((contractName): [string, Contract] => [contractName, Contracts.getFromLocal(contractName).upgradeable])
       .filter(
