@@ -116,9 +116,8 @@ export default class Contracts {
 
   private static getFromPathWithUpgradeable(targetPath: string, contractName: string): Contract {
     const contract = this.getFromPath(targetPath, contractName);
-    const dir = path.dirname(targetPath);
     const upgradeableName = `${contractName}Upgradeable`;
-    const upgradeablePath = path.join(dir, `${upgradeableName}.json`);
+    const upgradeablePath = path.join(Contracts.getLocalBuildDir(), `${upgradeableName}.json`);
     if (fs.existsSync(upgradeablePath)) {
       contract.upgradeable = this.getFromPath(upgradeablePath, upgradeableName);
     }
