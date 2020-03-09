@@ -1,0 +1,19 @@
+--- Counter.sol	2020-03-09 15:32:50.000000000 -0300
++++ CounterCanonical.sol	2020-03-09 15:34:45.000000000 -0300
+@@ -1,14 +1,12 @@
+ pragma solidity ^0.5.0;
+ 
+-// import "openzeppelin-eth/contracts/ownership/Ownable.sol";
+-import "@openzeppelin/upgrades/contracts/Initializable.sol";
+ 
+-contract Counter is Initializable {
++contract Counter {
+   //it keeps a count to demonstrate stage changes
+   uint private count;
+   address private _owner;
+ 
+-  function initialize(uint num) public initializer {
++  constructor(uint num) public {
+     _owner = msg.sender;
+     count = num;
+   }

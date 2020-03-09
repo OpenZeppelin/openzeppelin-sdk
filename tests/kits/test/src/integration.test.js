@@ -1,7 +1,6 @@
 'use strict';
 
 require('chai').should();
-const _ = require('lodash');
 
 const { getNetwork, run } = require('../../../util/share')(__dirname);
 
@@ -31,6 +30,10 @@ function runIntegrationTest({ kit }, action) {
 
   it('init oz project', function() {
     run(`npx oz init ${kit} 1.0.0 --no-interactive`);
+  });
+
+  it('patch counter contract', function() {
+    run(`patch ./contracts/Counter.sol ../test/counter.patch`);
   });
 
   action();
