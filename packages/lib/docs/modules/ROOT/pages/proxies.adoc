@@ -138,7 +138,7 @@ This is why when the xref:cli::index.adoc[*OpenZeppelin CLI*] creates a proxy, i
 
 [source,console]
 ----
-$ npx openzeppelin create MyLogicContract --init initialize --args arg1,arg2,arg3
+$ npx openzeppelin deploy MyLogicContract arg1 arg2 arg3
 ----
 
 This command creates a proxy that wraps around `MyLogicContract`, uses `MyLogicContract` as the logic contract, and calls the logic contract's `initialize` function.

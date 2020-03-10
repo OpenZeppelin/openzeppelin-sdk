@@ -5,5 +5,5 @@ This is a sample project with a single contract for getting started with the Ope
 To run it on your machine:
 - Install dependencies with `npm install`
 - Start a ganache instance with `npx ganache-cli -p 8545 -d`
-- Create a new `Counter` contract instance with `npx openzeppelin create Counter --network development`
+- Create a new `Counter` contract instance with `npx openzeppelin deploy Counter --network development`
 - Run the main script with `node src/index.js`

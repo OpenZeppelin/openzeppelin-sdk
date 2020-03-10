@@ -18,7 +18,7 @@ xref:upgrades::api.adoc#ProxyAdmin[`ProxyAdmin`] is a central admin for all xref
 
 As an admin of all proxy contracts it is in charge of upgrading them, as well as transferring their ownership to another admin. This contract is used to complement the xref:upgrades::proxies.adoc#transparent-proxies-and-function-clashes[Transparent Proxy Pattern], which prevents an admin from accidentally triggering a proxy management function when interacting with their instances. `ProxyAdmin` is owned by its deployer (the project owner), and exposes its administrative interface to this account.
 
-A `ProxyAdmin` is only deployed when you run an `oz create` (or `oz create2`) command for the first time. You can force the CLI to deploy one by running `oz push --deploy-proxy-admin`.
+A `ProxyAdmin` is only deployed when you run an `oz deploy` (or `oz create2`) command for the first time. You can force the CLI to deploy one by running `oz push --deploy-proxy-admin`.
 
 You can read its source code https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.6.0/packages/lib/contracts/upgradeability/ProxyAdmin.sol[here].
 
@@ -63,7 +63,7 @@ You can find your `ProxyAdmin` contract address in xref:configuration.adoc#netwo
 
 xref:upgrades::api.adoc#ProxyFactory[`ProxyFactory`] is used when creating contracts via the `oz create2` command, as well as when creating minimal proxies. It contains all the necessary methods to deploy a proxy through the `CREATE2` opcode or a minimal non-upgradeable proxy.
 
-This contract is only deployed when you run `openzeppelin create2` or `openzeppelin create --minimal` for the first time. You can force the CLI to deploy it by running `openzeppelin push --deploy-proxy-factory`.
+This contract is only deployed when you run `openzeppelin create2` or `openzeppelin deploy --kind minimal` for the first time. You can force the CLI to deploy it by running `openzeppelin push --deploy-proxy-factory`.
 
 You can read its source code https://github.com/OpenZeppelin/openzeppelin-sdk/blob/v2.6.0/packages/lib/contracts/upgradeability/ProxyFactory.sol[here].
 

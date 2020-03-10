@@ -155,7 +155,7 @@ export default class LocalController {
         __filename,
         'linkDependencies',
         'link-dependencies',
-        `${label} linked to the project. Run 'openzeppelin create' to deploy one of its contracts.`,
+        `${label} linked to the project. Run 'openzeppelin deploy' to deploy one of its contracts.`,
       );
     }
   }

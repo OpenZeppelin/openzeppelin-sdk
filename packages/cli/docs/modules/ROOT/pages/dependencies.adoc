@@ -53,9 +53,10 @@ NOTE: The unlocked accounts and transaction hashes may differ from the ones show
 
 [source,console]
 ----
-$ npx oz create
-? Pick a contract to instantiate: @openzeppelin/contracts-ethereum-package/StandaloneERC20
+$ npx oz deploy
+? Choose the kind of deployment: upgradeable
 ? Pick a network: development
+? Pick a contract to deploy: @openzeppelin/contracts-ethereum-package/StandaloneERC20
 ✓ Deploying @openzeppelin/contracts-ethereum-package dependency to network
 ? Call a function to initialize the instance after creating it?: Yes
 ? Select which function: * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
@@ -87,7 +88,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 [[writing-the-exchange-contract]]
 == Writing the Exchange Contract
 
-In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `oz create`.
+In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `oz deploy`.
 
 Because we're writing upgradeable contracts xref:upgrades::proxies.adoc#the-constructor-caveat[we cannot use Solidity `constructor` s]. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once.
 
@@ -139,10 +140,11 @@ Let's now create and initialize our new `TokenExchange` contract:
 
 [source,console]
 ----
-$ npx oz create
+$ npx oz deploy
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
-? Pick a contract to instantiate: TokenExchange
+? Choose the kind of deployment: upgradeable
 ? Pick a network: development
+? Pick a contract to instantiate: TokenExchange
 ✓ Contract TokenExchange deployed
 ? Call a function to initialize the instance after creating it?: Yes
 ? Select which function: initialize(_rate: uint256, _token: address)

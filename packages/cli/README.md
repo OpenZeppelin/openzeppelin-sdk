@@ -44,7 +44,7 @@ openzeppelin init my-project
 
 Now it is possible to add contracts to the project with the `openzeppelin add` command,
 push these contracts to a blockchain network with `openzeppelin push`, use
-`openzeppelin create` to create instances for these contracts that later can be
+`openzeppelin deploy` to create instances for these contracts that later can be
 upgraded, and many more things.
 
 Run `openzeppelin --help` for more details about this and all the other functions of
