@@ -103,12 +103,13 @@ Now that the `App` has been published and `Product` registered inside it, we're 
   ...
 ```
 
-With the `App` address at hand, we can deploy `Factory` using `oz create` as usual:
+With the `App` address at hand, we can deploy `Factory` using `oz deploy` as usual:
 
 [source,console]
 ----
-$ npx oz create
-? Pick a contract to instantiate Factory
+$ npx oz deploy
+? Choose the kind of deployment: upgradeable
+? Pick a contract to instantiate: Factory
 ✓ Added contract Factory
 ✓ Contract Factory deployed
 All contracts have been deployed

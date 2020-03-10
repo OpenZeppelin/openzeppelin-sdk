@@ -108,11 +108,11 @@ contract Migrations {
 }
 ----
 
-If you now run `openzeppelin create` or any other `openzeppelin` command that depends on compiling first, it will call `truffle compile` under the hood before proceeding with the other operations. The SDK will let you know about this:
+If you now run `openzeppelin deploy` or any other `openzeppelin` command that depends on compiling first, it will call `truffle compile` under the hood before proceeding with the other operations. The SDK will let you know about this:
 
 [source,bash]
 ----
-λ openzeppelin create
+$ openzeppelin deploy
 √ Compiling contracts with Truffle, using settings from truffle.js file
 Truffle output:
 

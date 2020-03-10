@@ -48,7 +48,7 @@ And initialize the OpenZeppelin SDK project:
 openzeppelin init my-project
 ```
 
-Now it is possible to use `openzeppelin create` to create instances for these contracts that 
+Now it is possible to use `openzeppelin deploy` to create instances for these contracts that 
 later can be upgraded, and many more things.
 
 Run `openzeppelin --help` for more details about thes and all the other functions of the

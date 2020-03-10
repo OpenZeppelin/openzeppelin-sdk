@@ -14,7 +14,7 @@ For a refresher on the topics, head to xref:learn::public-staging.adoc[Deploying
 
 == Storing Your Project On-chain
 
-So far, we've mostly limited ourselves to depoying contracts using xref:commands.adoc#create[`oz create`], which creates _upgradeable instances_ by deploying _proxies_ to an existing implementation contract (refer to xref:learn::on-upgrades.adoc#how-upgrades-work[How Upgrades Work] to brush up on this). Here, we will instead deploy just the implementations, so that other people can create new proxies pointing to them.
+So far, we've mostly limited ourselves to depoying contracts using xref:commands.adoc#create[`oz deploy`], which creates _upgradeable instances_ by deploying _proxies_ to an existing implementation contract (refer to xref:learn::on-upgrades.adoc#how-upgrades-work[How Upgrades Work] to brush up on this). Here, we will instead deploy just the implementations, so that other people can create new proxies pointing to them.
 
 To achieve this, we'll use two low-level CLI commands: xref:commands.adoc#add[`oz add`] and xref:commands.adoc#push[`oz push`]. These work simmilarly to `git add` and `git push`: they will register contracts in your project and deploy them to a network.
 

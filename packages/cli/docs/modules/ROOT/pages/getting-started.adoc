@@ -81,14 +81,15 @@ Open a separate terminal and start a new Ganache process:
 $ npx ganache-cli --deterministic
 ----
 
-This will start a new development network using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `oz create`, and choosing to deploy the `Counter` contract to the `development` network.
+This will start a new development network using a deterministic set of accounts, instead of random ones. We can now deploy our contract there, running `oz deploy`, and choosing to deploy the `Counter` contract to the `development` network.
 
 [source,console]
 ----
-$ npx oz create
+$ npx oz deploy
 ✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
-? Pick a contract to instantiate: Counter
+? Choose the kind of deployment: upgradeable
 ? Pick a network: development
+? Pick a contract to instantiate: Counter
 ✓ Added contract Counter
 ✓ Contract Counter deployed
 ? Call a function to initialize the instance after creating it?: No

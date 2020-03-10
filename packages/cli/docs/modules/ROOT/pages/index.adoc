@@ -3,7 +3,7 @@
 *Develop, deploy and operate upgradeable smart contract projects*. Support for Ethereum and every other EVM-powered blockchain.
 
 * *Interactive commands*: Send transactions, query balances, and interact with your contracts directly from the command line, using commands like `oz send-tx`, `oz call`, `oz balance`, and `oz transfer`.
-* *Deploy & upgrade your contracts*: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production. Run `oz create` to deploy your contracts, followed by `oz upgrade` any time you want to change their code.
+* *Deploy & upgrade your contracts*: You can develop your smart contracts iteratively, speeding up development locally, or squashing bugs in production. Run `oz deploy` to deploy your contracts, followed by `oz upgrade` any time you want to change their code.
 * *Link Ethereum Packages*: Use code from contracts already deployed to the blockchain directly on your project, saving gas on deployments and managing your dependencies securely, just with an `oz link` command.
 * *Bootstrap your dapp*: Jumpstart your dapp by unpacking one of our starter kits, pre-configured with OpenZeppelin Contracts, React, and Infura. Run `oz unpack` to start!
 
@@ -24,7 +24,7 @@ Below is a short list of the most used commands:
 
   * xref:commands.adoc#init[`oz init`]: initialize your OpenZeppelin project
   * xref:commands.adoc#compile[`oz compile`]: compile all Solidity smart contracts in your project
-  * xref:commands.adoc#create[`oz create`]: deploy an upgradeable smart contract
+  * xref:commands.adoc#deploy[`oz deploy`]: deploy an upgradeable smart contract
   * xref:commands.adoc#send[`oz send-tx`]: send a transaction to a contract and execute a function
   * xref:commands.adoc#call[`oz call`]: read data from the blockchain by calling `view` and `pure` functions
   * xref:commands.adoc#upgrade[`oz upgrade`]: upgrade a deployed contract to a new version without changing the address or state
