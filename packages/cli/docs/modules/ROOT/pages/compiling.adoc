@@ -6,7 +6,7 @@ This guide covers how compiling works, its different options, and the output for
 
 == Running the Compiler
 
-Most CLI commands, like `oz create` or `oz upgrade`, will automatically compile your projects smart contracts when required, so you don't need to worry about doing this yourself.
+Most CLI commands, like `oz deploy` or `oz upgrade`, will automatically compile your projects smart contracts when required, so you don't need to worry about doing this yourself.
 
 However, you can also just run the compilation by itself, using the xref:commands.adoc#compile[`oz compile`] command:
 

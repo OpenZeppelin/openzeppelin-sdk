@@ -178,7 +178,7 @@ contract MyContract {
 
 When creating a new instance of a contract from your contract's code, these creations are handled directly by Solidity and not by OpenZeppelin Upgrades, which means that *these contracts will not be upgradeable*.
 
-For instance, in the following example, even if `MyContract` is upgradeable (if created via `oz create MyContract`), the `token` contract created is not:
+For instance, in the following example, even if `MyContract` is upgradeable (if created via `oz deploy MyContract`), the `token` contract created is not:
 
 [source,solidity]
 ----
@@ -218,8 +218,8 @@ contract MyContract is Initializable {
 
 [source,console]
 ----
-$ TOKEN=$(npx oz create TokenContract)
-$ npx oz create MyContract --init --args $TOKEN
+$ TOKEN=$(npx oz deploy TokenContract)
+$ npx oz deploy MyContract $TOKEN
 ----
 
 An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin project's `App` in your contracts. The xref:api.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin project, which has references to your logic implementations, and can create new contract instances:

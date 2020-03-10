@@ -19,7 +19,7 @@ TIP: If you are already familiar with the goals behind `CREATE2`, feel free to <
 
 === `CREATE`
 
-Smart contracts can be created both by other contracts (using https://solidity.readthedocs.io/en/v0.5.15/control-structures.html#creating-contracts-via-new[Solidity's `new` keyword]) and by regular accounts (such as when running xref:commands.adoc#create[`oz create`]). In both cases, the address for the new contract is computed the same way: as a function of the sender's own address and a nonce.
+Smart contracts can be created both by other contracts (using https://solidity.readthedocs.io/en/v0.5.15/control-structures.html#creating-contracts-via-new[Solidity's `new` keyword]) and by regular accounts (such as when running xref:commands.adoc#create[`oz deploy`]). In both cases, the address for the new contract is computed the same way: as a function of the sender's own address and a nonce.
 
 [source,console]
 ----
