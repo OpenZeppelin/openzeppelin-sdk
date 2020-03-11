@@ -4,7 +4,16 @@ describe('When all the contracts transpilied and saved to contracts folder', ():
   beforeAll(
     async (): Promise<void> => {
       await transpileAndSaveContracts(
-        ['GLDToken', 'ElementaryTypesWithConstructor', 'ElementaryTypes', 'Deep', 'SIC', 'DC', 'CIB'],
+        [
+          'GLDToken',
+          'ElementaryTypesWithConstructor',
+          'ElementaryTypes',
+          'Deep',
+          'SIC',
+          'DC',
+          'CIB',
+          'StringConstructor',
+        ],
         './build/contracts/',
       );
     },

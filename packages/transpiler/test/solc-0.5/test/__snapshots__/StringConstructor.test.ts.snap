@@ -5,7 +5,7 @@ exports[`StringConstructor contract is converted to a valid StringConstructorUpg
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
 contract StringConstructorUpgradeable is Initializable {
-    function initialize(string memory message) external initializer {
+    function initialize(string calldata message) external initializer {
         __init(true, message);
     }
 
