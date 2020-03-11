@@ -6,7 +6,7 @@ contract GreeterWrapper {
     Greeter public greeter;
 
     constructor(Greeter _greeter) public {
-        require(address(greeter) != address(0));
+        require(address(_greeter) != address(0));
         greeter = _greeter;
     }
 
