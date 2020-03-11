@@ -12,7 +12,7 @@ contract GreeterWrapper {
         greeter = _greeter;
     }
 
-    function say() public view returns (string) {
+    function say() public view returns (string memory) {
         return greeter.who();
     }
 
