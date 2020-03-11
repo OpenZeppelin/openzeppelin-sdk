@@ -42,11 +42,13 @@ async function action(dependencies: string[], options: any): Promise<void> {
 }
 
 async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {
-  const { interactive } = options;
+  const { interactive, implicitActions } = options;
   const projectFile = new ProjectFile();
   const { package: packageName } = fromContractFullName(contractFullName);
-  if (interactive && packageName && !projectFile.hasDependency(packageName)) {
-    await action([packageName], { ...options, forceInstall: true, skipTelemetry: true });
+  if (implicitActions || interactive) {
+    if (packageName && !projectFile.hasDependency(packageName)) {
+      await action([packageName], { ...options, forceInstall: true, skipTelemetry: true });
+    }
   }
 }
 

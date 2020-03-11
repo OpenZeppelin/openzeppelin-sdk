@@ -37,7 +37,7 @@ async function action(contractNames: string[], options: any): Promise<void> {
       contractNames.length !== 0 ? contractNames : prompted.contractNames.map(contractName => ({ name: contractName }));
 
     if (!options.skipTelemetry) await Telemetry.report('add', { contracts }, interactive);
-    add({ contracts });
+    add({ contracts, projectFile: options.networkFile?.projectFile });
   }
   const projectFile = new ProjectFile();
   if (projectFile.contracts.length !== 0) {
@@ -49,12 +49,12 @@ async function action(contractNames: string[], options: any): Promise<void> {
 }
 
 async function runActionIfNeeded(contractFullName?: string, options?: any): Promise<void> {
-  const { interactive } = options;
+  const { interactive, implicitActions } = options;
   const { contractName, package: packageName } = fromContractFullName(contractFullName);
-  const projectFile = new ProjectFile();
+  const projectFile = options.networkFile?.projectFile ?? new ProjectFile();
   options = { ...options, skipTelemetry: true };
 
-  if (interactive) {
+  if (implicitActions || interactive) {
     if (!packageName && contractName && !projectFile.hasContract(contractName)) {
       await action([contractName], options);
     } else if (!packageName && !projectFile.hasContracts()) {

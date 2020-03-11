@@ -23,6 +23,7 @@ export interface Options {
   userNetwork?: string;
   networkFile?: NetworkFile;
   txParams?: TxParams;
+  implicitActions?: boolean;
 }
 
 export const name = 'deploy';

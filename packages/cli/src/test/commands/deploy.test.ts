@@ -8,10 +8,17 @@ import { ProxyType } from '../../scripts/interfaces';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+import * as Compiler from '../../models/compiler/Compiler';
+import * as transpiler from '../../transpiler';
+
 import { action as deploy } from '../../commands/deploy/action';
 
 const SimpleNonUpgradeable = Contracts.getFromLocal('SimpleNonUpgradeable');
 const WithConstructorNonUpgradeable = Contracts.getFromLocal('WithConstructorNonUpgradeable');
+
+const fakeTranspiled = {
+  SimpleNonUpgradeable: Contracts.getFromLocal('SimpleUpgradeable'),
+};
 
 describe('deploy (action)', function() {
   const [owner] = accounts;
@@ -27,122 +34,183 @@ describe('deploy (action)', function() {
     networkFile = new NetworkFile(projectFile, network);
   });
 
-  it('deploys a simple contract with no constructor', async function() {
-    const contract = 'SimpleNonUpgradeable';
-    await deploy({
-      contract,
-      arguments: [],
-      network,
-      txParams,
-      networkFile,
+  context('kind regular', function() {
+    it('deploys a simple contract with no constructor', async function() {
+      const contract = 'SimpleNonUpgradeable';
+      await deploy({
+        contract,
+        arguments: [],
+        network,
+        txParams,
+        networkFile,
+      });
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(1);
+
+      const instanceInfo = instances[0];
+      instanceInfo.kind.should.equal(ProxyType.NonProxy);
+      const instance = SimpleNonUpgradeable.at(instanceInfo.address);
+      (await instance.methods.answer().call()).should.equal('42');
     });
-    const instances = networkFile.getProxies({ contractName: contract });
-    instances.should.have.lengthOf(1);
 
-    const instanceInfo = instances[0];
-    instanceInfo.kind.should.equal(ProxyType.NonProxy);
-    const instance = SimpleNonUpgradeable.at(instanceInfo.address);
-    (await instance.methods.answer().call()).should.equal('42');
-  });
+    it('deploys a simple contract with constructor arguments', async function() {
+      const contract = 'WithConstructorNonUpgradeable';
+      await deploy({
+        contract,
+        arguments: ['30', 'abcde', '[3, 7]'],
+        network,
+        txParams,
+        networkFile,
+      });
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(1);
 
-  it('deploys a simple contract with constructor arguments', async function() {
-    const contract = 'WithConstructorNonUpgradeable';
-    await deploy({
-      contract,
-      arguments: ['30', 'abcde', '[3, 7]'],
-      network,
-      txParams,
-      networkFile,
+      const instanceInfo = instances[0];
+      instanceInfo.kind.should.equal(ProxyType.NonProxy);
+      const instance = WithConstructorNonUpgradeable.at(instanceInfo.address);
+      (await instance.methods.answer().call()).should.equal('42');
     });
-    const instances = networkFile.getProxies({ contractName: contract });
-    instances.should.have.lengthOf(1);
 
-    const instanceInfo = instances[0];
-    instanceInfo.kind.should.equal(ProxyType.NonProxy);
-    const instance = WithConstructorNonUpgradeable.at(instanceInfo.address);
-    (await instance.methods.answer().call()).should.equal('42');
-  });
-
-  it('should fail to deploy an unknown contract', async function() {
-    await deploy({
-      contract: 'NotExists',
-      arguments: [],
-      network,
-      txParams,
-      networkFile,
-    }).should.be.rejectedWith('Contract NotExists not found');
-  });
-
-  it('deploys multiple instances', async function() {
-    const contract = 'SimpleNonUpgradeable';
-    const params = {
-      contract,
-      arguments: [],
-      network,
-      txParams,
-      networkFile,
-    };
-
-    await deploy(params);
-    await deploy(params);
-    await deploy(params);
-
-    const instances = networkFile.getProxies({ contractName: contract });
-    instances.should.have.lengthOf(3);
-  });
-
-  it('should fail to deploy without necessary constructor arguments', async function() {
-    const contract = 'WithConstructorNonUpgradeable';
-    await deploy({
-      contract,
-      arguments: [],
-      network,
-      txParams,
-      networkFile,
-    }).should.be.rejectedWith('Expected 3 values but got 0');
-    const instances = networkFile.getProxies({ contractName: contract });
-    instances.should.have.lengthOf(0);
-  });
-
-  it('deploys libraries if necessary', async function() {
-    const contract = 'WithLibraryNonUpgradeable';
-    await deploy({
-      contract,
-      arguments: [],
-      network,
-      txParams,
-      networkFile,
+    it('should fail to deploy an unknown contract', async function() {
+      await deploy({
+        contract: 'NotExists',
+        arguments: [],
+        network,
+        txParams,
+        networkFile,
+      }).should.be.rejectedWith('Contract NotExists not found');
     });
-    const instances = networkFile.getProxies({ contractName: contract });
-    instances.should.have.lengthOf(1);
-  });
 
-  it('deploys a contract from a dependency', async function() {
-    await deploy({
-      contract: 'mock-stdlib-undeployed/GreeterBase',
-      arguments: [],
-      network,
-      txParams,
-      networkFile,
+    it('deploys multiple instances', async function() {
+      const contract = 'SimpleNonUpgradeable';
+      const params = {
+        contract,
+        arguments: [],
+        network,
+        txParams,
+        networkFile,
+      };
+
+      await deploy(params);
+      await deploy(params);
+      await deploy(params);
+
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(3);
     });
-    const instances = networkFile.getProxies({ contractName: 'GreeterBase' });
-    instances.should.have.lengthOf(1);
+
+    it('should fail to deploy without necessary constructor arguments', async function() {
+      const contract = 'WithConstructorNonUpgradeable';
+      await deploy({
+        contract,
+        arguments: [],
+        network,
+        txParams,
+        networkFile,
+      }).should.be.rejectedWith('Expected 3 values but got 0');
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(0);
+    });
+
+    it('deploys libraries if necessary', async function() {
+      const contract = 'WithLibraryNonUpgradeable';
+      await deploy({
+        contract,
+        arguments: [],
+        network,
+        txParams,
+        networkFile,
+      });
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(1);
+    });
+
+    it('deploys a contract from a dependency', async function() {
+      await deploy({
+        contract: 'mock-stdlib-undeployed/GreeterBase',
+        arguments: [],
+        network,
+        txParams,
+        networkFile,
+      });
+      const instances = networkFile.getProxies({ contractName: 'GreeterBase' });
+      instances.should.have.lengthOf(1);
+    });
+
+    it('does not redeploy unchanged library', async function() {
+      const contract = 'WithLibraryNonUpgradeable';
+      const options = { contract, network, txParams, networkFile, arguments: [] };
+
+      const spy = sinon.spy(Transactions, 'deployContract');
+
+      await deploy(options);
+      await deploy(options);
+
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(2);
+
+      spy.callCount.should.equal(3); // 1 for each contract deploy, only 1 for the library (reused the second time)
+      spy.restore();
+    });
   });
 
-  it('does not redeploy unchanged library', async function() {
-    const contract = 'WithLibraryNonUpgradeable';
-    const options = { contract, network, txParams, networkFile, arguments: [] };
+  context('kind upgradeable', function() {
+    const kind = 'upgradeable';
 
-    const spy = sinon.spy(Transactions, 'deployContract');
+    beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', function() {
+      this.sandbox = sinon.createSandbox();
+      // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
+      this.sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
+        const contract = Contracts['getFromPathWithUpgradeable'].wrappedMethod.apply(this, [targetPath, contractName]);
+        contract.upgradeable = fakeTranspiled[contractName];
+        return contract;
+      });
+      this.sandbox.stub(Compiler, 'compile');
+      this.sandbox.stub(transpiler, 'transpileAndSave');
+    });
 
-    await deploy(options);
-    await deploy(options);
+    afterEach(function() {
+      this.sandbox.restore();
+    });
 
-    const instances = networkFile.getProxies({ contractName: contract });
-    instances.should.have.lengthOf(2);
+    it('deploys a simple contract with no constructor', async function() {
+      const contract = 'SimpleNonUpgradeable';
+      await deploy({
+        contract,
+        arguments: [],
+        network,
+        kind,
+        txParams,
+        networkFile,
+        implicitActions: true,
+      });
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(1);
 
-    spy.callCount.should.equal(3); // 1 for each contract deploy, only 1 for the library (reused the second time)
-    spy.restore();
+      const instanceInfo = instances[0];
+      instanceInfo.kind.should.equal(ProxyType.Upgradeable);
+      const instance = SimpleNonUpgradeable.at(instanceInfo.address);
+      (await instance.methods.answer().call()).should.equal('42');
+    });
+
+    it.skip('deploys a simple contract with constructor arguments', async function() {
+      const contract = 'WithConstructorNonUpgradeable';
+      await deploy({
+        contract,
+        arguments: ['30', 'abcde', '[3, 7]'],
+        network,
+        kind,
+        txParams,
+        networkFile,
+      });
+      const instances = networkFile.getProxies({ contractName: contract });
+      instances.should.have.lengthOf(1);
+
+      const instanceInfo = instances[0];
+      instanceInfo.kind.should.equal(ProxyType.NonProxy);
+      const instance = WithConstructorNonUpgradeable.at(instanceInfo.address);
+      (await instance.methods.answer().call()).should.equal('42');
+    });
   });
 
   // see push tests for reference
