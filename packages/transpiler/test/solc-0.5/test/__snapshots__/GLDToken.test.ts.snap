@@ -1,22 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GLDToken contract is converted to a valid GLDTokenUpgradable contract 1`] = `
+exports[`GLDToken contract is converted to a valid GLDTokenUpgradeable contract 1`] = `
 "pragma solidity ^0.5.0;
 
-import \\"./@openzeppelin/contracts/token/ERC20/ERC20Upgradable.sol\\";
-import \\"./@openzeppelin/contracts/token/ERC20/ERC20DetailedUpgradable.sol\\";
+import \\"@openzeppelin/contracts/token/ERC20/ERC20.sol\\";
+import \\"./@openzeppelin/contracts/token/ERC20/ERC20Upgradeable.sol\\";
+import \\"@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol\\";
+import \\"./@openzeppelin/contracts/token/ERC20/ERC20DetailedUpgradeable.sol\\";
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
-contract GLDTokenUpgradable is Initializable, ERC20Upgradable, ERC20DetailedUpgradable {
+contract GLDTokenUpgradeable is Initializable, ERC20Upgradeable, ERC20DetailedUpgradeable {
     function initialize(uint256 initialSupply) external initializer {
         __init(true, initialSupply);
     }
 
     function __init(bool callChain, uint256 initialSupply) internal {
         if(callChain) {
-            ContextUpgradable.__init(false);
-            ERC20Upgradable.__init(false);
-            ERC20DetailedUpgradable.__init(false, \\"Gold\\", \\"GLD\\", 18);
+            ContextUpgradeable.__init(false);
+            ERC20Upgradeable.__init(false);
+            ERC20DetailedUpgradeable.__init(false, \\"Gold\\", \\"GLD\\", 18);
         }
         
         
@@ -29,7 +31,7 @@ contract GLDTokenUpgradable is Initializable, ERC20Upgradable, ERC20DetailedUpgr
 "
 `;
 
-exports[`GLDToken contract is converted to a valid GLDTokenUpgradable contract 2`] = `
+exports[`GLDToken contract is converted to a valid GLDTokenUpgradeable contract 2`] = `
 "pragma solidity ^0.5.0;
 
 import \\"@openzeppelin/contracts/token/ERC20/IERC20.sol\\";
@@ -38,7 +40,7 @@ import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 /**
  * @dev Optional functions from the ERC20 standard.
  */
-contract ERC20DetailedUpgradable is Initializable, IERC20 {
+contract ERC20DetailedUpgradeable is Initializable, IERC20 {
 
     function __init(bool callChain, string memory name, string memory symbol, uint8 decimals) internal {
         
@@ -95,10 +97,11 @@ contract ERC20DetailedUpgradable is Initializable, IERC20 {
 "
 `;
 
-exports[`GLDToken contract is converted to a valid GLDTokenUpgradable contract 3`] = `
+exports[`GLDToken contract is converted to a valid GLDTokenUpgradeable contract 3`] = `
 "pragma solidity ^0.5.0;
 
-import \\"../../GSN/ContextUpgradable.sol\\";
+import \\"@openzeppelin/contracts/GSN/Context.sol\\";
+import \\"../../GSN/ContextUpgradeable.sol\\";
 import \\"@openzeppelin/contracts/token/ERC20/IERC20.sol\\";
 import \\"@openzeppelin/contracts/math/SafeMath.sol\\";
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
@@ -127,14 +130,14 @@ import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20Upgradable is Initializable, ContextUpgradable, IERC20 {
+contract ERC20Upgradeable is Initializable, ContextUpgradeable, IERC20 {
     function initialize() external initializer {
         __init(true);
     }
 
     function __init(bool callChain) internal {
         if(callChain) {
-            ContextUpgradable.__init(false);
+            ContextUpgradeable.__init(false);
         }
         
         
@@ -342,7 +345,7 @@ contract ERC20Upgradable is Initializable, ContextUpgradable, IERC20 {
 "
 `;
 
-exports[`GLDToken contract is converted to a valid GLDTokenUpgradable contract 4`] = `
+exports[`GLDToken contract is converted to a valid GLDTokenUpgradeable contract 4`] = `
 "pragma solidity ^0.5.0;
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
@@ -356,7 +359,7 @@ import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
  *
  * This contract is only required for intermediate, library-like contracts.
  */
-contract ContextUpgradable is Initializable {
+contract ContextUpgradeable is Initializable {
     function initialize() external initializer {
         __init(true);
     }
