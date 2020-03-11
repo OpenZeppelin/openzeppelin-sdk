@@ -128,6 +128,7 @@ module.exports = function(dirname) {
   function setMockStdlibVersion(version) {
     sed("package.json", /(?<=mock-stdlib-)1\.\d\.0/, version);
     run("rm -rf node_modules/mock-stdlib");
+    run("rm -rf build");
     run(
       `ln -Tnsf ../../dependencies/mock-stdlib-${version} node_modules/mock-stdlib`
     );

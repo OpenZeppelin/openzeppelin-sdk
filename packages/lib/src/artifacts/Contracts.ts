@@ -21,6 +21,7 @@ export default class Contracts {
     return path.resolve(Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR);
   }
 
+  // todo: respect contracts_directory from https://www.trufflesuite.com/docs/truffle/reference/configuration
   public static getLocalContractsDir(): string {
     return path.resolve(Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR);
   }

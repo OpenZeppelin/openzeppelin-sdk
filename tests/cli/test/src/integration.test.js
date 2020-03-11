@@ -41,7 +41,9 @@ function runIntegrationTest({ lightweight }) {
   });
 
   it("creates an instance", function() {
-    run(`npx openzeppelin deploy Foo --kind upgradeable --network ${network} --no-interactive`);
+    run(
+      `npx openzeppelin deploy Foo --kind upgradeable --network ${network} --no-interactive`
+    );
     truffleExec(`run.js cli-app/Foo 0 say --network ${network}`).should.eq(
       "Foo"
     );
@@ -53,7 +55,7 @@ function runIntegrationTest({ lightweight }) {
     );
     const tokenAddress = getProxyAddress(network, "mock-stdlib/Greeter", 0);
     run(
-      `npx openzeppelin deploy GreeterWrapper "${tokenAddress}" --network ${network} --from ${this.from} --no-interactive`
+      `npx openzeppelin deploy GreeterWrapper "${tokenAddress}" --kind upgradeable --network ${network} --from ${this.from} --no-interactive`
     );
     truffleExec(
       `run.js cli-app/GreeterWrapper 0 say --network ${network} --from ${this.from}`
