@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ClassInheritance contract is converted to a valid CIBUpgradable contract 1`] = `
+exports[`ClassInheritance contract is converted to a valid CIBUpgradeable contract 1`] = `
 "pragma solidity ^0.5.0;
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
-contract CIAUpgradable is Initializable {
+contract CIAUpgradeable is Initializable {
     function initialize(uint bar) external initializer {
         __init(true, bar);
     }
@@ -23,14 +23,14 @@ contract CIAUpgradable is Initializable {
     
 }
 
-contract CIBUpgradable is Initializable, CIAUpgradable {
+contract CIBUpgradeable is Initializable, CIAUpgradeable {
     function initialize() external initializer {
         __init(true);
     }
 
     function __init(bool callChain) internal {
         if(callChain) {
-            CIAUpgradable.__init(false, 324);
+            CIAUpgradeable.__init(false, 324);
         }
         
         val = 123;
