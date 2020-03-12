@@ -50,16 +50,6 @@ describe('ValidationLogger', function() {
       validationLogger().log({ hasInitialValuesInDeclarations: true });
       this.logs.warns[0].should.match(/sets an initial value/);
     });
-
-    it('logs when importing openzeppelin-contracts', async function() {
-      validationLogger().log({ importsVanillaContracts: ['Foo.sol', 'Bar.sol'] });
-      this.logs.warns[0].should.match(/@openzeppelin\/contracts/);
-    });
-
-    it('does not log with no imports', async function() {
-      validationLogger().log({ importsVanillaContracts: [] });
-      this.logs.warns.length.should.equal(0);
-    });
   });
 
   describe('storage', function() {
