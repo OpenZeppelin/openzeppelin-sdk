@@ -3,7 +3,6 @@ require('../../setup');
 
 import { validate as validateContract } from '../../../src/validations';
 import Contracts from '../../../src/artifacts/Contracts';
-import { setVanillaContractsPackageName } from '../../../src/validations/VanillaContracts';
 
 describe('Validations', function() {
   describe('#hasConstructor', function() {
