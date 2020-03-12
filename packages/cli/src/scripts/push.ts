@@ -34,7 +34,6 @@ export default async function push({
     : [];
 
   if (!!depsContracts.length || !!contracts.length) {
-    console.error(depsContracts);
     // Transpile contract to upgradeable version and save it in contracts folder.
     await transpileAndSave([...contracts, ...depsContracts]);
     // Compile new contracts.
