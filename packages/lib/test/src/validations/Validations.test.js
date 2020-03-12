@@ -60,11 +60,6 @@ describe('Validations', function() {
     validate('WithParentWithInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.true;
   });
 
-  it('warns on contract that extends vanilla openzeppelin contracts', async function() {
-    setVanillaContractsPackageName('mock-dependency/');
-    validate('WithVanillaBaseContract').importsVanillaContracts.should.include('Greeter.sol');
-  });
-
   after(function() {
     setVanillaContractsPackageName('@openzeppelin/contracts/');
   });
