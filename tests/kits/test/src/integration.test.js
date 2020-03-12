@@ -63,8 +63,12 @@ describe(`Unpack a Tutorial Kit on the ${network}`, function() {
 
 describe(`Unpack a GSN Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'gsn' }, function() {
-    it('atch counter contract', function() {
-      run(`patch ./contracts/Counter.sol ../test/counter.patch`);
+    it('Patch counter contract', function() {
+      run(`patch ./contracts/Counter.sol ../test/gsn.patch`);
+    });
+
+    it('Install @openzeppelin/contracs dependency', function() {
+      run(`npm i @openzeppelin/contracts@latest`);
     });
 
     it('Add Counter contract', function() {
