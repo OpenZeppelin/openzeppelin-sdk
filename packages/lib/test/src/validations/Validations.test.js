@@ -59,10 +59,6 @@ describe('Validations', function() {
     validate('WithParentWithInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.true;
   });
 
-  after(function() {
-    setVanillaContractsPackageName('@openzeppelin/contracts/');
-  });
-
   describe.skip('uninitialized base contracts', function() {
     it('warns when adding a contract with uninitialized base contracts', async function() {
       validate('WithBaseUninitialized').uninitializedBaseContracts.should.deep.eq([
