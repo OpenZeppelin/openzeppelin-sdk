@@ -1,5 +1,6 @@
-import { pickBy } from 'lodash';
+import { pickBy, uniq } from 'lodash';
 
+import NetworkFile from '../models/files/NetworkFile';
 import push from './push';
 import update from '../scripts/update';
 import { parseContractReference } from '../utils/contract';
@@ -17,6 +18,7 @@ import {
 import promptForMethodParams from '../prompts/method-params';
 import Telemetry from '../telemetry';
 import { ProxyType, UpdateParams } from '../scripts/interfaces';
+import ProjectFile from '../models/files/ProjectFile';
 
 const name = 'upgrade';
 const signature = `${name} [alias-or-address]`;
@@ -48,12 +50,7 @@ async function commandActions(proxyReference: string, options: any): Promise<voi
     network: promptedNetwork,
   });
 
-  await push.runActionIfNeeded(null, network, {
-    ...options,
-    network: promptedNetwork,
-  });
-
-  await action(proxyReference, { ...options, network, txParams });
+  await action(proxyReference, { ...options, network, txParams, promptedNetwork });
   if (!options.dontExitProcess && process.env.NODE_ENV !== 'test') process.exit(0);
 }
 
@@ -80,6 +77,22 @@ async function action(proxyReference: string, options: any): Promise<void> {
     ...parsedContractReference,
     ...initMethodParams,
   } as UpdateParams);
+
+  const projectFile = new ProjectFile();
+  const networkFile = new NetworkFile(projectFile, network);
+
+  const proxies = networkFile.getProxies({
+    package: parsedContractReference.packageName ?? (parsedContractReference.contractAlias && projectFile.name),
+    contract: parsedContractReference.contractAlias,
+    address: parsedContractReference.proxyAddress,
+    kind: ProxyType.Upgradeable,
+  });
+
+  await push.runActionIfNeeded(uniq(proxies.map(proxy => proxy.contract)), network, {
+    ...options,
+    network: options.promptedNetwork,
+  });
+
   await Telemetry.report('update', { ...args, network, txParams }, interactive);
   await update({ ...args, network, txParams });
 }
