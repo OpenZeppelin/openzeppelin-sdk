@@ -24,6 +24,8 @@ function isProxyKind(kind: Options['kind']): boolean {
     case 'upgradeable':
     case 'minimal':
       return true;
+    default:
+      throw new Error(`Unknown proxy kind: ${kind}`);
   }
 }
 
