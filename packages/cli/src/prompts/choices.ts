@@ -5,7 +5,7 @@ import ProjectFile from '../models/files/ProjectFile';
 import ContractManager from '../models/local/ContractManager';
 import Dependency from '../models/dependency/Dependency';
 
-export type Choice = string | { name: string; value: string } | { type: 'separator' };
+export type Choice = string | { name: string; value: string; short?: string } | { type: 'separator' };
 
 export type ContractsSource = 'built' | 'notAdded' | 'added' | 'all';
 

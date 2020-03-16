@@ -5,9 +5,24 @@ import { commonOptions } from '../utils';
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
+import { capitalize } from 'lodash';
+import chalk from 'chalk';
 
-const kinds = ['regular', 'upgradeable', 'minimal'] as const;
-type Kind = typeof kinds[number]; // Union of all members of the kinds array.
+function kindChoice<K extends string>(kind: K, description: string) {
+  return {
+    name: `${chalk.underline(capitalize(kind))}: ${description}`,
+    value: kind,
+    short: kind,
+  };
+}
+
+const kinds = [
+  kindChoice('regular', 'standard non-upgradeable contract'),
+  kindChoice('upgradeable', 'upgradeable instance using a delegating proxy (EIP1967)'),
+  kindChoice('minimal', 'non-upgradeable minimal proxy instance (EIP1167)'),
+];
+
+type Kind = typeof kinds[number]['value']; // Union of all members of the kinds array.
 
 export interface Args {
   contract: string;
