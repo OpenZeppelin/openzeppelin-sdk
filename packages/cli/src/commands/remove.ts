@@ -27,10 +27,7 @@ async function action(contracts: string[], options: any): Promise<void> {
 
   await Telemetry.report('remove', prompted, interactive);
   remove(prompted);
-  const projectFile = new ProjectFile();
-  if (projectFile.contracts.length !== 0) {
-    await push.runActionIfRequested({ ...options, contracts: projectFile.contracts });
-  }
+  await push.runActionIfRequested({ ...options });
 }
 
 function getCommandProps(): InquirerQuestions {

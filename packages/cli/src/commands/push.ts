@@ -91,6 +91,13 @@ async function action(options: any): Promise<void> {
 
 async function runActionIfRequested(externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
+  // if not contracts has been passed use all contracts explicitly from ProjectFile
+  if (!externalOptions.contracts?.length) {
+    const projectFile = new ProjectFile();
+    if (!!projectFile.contracts?.length) {
+      externalOptions.contracts = projectFile.contracts;
+    }
+  }
   const options = omit(externalOptions, 'push');
   const network = isString(externalOptions.push) ? externalOptions.push : undefined;
   if (network) options.network = network;

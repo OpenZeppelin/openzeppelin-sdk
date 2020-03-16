@@ -39,13 +39,10 @@ async function action(contractNames: string[], options: any): Promise<void> {
     if (!options.skipTelemetry) await Telemetry.report('add', { contracts }, interactive);
     add({ contracts });
   }
-  const projectFile = new ProjectFile();
-  if (projectFile.contracts.length !== 0) {
-    await push.runActionIfRequested({
-      ...options,
-      contracts: contractNames && contractNames.length !== 0 ? contractNames : projectFile.contracts,
-    });
-  }
+  await push.runActionIfRequested({
+    ...options,
+    contracts: contractNames,
+  });
 }
 
 async function runActionIfNeeded(contractFullName?: string, options?: any): Promise<void> {

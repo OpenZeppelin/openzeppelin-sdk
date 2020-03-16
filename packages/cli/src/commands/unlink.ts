@@ -26,10 +26,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
 
   await Telemetry.report('unlink', prompted, interactive);
   await unlink(prompted);
-  const projectFile = new ProjectFile();
-  if (projectFile.contracts.length !== 0) {
-    await push.runActionIfRequested({ ...options, contracts: projectFile.contracts });
-  }
+  await push.runActionIfRequested({ ...options });
 }
 
 function getCommandProps(depNames: string[]): InquirerQuestions {

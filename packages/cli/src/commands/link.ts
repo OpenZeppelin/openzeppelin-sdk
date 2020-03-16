@@ -35,10 +35,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
 
   await link(linkArguments);
 
-  const projectFile = new ProjectFile();
-  if (projectFile.contracts.length !== 0) {
-    await push.runActionIfRequested({ ...options, contracts: projectFile.contracts });
-  }
+  await push.runActionIfRequested({ ...options });
 }
 
 async function runActionIfNeeded(contractFullName: string, options: any): Promise<void> {
