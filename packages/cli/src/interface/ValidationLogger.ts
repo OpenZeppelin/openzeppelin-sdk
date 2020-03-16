@@ -11,11 +11,13 @@ import {
 } from '@openzeppelin/upgrades';
 import { ContractInterface } from '../models/files/NetworkFile';
 
+const CLI_HOME = 'https://docs.openzeppelin.com/cli/2.6';
 const UPGRADES_HOME = 'https://docs.openzeppelin.com/upgrades/2.6/';
 const DANGEROUS_OPERATIONS_LINK = `${UPGRADES_HOME}/writing-upgradeable#potentially-unsafe-operations`;
 const AVOID_INITIAL_VALUES_LINK = `${UPGRADES_HOME}/writing-upgradeable#avoid-initial-values-in-field-declarations`;
 const INITIALIZERS_LINK = `${UPGRADES_HOME}/writing-upgradeable#initializers`;
 const STORAGE_CHECKS_LINK = `${UPGRADES_HOME}/writing-upgradeable#modifying-your-contracts`;
+const VANILLA_CONTRACTS_LINK = `${CLI_HOME}/dependencies#linking-the-contracts-ethereum-package`;
 
 export default class ValidationLogger {
   public contract: Contract;
@@ -39,6 +41,7 @@ export default class ValidationLogger {
       uninitializedBaseContracts,
       storageDiff,
       storageUncheckedVars,
+      importsEthereumPackageContracts,
     } = validations;
 
     this.logHasConstructor(hasConstructor);
@@ -48,6 +51,20 @@ export default class ValidationLogger {
     this.logUncheckedVars(storageUncheckedVars);
     this.logUninitializedBaseContracts(uninitializedBaseContracts);
     this.logStorageLayoutDiffs(storageDiff, getStorageLayout(this.contract, buildArtifacts));
+    this.logImportsEthereumPackageContracts(importsEthereumPackageContracts);
+  }
+
+  public logImportsEthereumPackageContracts(EthereumPackageContracts: string[] | null): void {
+    if (!isEmpty(EthereumPackageContracts)) {
+      Loggy.noSpin.warn(
+        __filename,
+        'logImportsEthereumPackageContracts',
+        `validation-imports-ethereum-contracts`,
+        `- Contract ${this.contractName} imports ${EthereumPackageContracts.join(
+          ', ',
+        )} from @openzeppelin/contracts-ethereum-package. Use @openzeppelin/contracts instead. See ${VANILLA_CONTRACTS_LINK}.`,
+      );
+    }
   }
 
   public logHasSelfDestruct(hasSelfDestruct: boolean): void {

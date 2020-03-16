@@ -5,6 +5,7 @@ import { hasSelfDestruct, hasDelegateCall } from './Instructions';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
+import { importsEthereumPackageContracts } from './VanillaContracts';
 import Contract from '../artifacts/Contract.js';
 import ContractAST, { StorageInfo, ContractDefinitionFilter } from '../utils/ContractAST';
 import { BuildArtifacts } from '..';
@@ -18,13 +19,14 @@ export interface ValidationInfo {
   uninitializedBaseContracts: any[];
   storageUncheckedVars?: StorageInfo[];
   storageDiff?: Operation[];
+  importsEthereumPackageContracts?: string[];
 }
 
 export function validate(
   contract: Contract,
   existingContractInfo: any = {},
   buildArtifacts: BuildArtifacts = getBuildArtifacts(),
-): any {
+): ValidationInfo {
   checkArtifactsForImportedSources(contract, buildArtifacts);
   const storageValidation = validateStorage(contract, existingContractInfo, buildArtifacts);
   const uninitializedBaseContracts = [];
@@ -34,6 +36,7 @@ export function validate(
     hasSelfDestruct: hasSelfDestruct(contract),
     hasDelegateCall: hasDelegateCall(contract),
     hasInitialValuesInDeclarations: hasInitialValuesInDeclarations(contract),
+    importsEthereumPackageContracts: importsEthereumPackageContracts(contract, buildArtifacts),
     uninitializedBaseContracts,
     ...storageValidation,
   };
@@ -52,6 +55,10 @@ export function newValidationErrors(validations: any, existingValidations: any =
     ),
     storageUncheckedVars: difference(validations.storageUncheckedVars, existingValidations.storageUncheckedVars),
     storageDiff: validations.storageDiff,
+    importsEthereumPackageContracts: difference(
+      validations.importsEthereumPackageContracts,
+      existingValidations.importsEthereumPackageContracts,
+    ),
   };
 }
 
@@ -62,7 +69,8 @@ export function validationPasses(validations: any): boolean {
     !validations.hasSelfDestruct &&
     !validations.hasDelegateCall &&
     !validations.hasInitialValuesInDeclarations &&
-    isEmpty(validations.uninitializedBaseContracts)
+    isEmpty(validations.uninitializedBaseContracts) &&
+    isEmpty(validations.importsEthereumPackageContracts)
   );
 }
 

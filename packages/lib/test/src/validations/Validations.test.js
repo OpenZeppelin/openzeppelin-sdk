@@ -2,6 +2,7 @@
 require('../../setup');
 
 import { validate as validateContract } from '../../../src/validations';
+import { setEthereumPackageContractsPackageName } from '../../../src/validations/VanillaContracts';
 import Contracts from '../../../src/artifacts/Contracts';
 
 describe('Validations', function() {
@@ -57,6 +58,15 @@ describe('Validations', function() {
 
   it('warns when adding a contract whose parent has initial values in fields declarations', async function() {
     validate('WithParentWithInitialValuesInFieldsDeclarations').hasInitialValuesInDeclarations.should.be.true;
+  });
+
+  it('warns on contract that extends ethereum pacakge openzeppelin contracts', async function() {
+    setEthereumPackageContractsPackageName('mock-dependency/');
+    validate('WithVanillaBaseContract').importsEthereumPackageContracts.should.include('Greeter.sol');
+  });
+
+  after(function() {
+    setEthereumPackageContractsPackageName('@openzeppelin/contracts-ethereum-package/');
   });
 
   describe.skip('uninitialized base contracts', function() {
