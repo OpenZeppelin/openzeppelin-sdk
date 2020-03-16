@@ -1,4 +1,4 @@
-import { shouldTranspileToValidContract } from './LocalConract.behaviour';
+import { shouldTranspileToValidContract } from './LocalContract.behaviour';
 
 describe(`ElementaryTypesWithConstructor contract`, (): void => {
   shouldTranspileToValidContract('ElementaryTypesWithConstructor', {
