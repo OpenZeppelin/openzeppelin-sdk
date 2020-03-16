@@ -50,6 +50,16 @@ describe('ValidationLogger', function() {
       validationLogger().log({ hasInitialValuesInDeclarations: true });
       this.logs.warns[0].should.match(/sets an initial value/);
     });
+
+    it('logs when importing openzeppelin-ethereum-package-contracts', async function() {
+      validationLogger().log({ importsEthereumPackageContracts: ['Foo.sol', 'Bar.sol'] });
+      this.logs.warns[0].should.match(/@openzeppelin\/contracts-ethereum-package/);
+    });
+
+    it('does not log with no imports', async function() {
+      validationLogger().log({ importsEthereumPackageContracts: [] });
+      this.logs.warns.length.should.equal(0);
+    });
   });
 
   describe('storage', function() {
