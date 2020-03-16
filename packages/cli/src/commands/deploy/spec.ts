@@ -6,8 +6,21 @@ import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
 
-const kinds = ['regular', 'upgradeable', 'minimal'] as const;
-type Kind = typeof kinds[number]; // Union of all members of the kinds array.
+function kindChoice<K extends string>(kind: K, description: string) {
+  return {
+    name: `${kind} (${description})`,
+    value: kind,
+    short: kind,
+  };
+}
+
+const kinds = [
+  kindChoice('regular', 'no proxy'),
+  kindChoice('upgradeable', 'upgradeability proxy'),
+  kindChoice('minimal', 'EIP1167 minimal proxy'),
+];
+
+type Kind = typeof kinds[number]['value']; // Union of all members of the kinds array.
 
 export interface Args {
   contract: string;

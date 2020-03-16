@@ -203,7 +203,7 @@ function throwIfInvalid(value: string, name: string, details?: ParamDetails): vo
   if (validationError) {
     error = validationError(value);
   } else if (choices) {
-    if (!choices.includes(value)) {
+    if (!choices.some(c => (typeof c === 'object' && 'value' in c ? c.value === value : c === value))) {
       error = `Invalid ${name} '${value}'`;
     }
   }
