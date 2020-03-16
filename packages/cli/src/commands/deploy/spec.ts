@@ -5,12 +5,11 @@ import { commonOptions } from '../utils';
 import { TxParams } from '@openzeppelin/upgrades';
 import NetworkFile from '../../models/files/NetworkFile';
 import { DEFAULT_TX_TIMEOUT } from '../../models/network/defaults';
-import { capitalize } from 'lodash';
 import chalk from 'chalk';
 
 function kindChoice<K extends string>(kind: K, description: string) {
   return {
-    name: `${chalk.underline(capitalize(kind))}: ${description}`,
+    name: `${kind}\t${chalk.reset.dim(description)}`,
     value: kind,
     short: kind,
   };
