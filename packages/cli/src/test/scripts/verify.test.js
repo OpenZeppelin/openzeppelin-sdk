@@ -1,20 +1,16 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import sinon from 'sinon';
 import axios from 'axios';
 
 import CaptureLogs from '../helpers/captureLogs';
 
-import { Contracts } from '@openzeppelin/upgrades';
-
 import { action as verify } from '../../commands/verify/action';
 import push from '../../scripts/push';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
-
-import * as Compiler from '../../models/compiler/Compiler';
-import * as transpiler from '../../transpiler';
 
 const sandbox = sinon.createSandbox();
 
@@ -23,20 +19,7 @@ describe('verify script', function() {
   const network = 'test';
   const txParams = {};
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-    sandbox.stub(Compiler, 'compile');
-    sandbox.stub(transpiler, 'transpileAndSave');
-  });
-
-  afterEach(function() {
-    sandbox.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   const assertVerify = async function(options, message) {
     try {

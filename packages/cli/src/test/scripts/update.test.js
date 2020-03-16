@@ -1,5 +1,6 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { mapKeys } from 'lodash';
 import sinon from 'sinon';
@@ -21,9 +22,6 @@ import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 import { ProxyType } from '../../scripts/interfaces';
 
-import * as Compiler from '../../models/compiler/Compiler';
-import * as transpiler from '../../transpiler';
-
 const sandbox = sinon.createSandbox();
 const updateSandbox = sinon.createSandbox();
 
@@ -39,20 +37,7 @@ describe('update script', function() {
   const version2 = '0.2.0';
   const txParams = { from: owner };
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-    sandbox.stub(Compiler, 'compile');
-    sandbox.stub(transpiler, 'transpileAndSave');
-  });
-
-  afterEach(function() {
-    sandbox.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   const assertProxyInfo = async function(
     networkFile,

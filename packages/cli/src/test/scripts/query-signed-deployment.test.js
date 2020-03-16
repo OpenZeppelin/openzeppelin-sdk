@@ -1,11 +1,11 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { random } from 'lodash';
 import sinon from 'sinon';
 
 import { accounts } from '@openzeppelin/test-environment';
-import { Contracts } from '@openzeppelin/upgrades';
 
 import querySignedDeployment from '../../scripts/query-signed-deployment';
 import ProjectFile from '../../models/files/ProjectFile';
@@ -13,9 +13,6 @@ import NetworkFile from '../../models/files/NetworkFile';
 import { helpers } from '@openzeppelin/upgrades';
 import push from '../../scripts/push';
 import queryDeployment from '../../scripts/query-deployment';
-
-import * as Compiler from '../../models/compiler/Compiler';
-import * as transpiler from '../../transpiler';
 
 const sandbox = sinon.createSandbox();
 
@@ -27,20 +24,7 @@ describe('query-signed-deployment script', function() {
   const txParams = { from: owner };
   const contractName = 'ImplV1';
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-    sandbox.stub(Compiler, 'compile');
-    sandbox.stub(transpiler, 'transpileAndSave');
-  });
-
-  afterEach(function() {
-    sandbox.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   const shouldHandleQuerySignedDeploymentScript = function() {
     beforeEach('setup', async function() {

@@ -1,5 +1,6 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { expect } from 'chai';
 
@@ -18,9 +19,6 @@ import remove from '../../scripts/remove';
 import Dependency from '../../models/dependency/Dependency';
 import CaptureLogs from '../helpers/captureLogs';
 
-import * as Compiler from '../../models/compiler/Compiler';
-import * as transpiler from '../../transpiler';
-
 const should = require('chai').should();
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
@@ -36,23 +34,7 @@ describe('push script', function() {
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sandbox.stub(upgrades.Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = upgrades.Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [
-        targetPath,
-        contractName,
-      ]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-    sandbox.stub(Compiler, 'compile');
-    sandbox.stub(transpiler, 'transpileAndSave');
-  });
-
-  afterEach(function() {
-    sandbox.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   const shouldDeployPackage = function() {
     it('should create a network file with version info', async function() {

@@ -1,6 +1,6 @@
 'use strict';
 
-require('../setup');
+import { stubContractUpgradeable } from '../setup';
 
 import sinon from 'sinon';
 
@@ -13,24 +13,15 @@ import NetworkFile from '../../models/files/NetworkFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
+const sandbox = sinon.createSandbox();
+
 describe('TestHelper', function() {
   const [owner] = accounts;
   const txParams = { from: owner };
   const projectName = 'Herbs';
   const initialVersion = '1.1.0';
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-  });
-
-  afterEach(function() {
-    sinon.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   describe('for app project', function() {
     beforeEach(async function() {

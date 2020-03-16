@@ -1,9 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import sinon from 'sinon';
-
-import { Contracts } from '@openzeppelin/upgrades';
 
 import { accounts } from '@openzeppelin/test-environment';
 
@@ -15,9 +14,6 @@ import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
-import * as Compiler from '../../models/compiler/Compiler';
-import * as transpiler from '../../transpiler';
-
 const sandbox = sinon.createSandbox();
 
 describe('send-tx script', function() {
@@ -26,20 +22,7 @@ describe('send-tx script', function() {
   const txParams = { from: account };
   const network = 'test';
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-    sandbox.stub(Compiler, 'compile');
-    sandbox.stub(transpiler, 'transpileAndSave');
-  });
-
-  afterEach(function() {
-    sandbox.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   beforeEach('setup', async function() {
     this.logs = new CaptureLogs();

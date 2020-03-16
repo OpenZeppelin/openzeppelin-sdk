@@ -1,5 +1,6 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { Proxy, Contracts, toSemanticVersion } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
@@ -14,9 +15,6 @@ import setAdmin from '../../scripts/set-admin';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
-import * as Compiler from '../../models/compiler/Compiler';
-import * as transpiler from '../../transpiler';
-
 const Package = Contracts.getFromLib('Package');
 const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
@@ -30,20 +28,7 @@ describe('migrate-manifest-version script', function() {
   const network = 'test';
   const txParams = { from: owner };
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sandbox.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-    sandbox.stub(Compiler, 'compile');
-    sandbox.stub(transpiler, 'transpileAndSave');
-  });
-
-  afterEach(function() {
-    sandbox.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   before(async function() {
     this.contentURI = '0x20';

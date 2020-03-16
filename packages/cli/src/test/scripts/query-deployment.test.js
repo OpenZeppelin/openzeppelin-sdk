@@ -1,9 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import sinon from 'sinon';
-
-import { Contracts } from '@openzeppelin/upgrades';
 
 import { random } from 'lodash';
 import { accounts } from '@openzeppelin/test-environment';
@@ -14,6 +13,8 @@ import NetworkFile from '../../models/files/NetworkFile';
 
 const should = require('chai').should();
 
+const sandbox = sinon.createSandbox();
+
 describe('query-deployment script', function() {
   const [owner, another] = accounts;
 
@@ -21,18 +22,7 @@ describe('query-deployment script', function() {
   const version = '0.4.0';
   const txParams = { from: owner };
 
-  beforeEach('stub getFromPathWithUpgradeable to simulate transpilation of contracts', async function() {
-    // stub getFromPathWithUpgradeable to fill upgradeable field with the same contract
-    sinon.stub(Contracts, 'getFromPathWithUpgradeable').callsFake(function(targetPath, contractName) {
-      const contract = Contracts.getFromPathWithUpgradeable.wrappedMethod.apply(this, [targetPath, contractName]);
-      contract.upgradeable = contract;
-      return contract;
-    });
-  });
-
-  afterEach(function() {
-    sinon.restore();
-  });
+  stubContractUpgradeable(sandbox);
 
   const shouldHandleQueryDeploymentScript = function() {
     beforeEach('setup', async function() {
