@@ -10,9 +10,8 @@ OpenZeppelin is a platform to develop, deploy and operate smart contract
 projects on Ethereum and every other EVM and eWASM-powered blockchain.
 
 This repository includes the OpenZeppelin
-[Command-Line Interface](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme),
-[JavaScript Library](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib#readme),
-and [the sources for the Documentation Website](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/docs#readme).
+[Command-Line Interface](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/cli#readme) and
+[Upgrades Library](https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/packages/lib#readme).
 
 ## Install
 
