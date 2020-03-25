@@ -7,6 +7,10 @@
       "ignoreChanges": [
         "examples/**"
       ]
+    },
+    "version": {
+      "exact": true,
+      "force-publish": true
     }
   }
 }
