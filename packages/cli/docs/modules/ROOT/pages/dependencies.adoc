@@ -40,7 +40,7 @@ NOTE: Make sure you install `@openzeppelin/contracts-ethereum-package` and not t
 [[creating-an-erc20-token]]
 == Creating an ERC20 Token
 
-Let's deploy an ERC20 token contract to our development network. Make sure to xref:learn::deploy-and-interact.adoc#local-blockchain[have a Ganache instance running], or start one by running:
+Let's deploy an ERC20 token contract to our development network. Make sure to xref:learn::deploying-and-interacting.adoc#local-blockchain[have a Ganache instance running], or start one by running:
 
 [source,console]
 ----
