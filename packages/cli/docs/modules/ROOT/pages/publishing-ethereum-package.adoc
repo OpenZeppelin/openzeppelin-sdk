@@ -9,7 +9,7 @@ In this guide we'll describe how you can create your own Ethereum Package, and m
 ====
 This guide features advanced usage of OpenZeppelin tools, and requires familiarity with using public networks, upgradeable contracts, and the OpenZeppelin CLI.
 
-For a refresher on the topics, head to xref:learn::public-staging.adoc[Deploying to a Public Test Network] and xref:learn::on-upgrades.adoc[Upgrades].
+For a refresher on the topics, head to xref:learn::connecting-to-public-test-networks.adoc[Deploying to a Public Test Network] and xref:learn::on-upgrades.adoc[Upgrades].
 ====
 
 == Storing Your Project On-chain
@@ -34,7 +34,7 @@ $ npx oz push
 All contracts have been deployed
 ----
 
-NOTE: For your Ethereum Pacakge to be used by others, it needs to be deployed on a real network instead of a local one. Take a look at xref:learn::public-staging.adoc[Deploying to a Public Test Network] for detailed instructions for this process.
+NOTE: For your Ethereum Pacakge to be used by others, it needs to be deployed on a real network instead of a local one. Take a look at xref:learn::connecting-to-public-test-networks.adoc[Deploying to a Public Test Network] for detailed instructions for this process.
 
 Ethereum Packages are upgradeable, which means they track the different implementation contracts that correspond to each version of the package. We'll use the xref:commands.adoc#publish[`oz publish`] command for this, which will deploy an xref:contracts-architecture.adoc#app.sol[`App`] contract and register the implementations there:
 
