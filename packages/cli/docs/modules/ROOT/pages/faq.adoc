@@ -49,7 +49,7 @@ However, if you are using OpenZeppelin Upgrades programmatically you could poten
 [[how-can-i-create-an-upgradeable-instance-from-solidity-code]]
 == How Can I Create an Upgradeable Instance From Solidity Code?
 
-You can create upgradeable instances from Solidity code by using your project's xref:contracts-architecture.adoc#app.sol[`App`] contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, that is, it needs to have the OpenZeppelin xref:architecture.adoc[Contracts Architecture] enabled.
+You can create upgradeable instances from Solidity code by using your project's xref:contracts-architecture.adoc#app.sol[`App`] contract, and then calling its `create` function from Solidity. Note that to be able to do this, your project needs to be published, that is, it needs to have the OpenZeppelin xref:contracts-architecture.adoc[Contracts Architecture] enabled.
 
 To see an example of how this is done, please refer to the example project https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/creating-instances-from-solidity[`creating-instances-from-solidity`].
 

@@ -40,7 +40,7 @@ NOTE: Make sure you install `@openzeppelin/contracts-ethereum-package` and not t
 [[creating-an-erc20-token]]
 == Creating an ERC20 Token
 
-Let's deploy an ERC20 token contract to our development network. Make sure to xref:learn::deploy-and-interact.adoc#local-blockchain[have a Ganache instance running], or start one by running:
+Let's deploy an ERC20 token contract to our development network. Make sure to xref:learn::deploying-and-interacting.adoc#local-blockchain[have a Ganache instance running], or start one by running:
 
 [source,console]
 ----
@@ -207,7 +207,7 @@ Success! We have our exchange up and running, gathering ETH in exchange for our 
 
 We forgot to add a method to withdraw the funds from the token exchange contract! While this would typically mean that the funds are locked in there forever, we can upgrade the contract with the OpenZeppelin CLI to add a way to collect those funds.
 
-NOTE: While upgrading a contract is certainly useful in situations like this, where you need to fix a bug or add a missing feature, it could still be used to change the rules of the game. For instance, you could upgrade the token exchange contract to alter the rate at any time. Because of this, it is important to have a proper xref:learn::mainnet.adoc#project-governance[Project Governance] in place.
+NOTE: While upgrading a contract is certainly useful in situations like this, where you need to fix a bug or add a missing feature, it could still be used to change the rules of the game. For instance, you could upgrade the token exchange contract to alter the rate at any time. Because of this, it is important to have a proper xref:learn::preparing-for-mainnet.adoc#project-governance[Project Governance] in place.
 
 Let's modify the `TokenExchange` contract to add a `withdraw` method, only callable by an `owner`.
 
