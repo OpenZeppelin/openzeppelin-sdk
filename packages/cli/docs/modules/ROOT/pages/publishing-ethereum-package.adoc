@@ -9,12 +9,12 @@ In this guide we'll describe how you can create your own Ethereum Package, and m
 ====
 This guide features advanced usage of OpenZeppelin tools, and requires familiarity with using public networks, upgradeable contracts, and the OpenZeppelin CLI.
 
-For a refresher on the topics, head to xref:learn::public-staging.adoc[Deploying to a Public Test Network] and xref:learn::on-upgrades.adoc[Upgrades].
+For a refresher on the topics, head to xref:learn::connecting-to-public-test-networks.adoc[Deploying to a Public Test Network] and xref:learn::upgrading-smart-contracts.adoc[Upgrades].
 ====
 
 == Storing Your Project On-chain
 
-So far, we've mostly limited ourselves to depoying contracts using xref:commands.adoc#create[`oz deploy`], which creates _upgradeable instances_ by deploying _proxies_ to an existing implementation contract (refer to xref:learn::on-upgrades.adoc#how-upgrades-work[How Upgrades Work] to brush up on this). Here, we will instead deploy just the implementations, so that other people can create new proxies pointing to them.
+So far, we've mostly limited ourselves to depoying contracts using xref:commands.adoc#create[`oz deploy`], which creates _upgradeable instances_ by deploying _proxies_ to an existing implementation contract (refer to xref:learn::upgrading-smart-contracts.adoc#how-upgrades-work[How Upgrades Work] to brush up on this). Here, we will instead deploy just the implementations, so that other people can create new proxies pointing to them.
 
 To achieve this, we'll use two low-level CLI commands: xref:commands.adoc#add[`oz add`] and xref:commands.adoc#push[`oz push`]. These work simmilarly to `git add` and `git push`: they will register contracts in your project and deploy them to a network.
 
@@ -34,7 +34,7 @@ $ npx oz push
 All contracts have been deployed
 ----
 
-NOTE: For your Ethereum Pacakge to be used by others, it needs to be deployed on a real network instead of a local one. Take a look at xref:learn::public-staging.adoc[Deploying to a Public Test Network] for detailed instructions for this process.
+NOTE: For your Ethereum Pacakge to be used by others, it needs to be deployed on a real network instead of a local one. Take a look at xref:learn::connecting-to-public-test-networks.adoc[Deploying to a Public Test Network] for detailed instructions for this process.
 
 Ethereum Packages are upgradeable, which means they track the different implementation contracts that correspond to each version of the package. We'll use the xref:commands.adoc#publish[`oz publish`] command for this, which will deploy an xref:contracts-architecture.adoc#app.sol[`App`] contract and register the implementations there:
 

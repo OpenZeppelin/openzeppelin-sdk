@@ -8,7 +8,7 @@ In this guide, we will learn how to create a contract https://en.wikipedia.org/w
 ====
 This guide features advanced usage of OpenZeppelin tools, and requires familiarity with Solidity, development blockchains and the OpenZeppelin CLI.
 
-For a refresher on the topics, head to xref:learn::deploy-and-interact.adoc[Deploying and Interacting With Smart Contracts].
+For a refresher on the topics, head to xref:learn::deploying-and-interacting.adoc[Deploying and Interacting With Smart Contracts].
 ====
 
 == Setting Up

@@ -72,7 +72,7 @@ We will use https://truffleframework.com/ganache[Ganache] as a _development netw
 
 Development networks are mini blockchains that run just on your computer, and are much faster than the actual Ethereum network. We will use one for coding and testing.
 
-TIP: Head to xref:learn::deploy-and-interact.adoc#local-blockchain[Setting up a Local Blockchain] to learn more about using Ganache.
+TIP: Head to xref:learn::deploying-and-interacting.adoc#local-blockchain[Setting up a Local Blockchain] to learn more about using Ganache.
 
 Open a separate terminal and start a new Ganache process:
 
