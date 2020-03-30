@@ -34,7 +34,7 @@ Below is a short list of the most used commands:
 == Learn More
 
  * Head to xref:getting-started.adoc[Getting Started] to see the CLI in action by deploying and upgrading a smart contract!
- * xref:using-dependencies.adoc[Using Dependencies] showcases a more complex project being built, including leveraging the xref:contracts::index.adoc[OpenZeppelin Contracts] library.
+ * xref:dependencies.adoc[Using Dependencies] showcases a more complex project being built, including leveraging the xref:contracts::index.adoc[OpenZeppelin Contracts] library.
  * If you are a Truffle user, go to xref:truffle.adoc[Using With Truffle] for information on using both tools on the same project.
  * Take a look at the API reference for all xref:commands.adoc[CLI commands].
  * For an overview of the internals of the CLI, you can read on the xref:contracts-architecture.adoc[Contracts Architecture] and different xref:configuration.adoc[Configuration Files].
