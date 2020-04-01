@@ -104,7 +104,7 @@ export const options: Option[] = [
   },
   {
     format: '-k, --kind <kind>',
-    description: `the kind of deployment (${kinds.join(', ')})`,
+    description: `the kind of deployment (${kinds.map(k => k.value).join(', ')})`,
     async details() {
       return {
         prompt: 'Choose the kind of deployment',
