@@ -840,7 +840,7 @@ export default class NetworkController {
 
   // Proxy model
   private async _updateTruffleDeployedInformation(contractAlias: string, implementation: Contract): Promise<void> {
-    const contractName = this.projectFile.normalizeContractAlias(contractAlias);
+    const contractName = this.projectFile.contract(contractAlias);
     if (contractName) {
       const path = Contracts.getLocalPath(contractName);
       const data = fs.readJsonSync(path);
