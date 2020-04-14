@@ -1,4 +1,4 @@
 ---
-name: New issue
-about: Report a bug or request a feature
+name: Bug report or Feature request
+about: Open a new issue
 ---
