@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import "./ImplementationProvider.sol";
 import "../ownership/Ownable.sol";
@@ -49,7 +49,7 @@ contract ImplementationDirectory is ImplementationProvider, OpenZeppelinUpgrades
    * @param contractName Name of the contract.
    * @return Address of the implementation.
    */
-  function getImplementation(string memory contractName) public view returns (address) {
+  function getImplementation(string memory contractName) public override view returns (address) {
     return implementations[contractName];
   }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import "../ownership/Ownable.sol";
 
@@ -31,7 +31,6 @@ contract Package is OpenZeppelinUpgradesOwnable {
   /**
    * @dev Returns a version given its semver identifier.
    * @param semanticVersion Semver identifier of the version.
-   * @return Contract address and content URI for the version, or zero if not exists.
    */
   function getVersion(uint64[3] memory semanticVersion) public view returns (address contractAddress, bytes memory contentURI) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
@@ -42,7 +41,6 @@ contract Package is OpenZeppelinUpgradesOwnable {
    * @dev Returns a contract for a version given its semver identifier.
    * This method is equivalent to `getVersion`, but returns only the contract address.
    * @param semanticVersion Semver identifier of the version.
-   * @return Contract address for the version, or zero if not exists.
    */
   function getContract(uint64[3] memory semanticVersion) public view returns (address contractAddress) {
     Version storage version = versions[semanticVersionHash(semanticVersion)];
@@ -100,7 +98,6 @@ contract Package is OpenZeppelinUpgradesOwnable {
    * @dev Returns the version with the highest semver identifier registered in the package.
    * For instance, if `1.2.0`, `1.3.0`, and `2.0.0` are present, will always return `2.0.0`, regardless 
    * of the order in which they were registered. Returns zero if no versions are registered.
-   * @return Semver identifier, contract address, and content URI for the version, or zero if not exists.
    */
   function getLatest() public view returns (uint64[3] memory semanticVersion, address contractAddress, bytes memory contentURI) {
     return getLatestByMajor(latestMajor);
@@ -112,7 +109,6 @@ contract Package is OpenZeppelinUpgradesOwnable {
    * regardless of the order in which they were registered. Returns zero if no versions are registered
    * for the specified major.
    * @param major Major identifier to query
-   * @return Semver identifier, contract address, and content URI for the version, or zero if not exists.
    */
   function getLatestByMajor(uint64 major) public view returns (uint64[3] memory semanticVersion, address contractAddress, bytes memory contentURI) {
     Version storage version = versions[majorToLatestVersion[major]];

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import "./ImplementationProvider.sol";
 import "./Package.sol";
@@ -46,7 +46,6 @@ contract App is OpenZeppelinUpgradesOwnable {
   /**
    * @dev Returns the provider for a given package name, or zero if not set.
    * @param packageName Name of the package to be retrieved.
-   * @return The provider.
    */
   function getProvider(string memory packageName) public view returns (ImplementationProvider provider) {
     ProviderInfo storage info = providers[packageName];

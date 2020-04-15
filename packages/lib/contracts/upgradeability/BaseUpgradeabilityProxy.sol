@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import './Proxy.sol';
 import '../utils/Address.sol';
@@ -25,9 +25,9 @@ contract BaseUpgradeabilityProxy is Proxy {
 
   /**
    * @dev Returns the current implementation.
-   * @return Address of the current implementation
+   * @return impl Address of the current implementation
    */
-  function _implementation() internal view returns (address impl) {
+  function _implementation() internal override view returns (address impl) {
     bytes32 slot = IMPLEMENTATION_SLOT;
     assembly {
       impl := sload(slot)

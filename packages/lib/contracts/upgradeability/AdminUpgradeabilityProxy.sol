@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import './BaseAdminUpgradeabilityProxy.sol';
 
@@ -20,5 +20,9 @@ contract AdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, Upgradeabilit
   constructor(address _logic, address _admin, bytes memory _data) UpgradeabilityProxy(_logic, _data) public payable {
     assert(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1));
     _setAdmin(_admin);
+  }
+
+  function _willFallback() internal override(BaseAdminUpgradeabilityProxy, Proxy) {
+    super._willFallback();
   }
 }

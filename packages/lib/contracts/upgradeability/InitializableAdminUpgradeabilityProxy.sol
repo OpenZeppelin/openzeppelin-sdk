@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import './BaseAdminUpgradeabilityProxy.sol';
 import './InitializableUpgradeabilityProxy.sol';
@@ -23,5 +23,9 @@ contract InitializableAdminUpgradeabilityProxy is BaseAdminUpgradeabilityProxy, 
     InitializableUpgradeabilityProxy.initialize(_logic, _data);
     assert(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1));
     _setAdmin(_admin);
+  }
+
+  function _willFallback() internal override(BaseAdminUpgradeabilityProxy, Proxy) virtual {
+    super._willFallback();
   }
 }
