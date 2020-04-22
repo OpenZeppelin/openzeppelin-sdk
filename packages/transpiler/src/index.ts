@@ -1,3 +1,6 @@
+import path from 'path';
+import fs from 'fs-extra';
+
 import { flatten } from 'lodash';
 
 import { getContract, isContract, throwIfInvalidNode } from './solc/ast-utils';
@@ -28,7 +31,8 @@ interface FileTransformation {
   source: string;
 }
 
-export function transpileContracts(contracts: string[], artifacts: Artifact[]): OutputFile[] {
+export function transpileContracts(contracts: string[], artifacts: Artifact[], contractsFolder: string): OutputFile[] {
+  contractsFolder = path.normalize(contractsFolder);
   // check that we have valid ast tree
   for (const art of artifacts) {
     throwIfInvalidNode(art.ast);
@@ -58,10 +62,10 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
 
     const contractNode = getContract(art);
 
-    if (!acc[art.fileName]) {
+    if (!acc[art.sourcePath]) {
       const directive = `\nimport "@openzeppelin/upgrades/contracts/Initializable.sol";`;
 
-      acc[art.fileName] = {
+      acc[art.sourcePath] = {
         transformations: [
           appendDirective(art.ast, directive),
           ...fixImportDirectives(art, artifacts, contractsToTranspile),
@@ -71,13 +75,13 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
       };
     }
 
-    acc[art.fileName].transformations = [
-      ...acc[art.fileName].transformations,
+    acc[art.sourcePath].transformations = [
+      ...acc[art.sourcePath].transformations,
       prependBaseClass(contractNode, source, 'Initializable'),
       ...transformParentsNames(contractNode, source, contractsToTranspile),
       ...transformConstructor(contractNode, source, contractsToTranspile, contractsToArtifactsMap),
       ...purgeVarInits(contractNode, source),
-      transformContractName(contractNode, source, `${contractName}Upgradable`),
+      transformContractName(contractNode, source, `${contractName}Upgradeable`),
     ];
 
     return acc;
@@ -89,22 +93,37 @@ export function transpileContracts(contracts: string[], artifacts: Artifact[]): 
 
     const source = art.source;
 
-    const fileTran = fileTrans[art.fileName];
+    const fileTran = fileTrans[art.sourcePath];
     if (!fileTran.source) {
       fileTran.source = transpile(source, fileTran.transformations);
     }
-    const entry = acc.find(o => o.fileName === art.fileName);
+    const entry = acc.find(o => o.fileName === path.basename(art.sourcePath));
     if (!entry) {
-      const path = art.sourcePath.replace('.sol', 'Upgradable.sol');
-      let patchedFilePath = path;
-      if (path.startsWith('contracts')) {
-        patchedFilePath = path.replace('contracts/', '');
+      const upgradeablePath = path.normalize(art.sourcePath).replace('.sol', 'Upgradeable.sol');
+      let patchedFilePath = upgradeablePath;
+      // Truffle stores an absolute file path in a sourcePath of an artifact field
+      // "sourcePath": "/Users/iYalovoy/repo/openzeppelin-sdk/tests/cli/workdir/contracts/Samples.sol"
+      // OpenZeppelin stores relative paths
+      // "sourcePath": "contracts/Foo.sol"
+      // OpenZeppelin sourcePath would start with `contracts` for contracts present in the `contracts` folder of a project
+      // Both Truffle and OpenZeppelin support packages
+      // "sourcePath": "@openzeppelin/upgrades/contracts/Initializable.sol",
+      // Relative paths can only be specified using `.` and `..` for both compilers
+
+      // if path exists then it is a local contract build by Truffle
+      if (fs.existsSync(art.sourcePath)) {
+        patchedFilePath = upgradeablePath.replace(contractsFolder, '');
+      } else {
+        if (upgradeablePath.startsWith('contracts')) {
+          patchedFilePath = upgradeablePath.replace('contracts/', '');
+        }
       }
-      patchedFilePath = `./contracts/__upgradable__/${patchedFilePath}`;
+
+      patchedFilePath = `./contracts/__upgradeable__/${patchedFilePath}`;
       acc.push({
         source: fileTran.source,
         path: patchedFilePath,
-        fileName: art.fileName,
+        fileName: path.basename(art.sourcePath),
         contracts: [contractName],
       });
     } else {

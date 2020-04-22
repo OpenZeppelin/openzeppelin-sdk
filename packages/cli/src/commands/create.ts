@@ -68,7 +68,7 @@ export async function createAction(contractFullName: string, options: any): Prom
 
   await link.runActionIfNeeded(promptedContractFullName, options);
   await add.runActionIfNeeded(promptedContractFullName, options);
-  await push.runActionIfNeeded(promptedContractFullName, network, {
+  await push.runActionIfNeeded([promptedContractFullName], {
     ...options,
     network: promptedNetwork,
   });

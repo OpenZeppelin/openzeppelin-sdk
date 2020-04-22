@@ -27,8 +27,7 @@ sleep 2
 
 $oz --version
 
-$oz push --network test --no-interactive
-$oz create Counter --network test --no-interactive
+$oz deploy Counter --kind upgradeable --network test
 
 RESULT=$(PROVIDER_URL="http://localhost:${ganache_port}" node src/index.js)
 if [ "$RESULT" != "20" ]; then

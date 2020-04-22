@@ -1,5 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
 
 import { App, Package, ImplementationDirectory, Proxy } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
@@ -12,6 +15,8 @@ import NetworkFile from '../../models/files/NetworkFile';
 
 const should = require('chai').should();
 
+const sandbox = sinon.createSandbox();
+
 describe('publish script', function() {
   const [owner] = accounts;
 
@@ -21,6 +26,8 @@ describe('publish script', function() {
   const projectName = 'Herbs';
   const contractName = 'ImplV1';
   const dependencyName = 'mock-stdlib-undeployed';
+
+  stubContractUpgradeable(sandbox);
 
   beforeEach('pushing package', async function() {
     const projectFile = new ProjectFile('mocks/packages/package-with-contracts-and-stdlib.zos.json');

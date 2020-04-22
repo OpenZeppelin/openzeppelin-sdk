@@ -1,7 +1,10 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { random } from 'lodash';
+import sinon from 'sinon';
+
 import { accounts } from '@openzeppelin/test-environment';
 
 import querySignedDeployment from '../../scripts/query-signed-deployment';
@@ -11,6 +14,8 @@ import { helpers } from '@openzeppelin/upgrades';
 import push from '../../scripts/push';
 import queryDeployment from '../../scripts/query-deployment';
 
+const sandbox = sinon.createSandbox();
+
 describe('query-signed-deployment script', function() {
   const [owner, , admin] = accounts;
 
@@ -18,6 +23,8 @@ describe('query-signed-deployment script', function() {
   const version = '0.4.0';
   const txParams = { from: owner };
   const contractName = 'ImplV1';
+
+  stubContractUpgradeable(sandbox);
 
   const shouldHandleQuerySignedDeploymentScript = function() {
     beforeEach('setup', async function() {

@@ -41,7 +41,7 @@ export default class ValidationLogger {
       uninitializedBaseContracts,
       storageDiff,
       storageUncheckedVars,
-      importsVanillaContracts,
+      importsEthereumPackageContracts,
     } = validations;
 
     this.logHasConstructor(hasConstructor);
@@ -51,18 +51,18 @@ export default class ValidationLogger {
     this.logUncheckedVars(storageUncheckedVars);
     this.logUninitializedBaseContracts(uninitializedBaseContracts);
     this.logStorageLayoutDiffs(storageDiff, getStorageLayout(this.contract, buildArtifacts));
-    this.logImportsVanillaContracts(importsVanillaContracts);
+    this.logImportsEthereumPackageContracts(importsEthereumPackageContracts);
   }
 
-  public logImportsVanillaContracts(vanillaContracts: string[] | null): void {
-    if (!isEmpty(vanillaContracts)) {
+  public logImportsEthereumPackageContracts(EthereumPackageContracts: string[] | null): void {
+    if (!isEmpty(EthereumPackageContracts)) {
       Loggy.noSpin.warn(
         __filename,
-        'logImportsVanillaContracts',
-        `validation-imports-vanilla-contracts`,
-        `- Contract ${this.contractName} imports ${vanillaContracts.join(
+        'logImportsEthereumPackageContracts',
+        `validation-imports-ethereum-contracts`,
+        `- Contract ${this.contractName} imports ${EthereumPackageContracts.join(
           ', ',
-        )} from @openzeppelin/contracts. Use @openzeppelin/contracts-ethereum-package instead. See ${VANILLA_CONTRACTS_LINK}.`,
+        )} from @openzeppelin/contracts-ethereum-package. Use @openzeppelin/contracts instead. See ${VANILLA_CONTRACTS_LINK}.`,
       );
     }
   }

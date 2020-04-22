@@ -15,14 +15,10 @@ async function main() {
   await testSimple(net, "minimal");
 
   await testArguments(net, "regular", "ValueWithConstructor");
-  await testArguments(net, "upgradeable", "ValueWithInitializer");
-
-  await assert.rejects(
-    testArguments(net, "upgradeable", "ValueWithConstructor")
-  );
+  await testArguments(net, "upgradeable", "ValueWithConstructor");
 }
 
-// Tests a simple contract with no constructor or initializer.
+// Tests a simple contract with no constructor.
 async function testSimple(net, kind) {
   const deploy = await exec(`oz deploy -n "${net}" -k "${kind}" Answer`);
   const instance = deploy.stdout.trim();
@@ -30,9 +26,10 @@ async function testSimple(net, kind) {
     `oz call -n "${net}" --to "${instance}" --method answer`
   );
   assert.strictEqual(call.stdout, "42\n");
+  console.log(`${kind} with constructor: ok`);
 }
 
-// Tests a contract with constructor/initializer arguments.
+// Tests a contract with constructor and arguments.
 async function testArguments(net, kind, contract) {
   const deploy = await exec(
     `oz deploy -n "${net}" -k "${kind}" "${contract}" 5 10`
@@ -42,6 +39,7 @@ async function testArguments(net, kind, contract) {
     `oz call -n "${net}" --to "${instance}" --method value`
   );
   assert.strictEqual(call.stdout, "50\n");
+  console.log(`${kind} with constructor and arguments: ok`);
 }
 
 async function network() {

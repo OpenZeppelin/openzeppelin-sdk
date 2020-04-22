@@ -9,6 +9,7 @@ import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
 import { action as deploy } from '../../commands/deploy/action';
+import { Options, Args } from '../../commands/deploy/spec';
 
 const SimpleNonUpgradeable = Contracts.getFromLocal('SimpleNonUpgradeable');
 const WithConstructorNonUpgradeable = Contracts.getFromLocal('WithConstructorNonUpgradeable');
@@ -35,6 +36,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular',
     });
     const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(1);
@@ -53,6 +55,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular',
     });
     const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(1);
@@ -70,6 +73,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular',
     }).should.be.rejectedWith('Contract NotExists not found');
   });
 
@@ -81,6 +85,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular' as Options['kind'],
     };
 
     await deploy(params);
@@ -99,6 +104,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular',
     }).should.be.rejectedWith('Expected 3 values but got 0');
     const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(0);
@@ -112,6 +118,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular',
     });
     const instances = networkFile.getProxies({ contractName: contract });
     instances.should.have.lengthOf(1);
@@ -124,6 +131,7 @@ describe('deploy (action)', function() {
       network,
       txParams,
       networkFile,
+      kind: 'regular',
     });
     const instances = networkFile.getProxies({ contractName: 'GreeterBase' });
     instances.should.have.lengthOf(1);
@@ -131,7 +139,7 @@ describe('deploy (action)', function() {
 
   it('does not redeploy unchanged library', async function() {
     const contract = 'WithLibraryNonUpgradeable';
-    const options = { contract, network, txParams, networkFile, arguments: [] };
+    const options = { contract, network, txParams, networkFile, arguments: [], kind: 'regular' as Options['kind'] };
 
     const spy = sinon.spy(Transactions, 'deployContract');
 

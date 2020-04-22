@@ -1,21 +1,21 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "mock-stdlib/contracts/Parent.sol";
 
 contract Foo is Parent {
-  function say() pure returns(string) {
-    return "Foo";
-  }
+    function say() public pure returns(string memory) {
+        return "Foo";
+    }
 }
 
 contract Bar {
-  function say() pure returns(string) {
-    return "Bar";
-  }
+    function say() public pure returns(string memory) {
+        return "Bar";
+    }
 }
 
 contract Baz {
-  function say() pure returns(string) {
-    return "Baz";
-  }
+    function say() public pure returns(string memory) {
+        return "Baz";
+    }
 }

@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ElementaryTypesWithConstructor contract is converted to a valid ElementaryTypesWithConstructorUpgradable contract 1`] = `
+exports[`ElementaryTypesWithConstructor contract is converted to a valid ElementaryTypesWithConstructorUpgradeable contract 1`] = `
 "pragma solidity ^0.5.0;
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
-contract ElementaryTypesWithConstructorUpgradable is Initializable  {
+contract ElementaryTypesWithConstructorUpgradeable is Initializable  {
     function initialize() external initializer {
         __init(true);
     }

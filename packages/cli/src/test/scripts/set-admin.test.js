@@ -1,5 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
 
 import { Proxy, ProxyAdmin } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
@@ -10,11 +13,15 @@ import setAdmin from '../../scripts/set-admin';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+const sandbox = sinon.createSandbox();
+
 describe('set-admin script', function() {
   const [owner, newAdmin, anotherNewAdmin] = accounts;
 
   const network = 'test';
   const txParams = { from: owner };
+
+  stubContractUpgradeable(sandbox);
 
   const assertAdmin = async function(address, expectedAdmin, networkFile) {
     const actualAdmin = await Proxy.at(address).admin();

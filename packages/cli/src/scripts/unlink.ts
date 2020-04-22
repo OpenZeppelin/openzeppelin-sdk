@@ -1,4 +1,3 @@
-import stdout from '../utils/stdout';
 import LocalController from '../models/local/LocalController';
 import { UnlinkParams } from './interfaces';
 

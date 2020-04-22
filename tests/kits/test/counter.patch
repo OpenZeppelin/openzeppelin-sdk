@@ -1,0 +1,11 @@
+3,4d2
+< // import "openzeppelin-eth/contracts/ownership/Ownable.sol";
+< import "@openzeppelin/upgrades/contracts/Initializable.sol";
+6c4
+< contract Counter is Initializable {
+---
+> contract Counter {
+11c9
+<   function initialize(uint num) public initializer {
+---
+>   constructor(uint num) public {

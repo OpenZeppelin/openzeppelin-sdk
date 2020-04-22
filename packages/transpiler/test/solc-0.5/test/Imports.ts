@@ -1,4 +1,4 @@
-import { shouldTranspileToValidContract } from './LocalConract.behaviour';
+import { shouldTranspileToValidContract } from './LocalContract.behaviour';
 
 // todo: once all imports are supported enable this test
 describe(`Import contract`, (): void => {

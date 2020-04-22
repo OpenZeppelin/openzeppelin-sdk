@@ -1,5 +1,6 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import sinon from 'sinon';
 import axios from 'axios';
@@ -11,10 +12,14 @@ import push from '../../scripts/push';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+const sandbox = sinon.createSandbox();
+
 describe('verify script', function() {
   const contract = 'ImplV1';
   const network = 'test';
   const txParams = {};
+
+  stubContractUpgradeable(sandbox);
 
   const assertVerify = async function(options, message) {
     try {
@@ -76,7 +81,7 @@ describe('verify script', function() {
 
       await push({ network, networkFile: this.networkFile, txParams });
       this.logs = new CaptureLogs();
-      this.axiosStub = sinon.stub(axios, 'request');
+      this.axiosStub = sandbox.stub(axios, 'request');
     });
 
     afterEach(function() {

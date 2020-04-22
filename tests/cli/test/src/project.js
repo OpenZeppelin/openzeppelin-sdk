@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const { toChecksumAddress } = require("web3-utils");
 const {
   truffleExec,
   setMockStdlibVersion,
@@ -29,7 +30,7 @@ function registerProjectHooks(network) {
       const accounts = truffleExec(`getaccounts.js --network ${network}`).split(
         ","
       );
-      this.from = _.trim(accounts[0]);
+      this.from = _.trim(toChecksumAddress(accounts[0]));
     }
   });
 

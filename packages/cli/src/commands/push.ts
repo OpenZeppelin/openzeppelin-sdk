@@ -1,6 +1,8 @@
 import { omit, isString } from 'lodash';
 import { ZWeb3 } from '@openzeppelin/upgrades';
 
+import ProjectFile from '../models/files/ProjectFile';
+
 import add from './add';
 import push from '../scripts/push';
 import { PushParams } from '../scripts/interfaces';
@@ -38,7 +40,8 @@ const register: (program: any) => any = program =>
 
 async function commandActions(options: any): Promise<void> {
   await add.runActionIfNeeded(null, options);
-  await action(options);
+  const projectFile = new ProjectFile();
+  await action({ ...options, contracts: projectFile.contracts });
 }
 
 async function action(options: any): Promise<void> {
@@ -52,6 +55,7 @@ async function action(options: any): Promise<void> {
     deployProxyFactory,
     interactive,
   } = options;
+
   const { network: networkInSession, expired } = Session.getNetwork();
   const opts = {
     network: networkInOpts || (!expired ? networkInSession : undefined),
@@ -76,9 +80,8 @@ async function action(options: any): Promise<void> {
     network,
     txParams,
     ...promptDeployDependencies,
+    contracts,
   };
-
-  if (contracts) pushArguments.contracts = contracts;
 
   if (!options.skipTelemetry)
     await Telemetry.report('push', (pushArguments as unknown) as Record<string, unknown>, interactive);
@@ -88,15 +91,22 @@ async function action(options: any): Promise<void> {
 
 async function runActionIfRequested(externalOptions: any): Promise<void> {
   if (!externalOptions.push) return;
+  // if not contracts has been passed use all contracts explicitly from ProjectFile
+  if (!externalOptions.contracts?.length) {
+    const projectFile = new ProjectFile();
+    if (!!projectFile.contracts?.length) {
+      externalOptions.contracts = projectFile.contracts;
+    }
+  }
   const options = omit(externalOptions, 'push');
   const network = isString(externalOptions.push) ? externalOptions.push : undefined;
   if (network) options.network = network;
   return action(options);
 }
 
-async function runActionIfNeeded(contract: string, network: string, options: any): Promise<void> {
+async function runActionIfNeeded(contracts: string[], options: any): Promise<void> {
   if (!options.interactive) return;
-  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contracts: contract ? [contract] : [] });
+  await action({ ...options, dontExitProcess: true, skipTelemetry: true, contracts });
 }
 
 async function promptForDeployDependencies(

@@ -1,8 +1,11 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { Proxy, Contracts, toSemanticVersion } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
+
+import sinon from 'sinon';
 
 import push from '../../scripts/push';
 import create from '../../scripts/create';
@@ -16,12 +19,16 @@ const Package = Contracts.getFromLib('Package');
 const DeprecatedApp = Contracts.getFromLib('DeprecatedApp');
 const ImplementationDirectory = Contracts.getFromLib('ImplementationDirectory');
 
+const sandbox = sinon.createSandbox();
+
 describe('migrate-manifest-version script', function() {
   const [owner, newAdmin, anotherAdmin] = accounts;
 
   const EMPTY_INITIALIZATION_DATA = Buffer.from('');
   const network = 'test';
   const txParams = { from: owner };
+
+  stubContractUpgradeable(sandbox);
 
   before(async function() {
     this.contentURI = '0x20';

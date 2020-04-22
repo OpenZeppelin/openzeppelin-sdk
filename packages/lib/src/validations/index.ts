@@ -5,7 +5,7 @@ import { hasSelfDestruct, hasDelegateCall } from './Instructions';
 import { getStorageLayout, getStructsOrEnums } from './Storage';
 import { compareStorageLayouts, Operation } from './Layout';
 import { hasInitialValuesInDeclarations } from './InitialValues';
-import { importsVanillaContracts } from './VanillaContracts';
+import { importsEthereumPackageContracts } from './VanillaContracts';
 import Contract from '../artifacts/Contract.js';
 import ContractAST, { StorageInfo, ContractDefinitionFilter } from '../utils/ContractAST';
 import { BuildArtifacts } from '..';
@@ -19,14 +19,14 @@ export interface ValidationInfo {
   uninitializedBaseContracts: any[];
   storageUncheckedVars?: StorageInfo[];
   storageDiff?: Operation[];
-  importsVanillaContracts?: string[];
+  importsEthereumPackageContracts?: string[];
 }
 
 export function validate(
   contract: Contract,
   existingContractInfo: any = {},
   buildArtifacts: BuildArtifacts = getBuildArtifacts(),
-): any {
+): ValidationInfo {
   checkArtifactsForImportedSources(contract, buildArtifacts);
   const storageValidation = validateStorage(contract, existingContractInfo, buildArtifacts);
   const uninitializedBaseContracts = [];
@@ -36,7 +36,7 @@ export function validate(
     hasSelfDestruct: hasSelfDestruct(contract),
     hasDelegateCall: hasDelegateCall(contract),
     hasInitialValuesInDeclarations: hasInitialValuesInDeclarations(contract),
-    importsVanillaContracts: importsVanillaContracts(contract, buildArtifacts),
+    importsEthereumPackageContracts: importsEthereumPackageContracts(contract, buildArtifacts),
     uninitializedBaseContracts,
     ...storageValidation,
   };
@@ -55,9 +55,9 @@ export function newValidationErrors(validations: any, existingValidations: any =
     ),
     storageUncheckedVars: difference(validations.storageUncheckedVars, existingValidations.storageUncheckedVars),
     storageDiff: validations.storageDiff,
-    importsVanillaContracts: difference(
-      validations.importsVanillaContracts,
-      existingValidations.importsVanillaContracts,
+    importsEthereumPackageContracts: difference(
+      validations.importsEthereumPackageContracts,
+      existingValidations.importsEthereumPackageContracts,
     ),
   };
 }
@@ -70,7 +70,7 @@ export function validationPasses(validations: any): boolean {
     !validations.hasDelegateCall &&
     !validations.hasInitialValuesInDeclarations &&
     isEmpty(validations.uninitializedBaseContracts) &&
-    isEmpty(validations.importsVanillaContracts)
+    isEmpty(validations.importsEthereumPackageContracts)
   );
 }
 

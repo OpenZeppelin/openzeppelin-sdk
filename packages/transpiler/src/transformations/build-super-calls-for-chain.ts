@@ -7,9 +7,9 @@ import { ContractDefinition, ModifierInvocation, Literal } from '../solc/ast-nod
 import { Artifact } from '../solc/artifact';
 
 // builds an __init call with given arguments, for example
-// ERC20DetailedUpgradable.__init(false, "Gold", "GLD", 18)
+// ERC20DetailedUpgradeable.__init(false, "Gold", "GLD", 18)
 function buildSuperCall(args: Literal[], name: string, source: string): string {
-  let superCall = `\n            ${name}Upgradable.__init(false`;
+  let superCall = `\n            ${name}Upgradeable.__init(false`;
   if (args && args.length) {
     superCall += args.reduce((acc, arg) => {
       const [, , argSource] = getNodeSources(arg, source);
@@ -20,7 +20,7 @@ function buildSuperCall(args: Literal[], name: string, source: string): string {
 }
 
 // builds all the __init calls for the parent of a given contract, for example
-// [ '\n            ContextUpgradable.__init(false);' ]
+// [ '\n            ContextUpgradeable.__init(false);' ]
 function buildSuperCalls(
   node: ContractDefinition,
   source: string,
@@ -45,8 +45,8 @@ function buildSuperCalls(
 }
 
 // builds all the __init calls a given contract, for example
-// ContextUpgradable.__init(false);
-// ERC20DetailedUpgradable.__init(false, 'Gold', 'GLD', 18);
+// ContextUpgradeable.__init(false);
+// ERC20DetailedUpgradeable.__init(false, 'Gold', 'GLD', 18);
 export function buildSuperCallsForChain(
   contractNode: ContractDefinition,
   source: string,

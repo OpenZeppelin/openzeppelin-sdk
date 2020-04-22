@@ -1,7 +1,9 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { random } from 'lodash';
+import sinon from 'sinon';
 import { accounts } from '@openzeppelin/test-environment';
 
 import CaptureLogs from '../helpers/captureLogs';
@@ -21,6 +23,8 @@ const should = require('chai').should();
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 const BooleanContract = Contracts.getFromLocal('Boolean');
 
+const sandbox = sinon.createSandbox();
+
 describe('create script', function() {
   const [owner, otherAdmin] = accounts;
 
@@ -33,6 +37,12 @@ describe('create script', function() {
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };
+
+  stubContractUpgradeable(sandbox);
+
+  afterEach(function() {
+    sandbox.restore();
+  });
 
   const assertProxy = async function(
     networkFile,

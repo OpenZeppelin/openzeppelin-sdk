@@ -1,5 +1,6 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
 
 import { expect } from 'chai';
 
@@ -24,12 +25,16 @@ const ImplV1 = Contracts.getFromLocal('ImplV1');
 const WithLibraryImplV1 = Contracts.getFromLocal('WithLibraryImplV1');
 const ImplementationDirectory = Contracts.getFromNodeModules('@openzeppelin/upgrades', 'ImplementationDirectory');
 
+const sandbox = sinon.createSandbox();
+
 describe('push script', function() {
   const [owner] = accounts;
 
   const network = 'test';
   const txParams = { from: owner };
   const defaultVersion = '1.1.0';
+
+  stubContractUpgradeable(sandbox);
 
   const shouldDeployPackage = function() {
     it('should create a network file with version info', async function() {
@@ -171,7 +176,7 @@ describe('push script', function() {
       });
 
       it('should refuse to redeploy a contract if validation throws', async function() {
-        sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+        sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           networkFile: this.networkFile,
           network,
@@ -181,7 +186,7 @@ describe('push script', function() {
       });
 
       it('should redeploy contract skipping errors', async function() {
-        sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+        sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
         await push({
           force: true,
           networkFile: this.networkFile,
@@ -192,7 +197,7 @@ describe('push script', function() {
       });
 
       afterEach(function() {
-        sinon.restore();
+        sandbox.restore();
       });
     });
   };
@@ -314,7 +319,7 @@ describe('push script', function() {
         });
 
         it('should refuse to deploy a contract if validation throws', async function() {
-          sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+          sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
           await push({
             contracts: ['ImplV1'],
             networkFile: this.networkFile,
@@ -325,7 +330,7 @@ describe('push script', function() {
         });
 
         it('should deploy contract skipping errors', async function() {
-          sinon.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
+          sandbox.stub(upgrades, 'validate').throws(new Error('Stubbed error during contract validation'));
           await push({
             contracts: ['ImplV1'],
             force: true,
@@ -337,7 +342,7 @@ describe('push script', function() {
         });
 
         afterEach(function() {
-          sinon.restore();
+          sandbox.restore();
         });
       });
     });
@@ -531,7 +536,7 @@ describe('push script', function() {
       beforeEach('deploying new dependency version', async function() {
         const mockStdlibPackage = new ProjectFile('mocks/mock-stdlib/zos.json');
         mockStdlibPackage.version = newVersion;
-        sinon.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
+        sandbox.stub(Dependency.prototype, 'projectFile').get(function getterFn() {
           return mockStdlibPackage;
         });
 
@@ -591,7 +596,7 @@ describe('push script', function() {
       const dependency = Dependency.fromNameWithVersion('mock-stdlib@1.1.0');
       this.dependencyProject = await dependency.deploy();
       this.dependencyPackage = await this.dependencyProject.getProjectPackage();
-      this.dependencyGetNetworkFileStub = sinon.stub(Dependency.prototype, 'getNetworkFile');
+      this.dependencyGetNetworkFileStub = sandbox.stub(Dependency.prototype, 'getNetworkFile');
       this.dependencyGetNetworkFileStub.callsFake(() => ({
         packageAddress: this.dependencyPackage.address,
         version: '1.1.0',
@@ -599,7 +604,7 @@ describe('push script', function() {
     });
 
     afterEach('unstub dependency network file stub', function() {
-      sinon.restore();
+      sandbox.restore();
     });
   };
 

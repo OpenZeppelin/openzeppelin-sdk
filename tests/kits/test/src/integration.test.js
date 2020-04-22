@@ -1,7 +1,6 @@
 'use strict';
 
 require('chai').should();
-const _ = require('lodash');
 
 const { getNetwork, run } = require('../../../util/share')(__dirname);
 
@@ -48,24 +47,36 @@ describe(`Unpack a Starter Kit on the ${network}`, function() {
 
 describe(`Unpack a Tutorial Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'tutorial' }, function() {
+    it('Patch counter contract', function() {
+      run(`patch ./contracts/Counter.sol ../test/counter.patch`);
+    });
+
     it('Add Counter contract', function() {
       run(`npx oz add Counter`);
     });
 
     it(`Create a Counter proxy on the ${network}`, function() {
-      run(`npx oz create Counter --init initialize --args 2 --network ${network}`);
+      run(`npx oz deploy Counter 42 --network ${network} --kind upgradeable`);
     });
   });
 });
 
 describe(`Unpack a GSN Kit on the ${network}`, function() {
   runIntegrationTest({ kit: 'gsn' }, function() {
+    it('Patch counter contract', function() {
+      run(`patch ./contracts/Counter.sol ../test/gsn.patch`);
+    });
+
+    it('Install @openzeppelin/contracs dependency', function() {
+      run(`npm i @openzeppelin/contracts@latest`);
+    });
+
     it('Add Counter contract', function() {
       run(`npx oz add Counter`);
     });
 
     it(`Create a Counter proxy on the ${network}`, function() {
-      run(`npx oz create Counter --init initialize --args 2 --network ${network}`);
+      run(`npx oz deploy Counter 42 --network ${network} --kind upgradeable`);
     });
   });
 });

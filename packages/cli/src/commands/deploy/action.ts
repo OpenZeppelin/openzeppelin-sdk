@@ -4,33 +4,38 @@ import Session from '../../models/network/Session';
 import { compile } from '../../models/compiler/Compiler';
 import { fromContractFullName } from '../../utils/naming';
 import NetworkController from '../../models/network/NetworkController';
+import { ProxyType } from '../../scripts/interfaces';
+import ContractManager from '../../models/local/ContractManager';
 import stdout from '../../utils/stdout';
 import { parseMultipleArgs } from '../../utils/input';
-import { createAction } from '../create';
 import { Loggy } from '@openzeppelin/upgrades';
+
+import link from '../link';
+import add from '../add';
+import push from '../push';
 
 import { Options, Args } from './spec';
 
-export async function preAction(params: Options & Args): Promise<void | (() => Promise<void>)> {
+function isProxyKind(kind: Options['kind']): boolean {
+  switch (kind) {
+    case 'regular':
+      return false;
+
+    case 'upgradeable':
+    case 'minimal':
+      return true;
+    default:
+      throw new Error(`Unknown proxy kind: ${kind}`);
+  }
+}
+
+export async function preAction(params: Options): Promise<void> {
   if (!params.skipCompile) {
     await compile();
-  }
-
-  // If the user requests upgradeability via flag, we short circuit to the
-  // create action. This avoid issues parsing deploy arguments due to the
-  // deploy action being unaware of initializer functions.
-  if (params.kind && params.kind !== 'regular') {
-    return () => runCreate(params);
   }
 }
 
 export async function action(params: Options & Args): Promise<void> {
-  if (params.kind && params.kind !== 'regular') {
-    return runCreate(params);
-  }
-
-  const { contract: fullContractName, arguments: deployArgs } = params;
-
   if (params.network === undefined) {
     const { network: lastNetwork, expired } = Session.getNetwork();
     if (!expired) {
@@ -38,48 +43,82 @@ export async function action(params: Options & Args): Promise<void> {
     }
   }
 
-  const { network, txParams } = params;
+  const address = isProxyKind(params.kind) ? await deployProxy(params) : await deployRegular(params);
 
-  // Used for network preselection in subsequent runs.
-  Session.setDefaultNetworkIfNeeded(network);
+  stdout(address);
+}
+
+export async function deployRegular(params: Options & Args): Promise<string> {
+  const { contract: fullContractName, arguments: deployArgs } = params;
+  const { network, txParams } = params;
 
   const { package: packageName, contractName } = fromContractFullName(fullContractName);
 
   const controller = new NetworkController(network, txParams, params.networkFile);
 
-  const contract = controller.contractManager.getContractClass(packageName, contractName);
-  const constructorInputs = getConstructorInputs(contract);
-
-  const args = parseMultipleArgs(deployArgs, constructorInputs);
+  const args = getConstructorArgs(packageName, contractName, deployArgs, controller.contractManager);
 
   try {
     const instance = await controller.createInstance(packageName, contractName, args);
-
-    if (params.kind === 'upgradeable') {
-      Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
-    }
-
-    stdout(instance.address);
+    return instance.address;
   } finally {
     controller.writeNetworkPackageIfNeeded();
   }
 }
 
-async function runCreate(params: Options & Args): Promise<void> {
-  // The syntax params['key'] is used to circumvent the type checker.
-  // This hack is temporary and should be removed once we remove the create command.
+async function deployProxy(params: Options & Args): Promise<string> {
+  const { contract: fullContractName, arguments: deployArgs, kind } = params;
+  const { network, txParams } = params;
 
-  if (params.arguments.length > 0) {
-    // Translate arguments to syntax expected by create.
-    params['args'] = params.arguments.join(',');
+  const { package: packageName, contractName } = fromContractFullName(fullContractName);
+
+  await link.runActionIfNeeded(fullContractName, params);
+  await add.runActionIfNeeded(fullContractName, params);
+  await push.runActionIfNeeded([fullContractName], { ...params, network: params.userNetwork });
+
+  const controller = new NetworkController(network, txParams, params.networkFile);
+
+  const args = getConstructorArgs(packageName, contractName, deployArgs, controller.contractManager);
+
+  try {
+    await controller.logErrorIfContractPackageIsInvalid(packageName, contractName, false);
+    const instance = await controller.createProxy(
+      packageName,
+      contractName,
+      'initialize',
+      args,
+      literalToProxyType(kind),
+    );
+
+    if (params.kind === 'upgradeable') {
+      Loggy.noSpin(__filename, 'deploy', 'deploy-hint', `To upgrade this instance run 'oz upgrade'`);
+    }
+
+    return instance.address;
+  } finally {
+    controller.writeNetworkPackageIfNeeded();
   }
+}
 
-  if (params.kind === 'minimal') {
-    params['minimal'] = true;
+function getConstructorArgs(
+  packageName: string,
+  contractName: string,
+  deployArgs: string[],
+  contractManager: ContractManager,
+): unknown[] {
+  const contract = contractManager.getContractClass(packageName, contractName);
+  const constructorInputs = getConstructorInputs(contract);
+
+  return parseMultipleArgs(deployArgs, constructorInputs);
+}
+
+function literalToProxyType(kind: Options['kind']): ProxyType {
+  switch (kind) {
+    case 'upgradeable':
+      return ProxyType.Upgradeable;
+    case 'minimal':
+      return ProxyType.Minimal;
+    case 'regular':
+      return ProxyType.NonProxy;
   }
-
-  params.skipCompile = true;
-  params['noDeprecationWarning'] = true;
-
-  await createAction(params.contract, params);
 }

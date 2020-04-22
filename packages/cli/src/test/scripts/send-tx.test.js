@@ -1,5 +1,9 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
+
 import { accounts } from '@openzeppelin/test-environment';
 
 import add from '../../scripts/add';
@@ -10,11 +14,15 @@ import CaptureLogs from '../helpers/captureLogs';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+const sandbox = sinon.createSandbox();
+
 describe('send-tx script', function() {
   const [account] = accounts;
 
   const txParams = { from: account };
   const network = 'test';
+
+  stubContractUpgradeable(sandbox);
 
   beforeEach('setup', async function() {
     this.logs = new CaptureLogs();

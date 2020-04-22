@@ -1,10 +1,9 @@
 {
   "manifestVersion": "2.2",
-  "contracts": {
-    "Answer": "Answer",
-    "ValueWithInitializer": "ValueWithInitializer",
-    "ValueWithConstructor": "ValueWithConstructor"
-  },
+  "contracts": [
+    "Answer",
+    "ValueWithConstructor"
+  ],
   "dependencies": {},
   "name": "regular-deploys",
   "version": "0.1.0",

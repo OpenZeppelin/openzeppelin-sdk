@@ -26,7 +26,7 @@ async function action(dependencies: string[], options: any): Promise<void> {
 
   await Telemetry.report('unlink', prompted, interactive);
   await unlink(prompted);
-  await push.runActionIfRequested(options);
+  await push.runActionIfRequested({ ...options });
 }
 
 function getCommandProps(depNames: string[]): InquirerQuestions {

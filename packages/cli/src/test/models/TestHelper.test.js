@@ -1,6 +1,8 @@
 'use strict';
 
-require('../setup');
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
 
 import { Contracts } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
@@ -11,11 +13,15 @@ import NetworkFile from '../../models/files/NetworkFile';
 
 const ImplV1 = Contracts.getFromLocal('ImplV1');
 
+const sandbox = sinon.createSandbox();
+
 describe('TestHelper', function() {
   const [owner] = accounts;
   const txParams = { from: owner };
   const projectName = 'Herbs';
   const initialVersion = '1.1.0';
+
+  stubContractUpgradeable(sandbox);
 
   describe('for app project', function() {
     beforeEach(async function() {

@@ -52,7 +52,7 @@ export function transformConstructor(
 
   const initializeFuncText = isFullyImplemented
     ? `
-    function initialize(${constructorParameterList}) external initializer {
+    function initialize(${constructorParameterList.replace('string memory', 'string calldata')}) external initializer {
         __init(true${constructorArgsList});
     }`
     : '';

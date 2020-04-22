@@ -89,7 +89,7 @@ export default class Dependency {
     // to Projects, which handle library deployment and linking for a set of contracts altogether.
 
     const contracts = this.projectFile.contracts.map((contractName): [Contract, string] => [
-      Contracts.getFromNodeModules(this.name, contractName),
+      Contracts.getFromNodeModules(this.name, contractName).upgradeable,
       contractName,
     ]);
 

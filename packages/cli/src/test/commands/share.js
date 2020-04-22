@@ -24,6 +24,8 @@ import * as sendTx from '../../scripts/send-tx';
 import * as call from '../../scripts/call';
 import * as accounts from '../../scripts/accounts';
 
+import * as transpiler from '../../transpiler';
+
 import program from '../../bin/program';
 import Session from '../../models/network/Session';
 import NetworkFile from '../../models/files/NetworkFile';
@@ -48,7 +50,7 @@ program.Command.prototype.parseReset = function() {
   });
 };
 
-exports.stubCommands = function() {
+export function stubCommands() {
   beforeEach('set up stubs', function() {
     this.addAll = sinon.stub(addAll, 'default');
     this.add = sinon.stub(add, 'default');
@@ -75,6 +77,7 @@ exports.stubCommands = function() {
     this.accounts = sinon.stub(accounts, 'default');
 
     this.compiler = sinon.stub(Compiler, 'compile');
+    this.transpiler = sinon.stub(transpiler, 'transpileAndSave');
     this.initializer = sinon.stub(ConfigManager, 'initNetworkConfiguration').callsFake(function(options) {
       ConfigManager.initStaticConfiguration();
       const { network, from } = Session.getOptions(options);
@@ -94,9 +97,9 @@ exports.stubCommands = function() {
     sinon.restore();
     program.parseReset();
   });
-};
+}
 
-exports.itShouldParse = function(name, cmd, args, cb) {
+export function itShouldParse(name, cmd, args, cb) {
   it(name, function(done) {
     this[cmd].onFirstCall().callsFake(() => {
       let err;
@@ -111,4 +114,4 @@ exports.itShouldParse = function(name, cmd, args, cb) {
     args.unshift('node');
     program.parse(args);
   });
-};
+}

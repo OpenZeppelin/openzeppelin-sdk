@@ -3,7 +3,7 @@ import glob from 'glob';
 import path from 'path';
 import Contract, { createContract } from './Contract';
 import ZWeb3 from './ZWeb3';
-import { getSolidityLibNames, hasUnlinkedVariables } from '../utils/Bytecode';
+import { hasUnlinkedVariables } from '../utils/Bytecode';
 
 import { ContractNotFound } from '../errors';
 
@@ -21,6 +21,7 @@ export default class Contracts {
     return path.resolve(Contracts.buildDir || Contracts.DEFAULT_BUILD_DIR);
   }
 
+  // todo: respect contracts_directory from https://www.trufflesuite.com/docs/truffle/reference/configuration
   public static getLocalContractsDir(): string {
     return path.resolve(Contracts.contractsDir || Contracts.DEFAULT_CONTRACTS_DIR);
   }
@@ -57,15 +58,15 @@ export default class Contracts {
   }
 
   public static getFromLocal(contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getLocalPath(contractName), contractName);
+    return Contracts.getFromPathWithUpgradeable(Contracts.getLocalPath(contractName), contractName);
   }
 
   public static getFromLib(contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getLibPath(contractName), contractName);
+    return Contracts.getFromPath(Contracts.getLibPath(contractName), contractName);
   }
 
   public static getFromNodeModules(dependency: string, contractName: string): Contract {
-    return Contracts._getFromPath(Contracts.getNodeModulesPath(dependency, contractName), contractName);
+    return Contracts.getFromPathWithUpgradeable(Contracts.getNodeModulesPath(dependency, contractName), contractName);
   }
 
   public static async getDefaultFromAddress(): Promise<string> {
@@ -99,7 +100,7 @@ export default class Contracts {
     };
   }
 
-  private static _getFromPath(targetPath: string, contractName: string): Contract {
+  private static getFromPath(targetPath: string, contractName: string): Contract {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     if (!fs.existsSync(targetPath)) {
       throw new ContractNotFound(contractName);
@@ -112,5 +113,15 @@ export default class Contracts {
       schema.linkedDeployedBytecode = schema.deployedBytecode;
     }
     return createContract(schema);
+  }
+
+  private static getFromPathWithUpgradeable(targetPath: string, contractName: string): Contract {
+    const contract = this.getFromPath(targetPath, contractName);
+    const upgradeableName = `${contractName}Upgradeable`;
+    const upgradeablePath = path.join(Contracts.getLocalBuildDir(), `${upgradeableName}.json`);
+    if (fs.existsSync(upgradeablePath)) {
+      contract.upgradeable = this.getFromPath(upgradeablePath, upgradeableName);
+    }
+    return contract;
   }
 }

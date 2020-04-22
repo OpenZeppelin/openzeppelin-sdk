@@ -1,5 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
 
 import { random } from 'lodash';
 import { accounts } from '@openzeppelin/test-environment';
@@ -10,12 +13,16 @@ import NetworkFile from '../../models/files/NetworkFile';
 
 const should = require('chai').should();
 
+const sandbox = sinon.createSandbox();
+
 describe('query-deployment script', function() {
   const [owner, another] = accounts;
 
   const network = 'test';
   const version = '0.4.0';
   const txParams = { from: owner };
+
+  stubContractUpgradeable(sandbox);
 
   const shouldHandleQueryDeploymentScript = function() {
     beforeEach('setup', async function() {

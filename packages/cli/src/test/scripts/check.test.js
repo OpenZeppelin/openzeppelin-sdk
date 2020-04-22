@@ -1,5 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
 
 import CaptureLogs from '../helpers/captureLogs';
 import check from '../../scripts/check';
@@ -7,10 +10,14 @@ import ProjectFile from '../../models/files/ProjectFile';
 
 const expect = require('chai').expect;
 
+const sandbox = sinon.createSandbox();
+
 describe('check script', function() {
   beforeEach('setup', async function() {
     this.projectFile = new ProjectFile('mocks/packages/package-empty.zos.json');
   });
+
+  stubContractUpgradeable(sandbox);
 
   beforeEach('capturing log output', function() {
     this.logs = new CaptureLogs();

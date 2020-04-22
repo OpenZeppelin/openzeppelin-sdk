@@ -14,14 +14,19 @@ export function fixImportDirectives(
       const isTranspiled = artifacts.some(art => art.ast.id === imp.sourceUnit && contracts.includes(art));
       const isLocal = imp.file.startsWith('.');
       const prefix = !isLocal ? './' : '';
-      const fixedPath = `import "${prefix}${imp.file.replace('.sol', 'Upgradable.sol')}";`;
+      const fixedPath = `import "${prefix}${imp.file.replace('.sol', 'Upgradeable.sol')}";`;
+      const absoluteOriginalImport = `import "${imp.absolutePath}";`;
+      const finalImportDirective = !isTranspiled ? absoluteOriginalImport : fixedPath;
+      const finalTransformation = isTranspiled
+        ? `${absoluteOriginalImport}\n${finalImportDirective}`
+        : absoluteOriginalImport;
       return !isLocal && !isTranspiled
         ? null
         : {
-            start,
+            start: start,
             end: start + len,
-            text: !isTranspiled ? `import "${imp.absolutePath}";` : fixedPath,
+            text: finalTransformation,
           };
     })
-    .filter((tran): tran is Transformation => tran !== null);
+    .filter((transformation): transformation is Transformation => transformation !== null);
 }

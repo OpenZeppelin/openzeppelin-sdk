@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Diamond contract is converted to a valid DCUpgradable contract 1`] = `
+exports[`Diamond contract is converted to a valid DCUpgradeable contract 1`] = `
 "pragma solidity ^0.5.0;
 import \\"@openzeppelin/upgrades/contracts/Initializable.sol\\";
 
-contract DAUpgradable is Initializable {
+contract DAUpgradeable is Initializable {
     function initialize() external initializer {
         __init(true);
     }
@@ -23,14 +23,14 @@ contract DAUpgradable is Initializable {
     
 }
 
-contract DB1Upgradable is Initializable, DAUpgradable {
+contract DB1Upgradeable is Initializable, DAUpgradeable {
     function initialize() external initializer {
         __init(true);
     }
 
     function __init(bool callChain) internal {
         if(callChain) {
-            DAUpgradable.__init(false);
+            DAUpgradeable.__init(false);
         }
         
         hello = \\"hello\\";
@@ -43,14 +43,14 @@ contract DB1Upgradable is Initializable, DAUpgradable {
     
 }
 
-contract DB2Upgradable is Initializable, DAUpgradable {
+contract DB2Upgradeable is Initializable, DAUpgradeable {
     function initialize() external initializer {
         __init(true);
     }
 
     function __init(bool callChain) internal {
         if(callChain) {
-            DAUpgradable.__init(false);
+            DAUpgradeable.__init(false);
         }
         
         bar = true;
@@ -63,16 +63,16 @@ contract DB2Upgradable is Initializable, DAUpgradable {
     
 }
 
-contract DCUpgradable is Initializable, DB2Upgradable, DB1Upgradable {
+contract DCUpgradeable is Initializable, DB2Upgradeable, DB1Upgradeable {
     function initialize() external initializer {
         __init(true);
     }
 
     function __init(bool callChain) internal {
         if(callChain) {
-            DAUpgradable.__init(false);
-            DB2Upgradable.__init(false);
-            DB1Upgradable.__init(false);
+            DAUpgradeable.__init(false);
+            DB2Upgradeable.__init(false);
+            DB1Upgradeable.__init(false);
         }
         
         owner = address(0x123);

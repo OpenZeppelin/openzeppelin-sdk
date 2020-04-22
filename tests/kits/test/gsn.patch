@@ -1,0 +1,14 @@
+3,4c3
+< import "@openzeppelin/contracts-ethereum-package/contracts/GSN/GSNRecipient.sol";
+< import "@openzeppelin/upgrades/contracts/Initializable.sol";
+---
+> import "@openzeppelin/contracts/GSN/GSNRecipient.sol";
+6c5
+< contract Counter is Initializable, GSNRecipient {
+---
+> contract Counter is GSNRecipient {
+11,12c10
+<   function initialize(uint num) public initializer {
+<     GSNRecipient.initialize();
+---
+>   constructor(uint num) public  {

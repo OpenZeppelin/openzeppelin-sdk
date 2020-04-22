@@ -51,13 +51,13 @@ describe('ValidationLogger', function() {
       this.logs.warns[0].should.match(/sets an initial value/);
     });
 
-    it('logs when importing openzeppelin-contracts', async function() {
-      validationLogger().log({ importsVanillaContracts: ['Foo.sol', 'Bar.sol'] });
-      this.logs.warns[0].should.match(/@openzeppelin\/contracts/);
+    it('logs when importing openzeppelin-ethereum-package-contracts', async function() {
+      validationLogger().log({ importsEthereumPackageContracts: ['Foo.sol', 'Bar.sol'] });
+      this.logs.warns[0].should.match(/@openzeppelin\/contracts-ethereum-package/);
     });
 
     it('does not log with no imports', async function() {
-      validationLogger().log({ importsVanillaContracts: [] });
+      validationLogger().log({ importsEthereumPackageContracts: [] });
       this.logs.warns.length.should.equal(0);
     });
   });

@@ -1,5 +1,8 @@
 'use strict';
-require('../setup');
+
+import { stubContractUpgradeable } from '../setup';
+
+import sinon from 'sinon';
 
 import { Package } from '@openzeppelin/upgrades';
 import { accounts } from '@openzeppelin/test-environment';
@@ -9,11 +12,19 @@ import freeze from '../../scripts/freeze';
 import ProjectFile from '../../models/files/ProjectFile';
 import NetworkFile from '../../models/files/NetworkFile';
 
+const sandbox = sinon.createSandbox();
+
 describe('freeze script', function() {
   const [owner] = accounts;
 
   const network = 'test';
   const txParams = { from: owner };
+
+  stubContractUpgradeable(sandbox);
+
+  afterEach(function() {
+    sandbox.restore();
+  });
 
   beforeEach('init package file', async function() {
     this.projectFile = new ProjectFile('mocks/packages/package-with-contracts.zos.json');

@@ -12,7 +12,7 @@ export async function transpileAndSaveContracts(contracts: string[], dir: string
     return JSON.parse(fs.readFileSync(`${dir}${file}`).toString());
   });
 
-  const output = transpileContracts(contracts, artifacts);
+  const output = transpileContracts(contracts, artifacts, './contracts');
 
   for (const file of output) {
     await fs.ensureDir(path.dirname(file.path));

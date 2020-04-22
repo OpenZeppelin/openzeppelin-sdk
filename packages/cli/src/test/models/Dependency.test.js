@@ -1,6 +1,6 @@
 'use strict';
 
-require('../setup');
+import { stubContractUpgradeable } from '../setup';
 
 import { expect } from 'chai';
 import { accounts } from '@openzeppelin/test-environment';
@@ -9,8 +9,12 @@ import sinon from 'sinon';
 import npm from 'npm-programmatic';
 import Dependency from '../../models/dependency/Dependency';
 
+const sandbox = sinon.createSandbox();
+
 describe('Dependency', function() {
   const [from] = accounts;
+
+  stubContractUpgradeable(sandbox);
 
   describe('static methods', function() {
     describe('#satisfiesVersion', function() {
@@ -69,13 +73,13 @@ describe('Dependency', function() {
 
     describe('#install', function() {
       it('calls npm install', async function() {
-        const npmInstallStub = sinon.stub(npm, 'install');
+        const npmInstallStub = sandbox.stub(npm, 'install');
         const nameAndVersion = 'mock-stdlib@1.1.0';
         const npmParams = { save: true, cwd: process.cwd() };
 
         await Dependency.installFn(nameAndVersion);
         npmInstallStub.should.have.been.calledWithExactly([nameAndVersion], npmParams);
-        sinon.restore();
+        sandbox.restore();
       });
     });
 
