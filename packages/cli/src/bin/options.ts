@@ -31,3 +31,7 @@ program.Command.prototype.withNonInteractiveOption = function(): Command {
 program.Command.prototype.withSkipCompileOption = function(): Command {
   return this.option('--skip-compile', 'skips contract compilation');
 };
+
+program.Command.prototype.withAsyncOption = function(): Command {
+  return this.option('--async-tx', 'avoid waiting for tx gets mined');
+};
