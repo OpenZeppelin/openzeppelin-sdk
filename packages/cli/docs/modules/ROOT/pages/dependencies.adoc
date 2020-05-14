@@ -17,7 +17,7 @@ $ npm install @openzeppelin/cli
 $ npx openzeppelin init
 ----
 
-NOTE: The full code for this project is available in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/v2.4.0/examples/linking-contracts[Github repo].
+NOTE: The full code for this project is available in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/linking-contracts[Github repo].
 
 [[linking-the-contracts-ethereum-package]]
 == Linking the Contracts Ethereum Package
@@ -47,40 +47,69 @@ Let's deploy an ERC20 token contract to our development network. Make sure to xr
 $ npx ganache-cli --deterministic
 ----
 
-For setting up the token, we will be using the https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/master/contracts/token/ERC20/StandaloneERC20.sol[StandaloneERC20 implementation] provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol, and decimals), and mint a large initial supply for one of our accounts.
+For setting up the token, we will be using the https://github.com/OpenZeppelin/openzeppelin-contracts-ethereum-package/blob/master/contracts/presets/ERC20PresetMinterPauser.sol[ERC20PresetMinterPauser implementation] provided by the OpenZeppelin package. We will _initialize_ the instance with the token metadata (name, symbol), and then mint a large initial supply for one of our accounts.
 
 NOTE: The unlocked accounts and transaction hashes may differ from the ones shown here. Run a brand-new Ganache in `--deterministic` mode to get the same ones.
 
 [source,console]
 ----
 $ npx oz deploy
-? Choose the kind of deployment: upgradeable
-? Pick a network: development
-? Pick a contract to deploy: @openzeppelin/contracts-ethereum-package/StandaloneERC20
-✓ Deploying @openzeppelin/contracts-ethereum-package dependency to network
-? Call a function to initialize the instance after creating it?: Yes
-? Select which function: * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, initialHolder: address, minters: address[], pausers: address[])
-? name (string): MyToken
-? symbol (string): MYT
-? decimals (uint8): 18
-? initialSupply (uint256): 100e18
-? initialHolder (address): 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
-? minters (address[]):
-? pausers (address[]):
+No contracts found to compile.
+? Choose the kind of deployment upgradeable
+? Pick a network development
+? Pick a contract to deploy @openzeppelin/contracts-ethereum-package/ERC20PresetMinterPauserUpgradeSafe
+✓ Deploying @openzeppelin/contracts-ethereum-package dependency to network dev-1589440867048
+All implementations are up to date
+? Call a function to initialize the instance after creating it? Yes
+? Select which function initialize(name: string, symbol: string)
+? name: string: MyToken
+? symbol: string: MYT
 ✓ Setting everything up to create contract instances
-✓ Instance created at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
+✓ Instance created at 0x59d3631c86BbE35EF041872d502F218A39FBa150
+To upgrade this instance run 'oz upgrade'
+0x59d3631c86BbE35EF041872d502F218A39FBa150
 ----
 
-Let's break down what we did in the command above. We first chose to create an instance of the `StandaloneERC20` contract from the `@openzeppelin/contracts-ethereum-package` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. The OpenZeppelin CLI will then atomically create and initialize the new instance in a single transaction.
+Let's break down what we did in the command above. We first chose to create an instance of the `ERC20PresetMinterPauserUpgradeSafe` contract from the `@openzeppelin/contracts-ethereum-package` package we had linked before, and to create it in the local `development` network. We are then instructing the CLI to _initialize_ it with the initial values needed to set up our token. This requires us to choose the appropriate `initialize` function, and input all the required arguments. The OpenZeppelin CLI will then atomically deploy and initialize the new instance in a single transaction.
 
-We now have a working ERC20 token contract in our development network. We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
+We now have a working ERC20 token contract in our development network. 
+
+Next we get the accounts we have setup
+[source,console]
+----
+$ npx oz accounts
+? Pick a network development
+Accounts for dev-1589440867048:
+Default: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+All:
+- 0: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+- 1: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+...
+----
+
+Then we mint 100 MYT to our default account
+[source,console]
+----
+$ npx oz send-tx
+? Pick a network development
+? Pick an instance ERC20PresetMinterPauserUpgradeSafe at 0x59d3631c86BbE35EF041872d502F218A39FBa150
+? Select which function mint(to: address, amount: uint256)
+? to: address: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+? amount: uint256: 100000000000000000000
+✓ Transaction successful. Transaction hash: 0xff24cce7801e424db6e5a7076d4a9c677ef76df320fe04e2c39e537d09029ec0
+Events emitted:
+ - Transfer(0x0000000000000000000000000000000000000000, 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1, 100000000000000000000)
+----
+
+We can check that the initial supply was properly allocated by using the `balance` command. Make sure to use the address where your ERC20 token instance was created.
 
 [source,console]
 ----
-$ npx oz balance --erc20 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
-? Enter an address to query its balance: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
-? Pick a network: development
+$ npx oz balance --erc20 0x59d3631c86BbE35EF041872d502F218A39FBa150
+? Enter an address to query its balance 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+? Pick a network development
 Balance: 100 MYT
+100000000000000000000
 ----
 
 Great! We can now write an exchange contract and connect it to this token when we deploy it.
@@ -88,7 +117,7 @@ Great! We can now write an exchange contract and connect it to this token when w
 [[writing-the-exchange-contract]]
 == Writing the Exchange Contract
 
-In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we create the instance with `oz deploy`.
+In order to transfer an amount of tokens every time it receives ETH, our exchange contract will need to store the token contract address and the exchange rate in its state. We will set these two values during initialization, when we deploy the instance with `oz deploy`.
 
 Because we're writing upgradeable contracts xref:upgrades::proxies.adoc#the-constructor-caveat[we cannot use Solidity `constructor` s]. Instead, we need to use _initializers_. An initializer is just a regular Solidity function, with an additional check to ensure that it can be called only once.
 
@@ -104,7 +133,7 @@ Now, let's write our exchange contract in `contracts/TokenExchange.sol`, using a
 [source,solidity]
 ----
 // contracts/TokenExchange.sol
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.2;
 
 // Import base Initializable contract
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
@@ -112,6 +141,7 @@ import "@openzeppelin/upgrades/contracts/Initializable.sol";
 // Import the IERC20 interface and and SafeMath library
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+
 
 contract TokenExchange is Initializable {
     using SafeMath for uint256;
@@ -127,7 +157,7 @@ contract TokenExchange is Initializable {
     }
 
     // Send tokens back to the sender using predefined exchange rate
-    function() external payable {
+    receive() external payable {
         uint256 tokens = msg.value.mul(rate);
         token.transfer(msg.sender, tokens);
     }
@@ -141,16 +171,20 @@ Let's now create and initialize our new `TokenExchange` contract:
 [source,console]
 ----
 $ npx oz deploy
-✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
-? Choose the kind of deployment: upgradeable
-? Pick a network: development
-? Pick a contract to instantiate: TokenExchange
+✓ Compiled contracts with solc 0.6.7 (commit.b8d736ae)
+? Choose the kind of deployment upgradeable
+? Pick a network development
+? Pick a contract to deploy TokenExchange
+✓ Added contract TokenExchange
 ✓ Contract TokenExchange deployed
-? Call a function to initialize the instance after creating it?: Yes
-? Select which function: initialize(_rate: uint256, _token: address)
-? _rate (uint256): 10
-? _token (address): 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
-Instance created at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
+All implementations have been deployed
+? Call a function to initialize the instance after creating it? Yes
+? Select which function initialize(_rate: uint256, _token: address)
+? _rate: uint256: 10
+? _token: address: 0x59d3631c86BbE35EF041872d502F218A39FBa150
+✓ Instance created at 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e
+To upgrade this instance run 'oz upgrade'
+0x67B5656d60a809915323Bf2C40A8bEF15A152e3e
 ----
 
 Our exchange is almost ready! We only need to fund it, so it can send tokens to purchasers. Let's do that using the `oz send-tx` command, to transfer the full token balance from our own account to the exchange contract. Make sure to replace the recipient of the transfer with the `TokenExchange` address you got from the previous command.
@@ -158,17 +192,14 @@ Our exchange is almost ready! We only need to fund it, so it can send tokens to 
 [source,console]
 ----
 $ npx oz send-tx
-? Pick a network: development
-? Choose an instance: StandaloneERC20 at 0x2612Af3A521c2df9EAF28422Ca335b04AdF3ac66
-? Select which function: transfer(to: address, value: uint256)
-? to (address): 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
-? value (uint256): 10e18
-Transaction successful: 0x5863c8a8e122fcda7c6234abc6e60fad3f5a8108a3f88e2d8a956b63dbc222c2
+? Pick a network development
+? Pick an instance ERC20PresetMinterPauserUpgradeSafe at 0x59d3631c86BbE35EF041872d502F218A39FBa150
+? Select which function transfer(recipient: address, amount: uint256)
+? recipient: address: 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e
+? amount: uint256: 100e18
+✓ Transaction successful. Transaction hash: 0xdfec4bb86d995ab6f48696bf09685e0bee9949f19eb0dc6c6425e2ea3a37ef49
 Events emitted:
- - Transfer
-    from: 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1,
-    to: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec,
-    value: 10000000000000000000
+ - Transfer(0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1, 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e, 100000000000000000000)
 ----
 
 All set! We can start playing with our brand new token exchange.
@@ -181,11 +212,11 @@ Now that we have initialized our exchange contract and seeded it with funds, we 
 [source,console]
 ----
 $ npx oz transfer
-? Pick a network: development
-? Choose the account to send transactions from: (1) 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
-? Enter the receiver account: 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec
+? Pick a network development
+? Choose the account to send transactions from (1) 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+? Enter the receiver account 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e
 ? Enter an amount to transfer 0.1 ether
-✓ Funds sent. Transaction hash: 0xc85a8caa161110ba7f08134f4496a995968a5aff7ae60ad9b6ce1c824e13cacb
+✓ Funds sent. Transaction hash: 0xfcd74514cd9629a26ec25f637f5dd958dbdfa151594c1a3a6671dcf1d889a50e
 ----
 
 NOTE: Make sure you replace the receiver account with the corresponding address where your `TokenExchange` was created.
@@ -194,10 +225,11 @@ We can now use `oz balance` again, to check the token balance of the address tha
 
 [source,console]
 ----
-$ npx oz balance --erc20 0x5f8e26fAcC23FA4cbd87b8d9Dbbd33D5047abDE1
-? Enter an address to query its balance: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
-? Pick a network: development
+$ npx oz balance --erc20 0x59d3631c86BbE35EF041872d502F218A39FBa150
+? Enter an address to query its balance 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+? Pick a network development
 Balance: 1 MYT
+1000000000000000000
 ----
 
 Success! We have our exchange up and running, gathering ETH in exchange for our tokens. But how can we collect the funds we earned...?
@@ -207,7 +239,7 @@ Success! We have our exchange up and running, gathering ETH in exchange for our 
 
 We forgot to add a method to withdraw the funds from the token exchange contract! While this would typically mean that the funds are locked in there forever, we can upgrade the contract with the OpenZeppelin CLI to add a way to collect those funds.
 
-NOTE: While upgrading a contract is certainly useful in situations like this, where you need to fix a bug or add a missing feature, it could still be used to change the rules of the game. For instance, you could upgrade the token exchange contract to alter the rate at any time. Because of this, it is important to have a proper xref:learn::mainnet.adoc#project-governance[Project Governance] in place.
+NOTE: While upgrading a contract is certainly useful in situations like this, where you need to fix a bug or add a missing feature, it could still be used to change the rules of the game. For instance, you could upgrade the token exchange contract to alter the rate at any time. Because of this, it is important to have appropriate Project Governance in place.
 
 Let's modify the `TokenExchange` contract to add a `withdraw` method, only callable by an `owner`.
 
@@ -217,14 +249,17 @@ Let's modify the `TokenExchange` contract to add a `withdraw` method, only calla
 contract TokenExchange is Initializable {
     uint256 public rate;
     IERC20 public token;
-    address public owner;
-
-    function withdraw() public {
-        require(msg.sender == owner, "Address not allowed to call this function");
-        msg.sender.transfer(address(this).balance);
-    }
++    address public owner;
 
     // (existing functions not shown here for brevity)
+    
++    function withdraw() public {
++        require(
++            msg.sender == owner,
++            "Address not allowed to call this function"
++        );
++        msg.sender.transfer(address(this).balance);
++    }    
 }
 ----
 
@@ -238,23 +273,33 @@ The only thing missing is actually _setting_ the `owner` of the contract. To do 
 ----
 // contracts/TokenExchange.sol
 contract TokenExchange is Initializable {
-  uint256 public rate;
-  IERC20 public token;
-  address public owner;
+    uint256 public rate;
+    IERC20 public token;
+    address public owner;
 
-  function withdraw() public {
-    require(msg.sender == owner, "Address not allowed to call this function");
-    msg.sender.transfer(address(this).balance);
-  }
+    // (existing functions not shown here for brevity)
 
-  // To be run during upgrade, ensuring it can never be called again
-  function setOwner(address _owner) public {
-    require(owner == address(0), "Owner already set, cannot modify!");
-    owner = _owner;
-  }
+    function withdraw() public {
+        require(
+            msg.sender == owner,
+            "Address not allowed to call this function"
+        );
+        msg.sender.transfer(address(this).balance);
+    }
 
-  // (existing functions not shown here for brevity)
++    // To be run during upgrade, ensuring it can never be called again
++    function setOwner(address _owner) public {
++        require(owner == address(0), "Owner already set, cannot modify!");
++        owner = _owner;
++    }
 }
+----
+
+First we compile the contract
+[source,console]
+----
+$ npx oz compile
+✓ Compiled contracts with solc 0.6.7 (commit.b8d736ae)
 ----
 
 We can now upgrade our token exchange contract to this new version, and call `setOwner` during the upgrade process. The OpenZeppelin CLI will take care of making the upgrade and the call atomically in a single transaction.
@@ -262,16 +307,19 @@ We can now upgrade our token exchange contract to this new version, and call `se
 [source,console]
 ----
 $ npx oz upgrade
-? Pick a network: development
-✓ Compiled contracts with solc 0.5.9 (commit.e560f70d)
+? Pick a network development
+? Which instances would you like to upgrade? Choose by name
+? Pick an instance to upgrade TokenExchange
+? Call a function on the instance after upgrading it? Yes
+? Select which function setOwner(_owner: address)
+? _owner: address: 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+Nothing to compile, all contracts are up to date.
 - New variable 'address owner' was added in contract TokenExchange in contracts/TokenExchange.sol:1 at the end of the contract.
+See https://docs.openzeppelin.com/upgrades/2.6//writing-upgradeable#modifying-your-contracts for more info.
 ✓ Contract TokenExchange deployed
-? Which proxies would you like to upgrade?: Choose by name
-? Pick a contract to upgrade: TokenExchange
-? Call a function on the instance after upgrading it?: Yes
-? Select which function: setOwner(_owner: address)
-? _owner (address): 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
-✓ Instance upgraded at 0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec.
+All implementations have been deployed
+✓ Instance upgraded at 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e. Transaction receipt: 0xb742c40f939daab145552880e7e07a696570684af1b6aef03d196d39ea61c019
+✓ Instance at 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e upgraded
 ----
 
 There! We can now call `withdraw` from our default address to extract all ETH sent to the exchange.
@@ -279,10 +327,10 @@ There! We can now call `withdraw` from our default address to extract all ETH se
 [source,console]
 ----
 $ npx oz send-tx
-? Pick a network: development
-? Pick an instance: TokenExchange at 0xD86C8F0327494034F60e25074420BcCF560D5610
-? Select which function: withdraw()
-✓ Transaction successful. Transaction hash: 0xc9fb0d3ada96ec4c67c1c8f1569f9cfaf0ff0f7b241e172b32a023b1763ab7ab
+? Pick a network development
+? Pick an instance TokenExchange at 0x67B5656d60a809915323Bf2C40A8bEF15A152e3e
+? Select which function withdraw()
+✓ Transaction successful. Transaction hash: 0x4797d95b1892c9a0cb264bb430fcb425b7cb220ef33cb759496d1dd1dc05a31a
 ----
 
 NOTE: You can also upgrade dependencies from an Ethereum Package. Upon a new release of `@openzeppelin/contracts-ethereum-package`, if you want to update your ERC20 to include the latest fixes, you can just `oz link` the new version and use `oz upgrade` to get your instance to the newest code.
