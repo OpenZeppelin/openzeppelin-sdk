@@ -1,4 +1,5 @@
 /build/*
-/.zos.session
-/zos.dev-*
-.zos*
+
+# OpenZeppelin
+.openzeppelin/dev-*.json
+.openzeppelin/.session
