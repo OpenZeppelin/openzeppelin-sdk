@@ -3,16 +3,25 @@
   "contracts": {
     "TokenExchange": "TokenExchange"
   },
-  "name": "example-linking-contracts",
-  "version": "1.0.0",
   "dependencies": {
-    "openzeppelin-eth": "2.2.0"
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0"
   },
+  "name": "example-linking-contracts",
+  "version": "2.8.0",
   "compiler": {
-    "manager": "zos",
     "compilerSettings": {
-      "optimizer": {}
+      "optimizer": {
+        "enabled": false,
+        "runs": "200"
+      }
     },
-    "solcVersion": "0.5.9"
-  }
+    "typechain": {
+      "enabled": false
+    },
+    "manager": "openzeppelin",
+    "solcVersion": "0.6.7",
+    "artifactsDir": "build/contracts",
+    "contractsDir": "contracts"
+  },
+  "telemetryOptIn": false
 }
