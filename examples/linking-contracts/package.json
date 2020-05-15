@@ -4,15 +4,27 @@
   "private": true,
   "description": "",
   "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [],
   "author": "Santiago Palladino <santiago@openzeppelin.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenZeppelin/openzeppelin-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OpenZeppelin/openzeppelin-sdk/issues"
+  },
+  "homepage": "https://github.com/OpenZeppelin/openzeppelin-sdk/blob/master/examples/linking-contracts/README.md",
+  "description": "",
   "dependencies": {
-    "@openzeppelin/upgrades": "2.8.0",
-    "openzeppelin-eth": "^2.2.0"
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0",
+    "@openzeppelin/upgrades": "2.8.0"
   },
   "devDependencies": {
     "@openzeppelin/cli": "2.8.2",
-    "ganache-cli": "^6.4.3"
+    "ganache-cli": "^6.9.1"
   }
 }
