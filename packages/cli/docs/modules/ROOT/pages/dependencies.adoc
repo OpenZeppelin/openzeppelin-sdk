@@ -17,7 +17,7 @@ $ npm install @openzeppelin/cli
 $ npx openzeppelin init
 ----
 
-NOTE: The full code for this project is available in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/master/examples/linking-contracts[Github repo].
+NOTE: The full code for this project is available in our https://github.com/OpenZeppelin/openzeppelin-sdk/tree/release/2.8/examples/linking-contracts[Github repo].
 
 [[linking-the-contracts-ethereum-package]]
 == Linking the Contracts Ethereum Package
