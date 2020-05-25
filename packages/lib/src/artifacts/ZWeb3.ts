@@ -11,6 +11,7 @@ export const NETWORKS = {
   3: 'ropsten',
   4: 'rinkeby',
   5: 'goerli',
+  10: 'quorum',
   42: 'kovan',
 };
 
