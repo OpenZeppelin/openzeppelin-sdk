@@ -31,6 +31,8 @@ However, while Solidity ensures that a `constructor` is called only once in the 
 
 [source,solidity]
 ----
+// contracts/MyContract.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 
@@ -39,7 +41,7 @@ contract MyContract {
     bool private initialized;
 
     function initialize(uint256 _x) public {
-        require(!initialized, "MyContract: already initialized");
+        require(!initialized, "Contract instance has already been initialized");
         initialized = true;
         x = _x;
     }
@@ -50,6 +52,8 @@ Since this pattern is very common when writing upgradeable contracts, OpenZeppel
 
 [source,solidity]
 ----
+// contracts/MyContract.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
@@ -68,6 +72,8 @@ Another difference between a `constructor` and a regular function is that Solidi
 
 [source,solidity]
 ----
+// contracts/MyContract.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
@@ -100,6 +106,10 @@ Keep in mind that this restriction affects not only your contracts, but also the
 [source,solidity]
 ----
 // @openzeppelin/contracts/token/ERC20/ERC20.sol
+pragma solidity ^0.6.0;
+
+  ...
+
 contract ERC20 is Context, IERC20 {
 
   ...
@@ -107,8 +117,6 @@ contract ERC20 is Context, IERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-
-  ...
 
     constructor (string memory name, string memory symbol) public {
         _name = name;
@@ -124,16 +132,14 @@ This means you should not be using these contracts in your OpenZeppelin Upgrades
 
 [source,solidity]
 ----
-// @openzeppelin/contracts-ethereum-package/token/ERC20/ERC20.sol
-contract ERC20UpgradeSafe is Initializable, ContextUpgradeSafe, IERC20 {
-
+// @openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol
+pragma solidity ^0.6.0;
   ...
-
+contract ERC20UpgradeSafe is Initializable, ContextUpgradeSafe, IERC20 {
+  ...
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-
-  ...
 
     function __ERC20_init(string memory name, string memory symbol) internal initializer {
         __Context_init_unchained();
@@ -145,7 +151,6 @@ contract ERC20UpgradeSafe is Initializable, ContextUpgradeSafe, IERC20 {
         _symbol = symbol;
         _decimals = 18;
     }
-
   ...
 }
 ----
@@ -159,11 +164,8 @@ Solidity allows defining initial values for fields when declaring them in a cont
 
 [source,solidity]
 ----
-pragma solidity ^0.6.0;
-
-
 contract MyContract {
-    uint256 public hasInitialValue = 42;
+    uint256 public constant hasInitialValue = 42;
 }
 ----
 
@@ -171,11 +173,6 @@ This is equivalent to setting these values in the constructor, and as such, will
 
 [source,solidity]
 ----
-pragma solidity ^0.6.0;
-
-import "@openzeppelin/upgrades/contracts/Initializable.sol";
-
-
 contract MyContract is Initializable {
     uint256 public hasInitialValue;
 
@@ -203,17 +200,18 @@ For instance, in the following example, even if `MyContract` is upgradeable (if 
 
 [source,solidity]
 ----
-pragma solidity ^0.6.2;
+// contracts/MyContract.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
 
 contract MyContract is Initializable {
     ERC20 public token;
 
     function initialize() public initializer {
-        token = new ERC20("MyToken", "MYT"); // This contract will not be upgradeable
+        token = new ERC20("Test", "TST"); // This contract will not be upgradeable
     }
 }
 ----
@@ -222,17 +220,54 @@ The easiest way around this issue is to avoid creating contracts on your own alt
 
 [source,solidity]
 ----
-pragma solidity ^0.6.2;
+// contracts/MyContract.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+
+contract MyContract is Initializable {
+    IERC20 public token;
+
+    function initialize(IERC20 _token) public initializer {
+        // 'token' will be upgradeable if it was created via the OpenZeppelin CLI
+        token = _token;
+    }
+}
+----
+
+[source,console]
+----
+$ TOKEN=$(npx oz deploy TokenContract)
+$ npx oz deploy MyContract $TOKEN
+----
+
+An advanced alternative, if you need to create upgradeable contracts on the fly, is to keep an instance of your OpenZeppelin project's `App` in your contracts. The xref:api.adoc#App[`App`] is a contract that acts as the entrypoint for your OpenZeppelin project, which has references to your logic implementations, and can create new contract instances:
+
+[source,solidity]
+----
+// contracts/MyContract.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.0;
+
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "@openzeppelin/upgrades/contracts/application/App.sol";
 
 
 contract MyContract is Initializable {
-    ERC20UpgradeSafe public token;
+    App private app;
 
-    function initialize(ERC20UpgradeSafe _token) public initializer {
-        // 'token' will be upgradeable if it was created via the OpenZeppelin CLI
-        token = _token;
+    function initialize(App _app) public initializer {
+        app = _app;
+    }
+
+    function createNewToken() public returns (address) {
+        return
+            app.create(
+                "@openzeppelin/contracts-ethereum-package",
+                "StandaloneERC20"
+            );
     }
 }
 ----
@@ -251,7 +286,7 @@ As such, it is strongly recommended to avoid any usage of either `selfdestruct` 
 [[modifying-your-contracts]]
 == Modifying Your Contracts
 
-When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction by learning about our xref:proxies.adoc[Proxies].
+When writing new versions of your contracts, either due to new features or bug fixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction by learning about our xref:proxies.adoc[Proxies].
 
 WARNING: Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.
 
@@ -335,7 +370,7 @@ contract MyContract {
 }
 ----
 
-Then upgraded to...
+Then upgraded to:
 [source,solidity]
 ----
 contract MyContract {

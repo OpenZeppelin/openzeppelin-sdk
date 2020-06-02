@@ -22,14 +22,16 @@ $ npx oz init creating-from-solidity 1.0.0
 
 The project name is important: we'll be using it later from the Solidity code.
 
-We can now write the code for `Product`, a simple contract that stores a value. This is the contract that will be created by out contract factory.
+We can now write the code for `Product`, a simple contract that stores a value. This is the contract that will be created by our contract factory.
 
 [source,solidity]
 ----
 // contracts/Product.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
+
 
 contract Product is Initializable {
     uint256 public value;
@@ -45,10 +47,12 @@ The `Factory` is a bit more involved: we'll provide it with our project's xref:c
 [source,solidity]
 ----
 // contracts/Factory.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/upgrades/contracts/application/App.sol";
+
 
 contract Factory is Initializable {
     App private app;
@@ -56,7 +60,7 @@ contract Factory is Initializable {
     event InstanceCreated(address);
 
     function initialize(App _app) public initializer {
-      app = _app);
+        app = _app;
     }
 
     function createInstance(bytes memory _data) public {
@@ -82,23 +86,27 @@ To do this, we'll first need to `add` the `Product` contract to our `App` (so th
 [source,console]
 ----
 $ npx oz add Product
+✓ Compiled contracts with solc 0.5.17 (commit.d19bba13)
 ✓ Added contract Product
 $ npx oz push
+Nothing to compile, all contracts are up to date.
+? Pick a network development
 ✓ Contract Product deployed
-All contracts have been deployed
+All implementations have been deployed
 $ npx oz publish
+? Pick a network development
 ✓ Project structure deployed
-✓ Registering Product at 0x3064A4B40fcf4E68bCc5E2EBF44421A325C78b00 in directory
-✓ Published to dev-1578608628898!
+✓ Registering Product at 0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab in directory
+✓ Published to dev-1591071938836!
 ----
 
 Now that the `App` has been published and `Product` registered inside it, we're ready to use it! Head to your project's xref:cli::configuration.adoc#network.json[network configuration file] and look for the `app` entry:
 
 ```json
-// .openzeppelin/dev-1578608628898.json
+// .openzeppelin/dev-1591071938836.json
   ...
   "app": {
-    "address": "0x61F31Be60e7EA755cc034cD38FdE02bA4e3ecd47"
+    "address": "0x5b1869D9A4C187F2EAa108f3062412ecf0526b24"
   },
   ...
 ```
@@ -108,23 +116,26 @@ With the `App` address at hand, we can deploy `Factory` using `oz deploy` as usu
 [source,console]
 ----
 $ npx oz deploy
-? Choose the kind of deployment: upgradeable
-? Pick a contract to instantiate: Factory
+Nothing to compile, all contracts are up to date.
+? Choose the kind of deployment upgradeable
+? Pick a network development
+? Pick a contract to deploy Factory
 ✓ Added contract Factory
 ✓ Contract Factory deployed
-All contracts have been deployed
+All implementations have been deployed
 ? Call a function to initialize the instance after creating it? Yes
-? Select which function * initialize(_appContractAddress: address)
-? _appContractAddress (address): 0x61F31Be60e7EA755cc034cD38FdE02bA4e3ecd47
+? Select which function initialize(_app: address)
+? _app: address: 0x5b1869D9A4C187F2EAa108f3062412ecf0526b24
 ✓ Setting everything up to create contract instances
-✓ creating-from-solidity Factory instance created at 0xA7b8Fb47F9114278ece7d2d8161533d06B9203a4
-0xA7b8Fb47F9114278ece7d2d8161533d06B9203a4
+✓ creating-from-solidity Factory instance created at 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
+To upgrade this instance run 'oz upgrade'
+0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
 ----
 
 [encoding-call-data]
 == Encoding Call Data
 
-Our `Factory` is ready for its `createInstace` method to be called, but there's still something missing: `Product` 's initialization data.
+Our `Factory` is ready for its `createInstance` method to be called, but there's still something missing: `Product` 's initialization data.
 
 Recall that `Product` has an `initialize` method: when creating a new one, we need to make sure it is called with the right arguments.
 
@@ -157,12 +168,13 @@ With the call data <<encoding-call-data, we just generated>> we're finally ready
 [source,console]
 ----
 $ npx oz send-tx
-? Pick an instance Factory at 0xA7b8Fb47F9114278ece7d2d8161533d06B9203a4
+? Pick a network development
+? Pick an instance Factory at 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
 ? Select which function createInstance(_data: bytes)
-? _data (bytes): 0xfe4b84df000000000000000000000000000000000000000000000000000000000000002a
-✓ Transaction successful. Transaction hash: 0xc39b59dc10e1c68c681648d30d042b2b8c8a912839912533a349628c299ec619
+? _data: bytes: 0xfe4b84df000000000000000000000000000000000000000000000000000000000000002a
+✓ Transaction successful. Transaction hash: 0x803969c85bb93058ae7deecfaab53ba78b79161bde4fb168c174e949a8698e71
 Events emitted:
- - InstanceCreated(0x37838554CEb544A849cD4e5867AD0a9F7d4fB779)
+ - InstanceCreated(0x3c63250aFA2470359482d98749f2d60D2971c818)
 ----
 
 We have now created a new upgradeable `Product` contract from our `Factory` contract! Note that the data provided to `createInstance` is the one we generated using `encodeCall`.
