@@ -258,7 +258,7 @@ As such, it is strongly recommended to avoid any usage of either `selfdestruct` 
 [[modifying-your-contracts]]
 == Modifying Your Contracts
 
-When writing new versions of your contracts, either due to new features or bugfixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction by learning about our xref:proxies.adoc[Proxies].
+When writing new versions of your contracts, either due to new features or bug fixing, there is an additional restriction to observe: you cannot change the order in which the contract state variables are declared, nor their type. You can read more about the reasons behind this restriction by learning about our xref:proxies.adoc[Proxies].
 
 WARNING: Violating any of these storage layout restrictions will cause the upgraded version of the contract to have its storage values mixed up, and can lead to critical errors in your application.
 
