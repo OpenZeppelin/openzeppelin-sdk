@@ -22,7 +22,7 @@ $ npx oz init creating-from-solidity 1.0.0
 
 The project name is important: we'll be using it later from the Solidity code.
 
-We can now write the code for `Product`, a simple contract that stores a value. This is the contract that will be created by out contract factory.
+We can now write the code for `Product`, a simple contract that stores a value. This is the contract that will be created by our contract factory.
 
 [source,solidity]
 ----
@@ -124,7 +124,7 @@ All contracts have been deployed
 [encoding-call-data]
 == Encoding Call Data
 
-Our `Factory` is ready for its `createInstace` method to be called, but there's still something missing: `Product` 's initialization data.
+Our `Factory` is ready for its `createInstance` method to be called, but there's still something missing: `Product` 's initialization data.
 
 Recall that `Product` has an `initialize` method: when creating a new one, we need to make sure it is called with the right arguments.
 
