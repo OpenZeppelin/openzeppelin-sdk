@@ -27,9 +27,11 @@ We can now write the code for `Product`, a simple contract that stores a value. 
 [source,solidity]
 ----
 // contracts/Product.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
+
 
 contract Product is Initializable {
     uint256 public value;
@@ -45,10 +47,12 @@ The `Factory` is a bit more involved: we'll provide it with our project's xref:c
 [source,solidity]
 ----
 // contracts/Factory.sol
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/upgrades/contracts/application/App.sol";
+
 
 contract Factory is Initializable {
     App private app;
@@ -56,7 +60,7 @@ contract Factory is Initializable {
     event InstanceCreated(address);
 
     function initialize(App _app) public initializer {
-      app = _app;
+        app = _app;
     }
 
     function createInstance(bytes memory _data) public {
