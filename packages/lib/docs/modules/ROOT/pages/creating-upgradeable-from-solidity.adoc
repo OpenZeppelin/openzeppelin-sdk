@@ -56,7 +56,7 @@ contract Factory is Initializable {
     event InstanceCreated(address);
 
     function initialize(App _app) public initializer {
-      app = _app);
+      app = _app;
     }
 
     function createInstance(bytes memory _data) public {
