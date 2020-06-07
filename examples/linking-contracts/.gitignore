@@ -2,3 +2,6 @@
 /.zos.session
 /zos.dev-*
 .zos*
+
+.openzeppelin/.session
+.openzeppelin/dev-*.json
