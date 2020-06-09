@@ -12,7 +12,7 @@ import {
 import { ContractInterface } from '../models/files/NetworkFile';
 
 const CLI_HOME = 'https://docs.openzeppelin.com/cli/2.6';
-const UPGRADES_HOME = 'https://docs.openzeppelin.com/upgrades/2.6/';
+const UPGRADES_HOME = 'https://docs.openzeppelin.com/upgrades/2.6';
 const DANGEROUS_OPERATIONS_LINK = `${UPGRADES_HOME}/writing-upgradeable#potentially-unsafe-operations`;
 const AVOID_INITIAL_VALUES_LINK = `${UPGRADES_HOME}/writing-upgradeable#avoid-initial-values-in-field-declarations`;
 const INITIALIZERS_LINK = `${UPGRADES_HOME}/writing-upgradeable#initializers`;
