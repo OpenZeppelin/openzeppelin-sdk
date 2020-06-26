@@ -27,10 +27,10 @@ npm install @openzeppelin/upgrades
 
 ## Usage
 
-Suppose there is a contract called `MyContract` in the file
-`contracts/MyContract.sol`, already compiled to
-`build/contracts/MyContract.json`, and that there is a development blockchain
-network running locally in port 9545.
+Suppose there is a contract called `MyContractV0` in the file
+`contracts/MyContractV0.sol`, already compiled to
+`build/contracts/MyContractV0.json`, and that there is a development blockchain
+network running locally in port 8545.
 
 Open a Node.js console:
 
@@ -39,18 +39,42 @@ node
 ```
 
 ```js
-> const { ZWeb3, Contracts, SimpleProject } = require('@openzeppelin/upgrades')
-> // Initialize a web3 provider.
-> ZWeb3.initialize("http://localhost:9545")
-> // Load the contract.
-> const MyContract = Contracts.getFromLocal('MyContract')
-> // Instantiate a project.
-> myProject = new SimpleProject('MyProject', { from: await ZWeb3.defaultAccount() })
-> // Create a proxy for the contract.
-> myProject.createProxy(MyContract).then(proxy => myProxy = proxy)
-> // Make a change on the contract, and compile it.
-> const MyContractUpgraded = Contracts.getFromLocal('MyContract')
-> myProject.upgradeProxy(proxy, MyContractUpgraded)
+const Web3 = require('web3');
+const { Contracts, ProxyAdminProject, ZWeb3 } = require('@openzeppelin/upgrades')
+
+async function main() {
+  // Create web3 provider and initialize OpenZeppelin upgrades
+  const web3 = new Web3('http://localhost:8545');
+  ZWeb3.initialize(web3.currentProvider)
+
+  // Create an OpenZeppelin project
+  const [from] = await ZWeb3.eth.getAccounts();
+  const project = new ProxyAdminProject('MyProject', null, null, { from, gas: 1e6, gasPrice: 1e9 });
+
+  // Deploy an instance of MyContractV0
+  console.log('Creating an upgradeable instance of v0...');
+  const MyContractV0 = Contracts.getFromLocal('MyContractV0');
+  const instance = await project.createProxy(MyContractV0, { initArgs: [42] });
+  const address = instance.options.address;
+  console.log(`Contract created at ${address}`);
+
+  // And check its initial value
+  const initialValue = await instance.methods.value().call();
+  console.log(`Initial value is ${initialValue.toString()}\n`);
+
+  // Upgrade it to V1
+  console.log('Upgrading to v1...');
+  const MyContractV1 = Contracts.getFromLocal('MyContractV1');
+  const instanceV1 = await project.upgradeProxy(instance.options.address, MyContractV1);
+  console.log(`Contract upgraded at ${instanceV1.options.address}`);
+
+  // And check its new `add` method, note that we use instanceV1 since V0 has no `add` in its ABI
+  await instanceV1.methods.add(10).send({ from, gas: 1e5, gasPrice: 1e9 });
+  const newValue = await instance.methods.value().call();
+  console.log(`Updated value is ${newValue.toString()}\n`);
+}
+
+main();
 ```
 
 ## Security
