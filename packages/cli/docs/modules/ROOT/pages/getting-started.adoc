@@ -18,7 +18,7 @@ The CLI is installed as a dependency to your Node project:
 $ npm install @openzeppelin/cli
 ----
 
-TIP: If you're unfamiliar with Node and npm, head to our guide on xref:learn::setting-up-a-node-project[Setting Up a Node Project].
+TIP: If you're unfamiliar with Node and npm, head to our guide on xref:learn::setting-up-a-node-project.adoc[Setting Up a Node Project].
 
 We are installing the CLI https://docs.npmjs.com/downloading-and-installing-packages-locally[locally] instead of https://docs.npmjs.com/downloading-and-installing-packages-globally[globally], which means usage of the CLI will be prefixed with `npx`. This will avoid issues that arise from having global dependencies, and will let you have different versions of the CLI in each of your projects, if you so desire.
 
