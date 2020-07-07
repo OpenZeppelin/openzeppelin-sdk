@@ -16,6 +16,10 @@ abstract contract Proxy {
     _fallback();
   }
 
+  receive () payable external {
+    _fallback();
+  }
+
   /**
    * @return The Address of the implementation.
    */
