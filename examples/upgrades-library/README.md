@@ -23,6 +23,10 @@ Then start a ganache instance by running:
 
     $ npx ganache-cli -p 8545
 
-Next run `index.js` script using the command:
+Next compile the contract:
+
+    $ npx oz compile
+
+Finally run `index.js` script using the command:
 
     $ npm run start
