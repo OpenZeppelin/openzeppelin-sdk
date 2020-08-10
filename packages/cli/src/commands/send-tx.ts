@@ -28,7 +28,7 @@ const register: (program: any) => any = program =>
     .description(description)
     .option('--to <to>', 'address of the contract that will receive the transaction')
     .option('--method <method>', `name of the method to execute in the contract`)
-    .option('--args <arg1, arg2, ...>', 'arguments to the method to execute')
+    .option('--args <arg1,arg2,...>', 'arguments to the method to execute')
     .option('--value <value>', `optional value in wei to send with the transaction`)
     .option(
       '--gas <gas>',

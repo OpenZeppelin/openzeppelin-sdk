@@ -35,7 +35,7 @@ const register: (program: any) => any = program =>
       '--init [function]',
       `call function after upgrading contract. If no name is given, 'initialize' will be used`,
     )
-    .option('--args <arg1, arg2, ...>', 'provide initialization arguments for your contract if required')
+    .option('--args <arg1,arg2,...>', 'provide initialization arguments for your contract if required')
     .option('--all', 'upgrade all contracts in the application')
     .option('--force', 'ignore contracts validation errors')
     .withNetworkOptions()
