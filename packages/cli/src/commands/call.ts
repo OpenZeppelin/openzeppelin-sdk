@@ -28,7 +28,7 @@ const register: (program: any) => any = program =>
     .description(description)
     .option('--to <to>', 'address of the contract that will receive the call')
     .option('--method <method>', `name of the method to execute in the contract`)
-    .option('--args <arg1, arg2, ...>', 'arguments to the method to execute')
+    .option('--args <arg1,arg2,...>', 'arguments to the method to execute')
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);

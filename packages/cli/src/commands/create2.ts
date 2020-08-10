@@ -31,7 +31,7 @@ const register: (program: any) => any = program =>
       '--init [function]',
       `initialization function to call after creating contract (defaults to 'initialize', skips initialization if not set)`,
     )
-    .option('--args <arg1, arg2, ...>', 'arguments to the initialization function')
+    .option('--args <arg1,arg2,...>', 'arguments to the initialization function')
     .option('--admin <admin>', "admin of the proxy (uses the project's proxy admin if not set)")
     .option(
       '--signature <signature>',
