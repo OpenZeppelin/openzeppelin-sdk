@@ -1,5 +1,7 @@
 = Upgrades
 
+TIP: If you're using Truffle or Buidler, check out the new https://github.com/OpenZeppelin/openzeppelin-upgrades[Upgrades plugins] to integrate upgradeability into your existing workflow.
+
 *Deploy and upgrade smart contracts securely* from your JavaScript code.
 
 This library powers the xref:cli::index.adoc[*OpenZeppelin CLI*], by implementing all its deployment and upgrade operations. You can call into this library directly from your scripts if you do not want to go through the CLI.
