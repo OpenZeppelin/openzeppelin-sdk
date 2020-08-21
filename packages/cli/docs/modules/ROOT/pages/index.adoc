@@ -1,5 +1,7 @@
 = Command Line Interface (CLI)
 
+TIP: If you're using Truffle or Buidler, check out the new https://github.com/OpenZeppelin/openzeppelin-upgrades[Upgrades plugins] to integrate upgradeability into your existing workflow.
+
 *Develop, deploy and operate upgradeable smart contract projects*. Support for Ethereum and every other EVM-powered blockchain.
 
 * *Interactive commands*: Send transactions, query balances, and interact with your contracts directly from the command line, using commands like `oz send-tx`, `oz call`, `oz balance`, and `oz transfer`.
