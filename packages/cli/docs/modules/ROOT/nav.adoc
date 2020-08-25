@@ -3,7 +3,6 @@
 * xref:dependencies.adoc[Using Dependencies]
 * xref:compiling.adoc[Compiling]
 * xref:deploying-with-create2.adoc[Deploying With `CREATE2`]
-* xref:publishing-ethereum-package.adoc[Publishing an Ethereum Package]
 * xref:truffle.adoc[Using With Truffle]
 * xref:migrate-cli-versions.adoc[Migrating CLI version]
 * xref:faq.adoc[Frequently Asked Questions]
