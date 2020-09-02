@@ -67,10 +67,10 @@
     "semver": "^5.5.1",
     "spinnies": "^0.4.2",
     "truffle-flattener": "^1.4.0",
-    "web3": "1.2.2",
-    "web3-eth": "1.2.2",
-    "web3-eth-contract": "1.2.2",
-    "web3-utils": "1.2.2"
+    "web3": "1.2.11",
+    "web3-eth": "1.2.11",
+    "web3-eth-contract": "1.2.11",
+    "web3-utils": "1.2.11"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.3",
