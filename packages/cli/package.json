@@ -93,10 +93,10 @@
     "typechain-target-web3-v1": "^1.0.1",
     "underscore": "^1.9.1",
     "uuid": "^3.3.3",
-    "web3": "1.2.2",
-    "web3-eth": "1.2.2",
-    "web3-eth-contract": "1.2.2",
-    "web3-utils": "1.2.2"
+    "web3": "1.2.11",
+    "web3-eth": "1.2.11",
+    "web3-eth-contract": "1.2.11",
+    "web3-utils": "1.2.11"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.3",
