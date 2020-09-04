@@ -6,6 +6,7 @@
 * xref:truffle.adoc[Using With Truffle]
 * xref:migrate-cli-versions.adoc[Migrating CLI version]
 * xref:faq.adoc[Frequently Asked Questions]
+* xref:upgrades::index.adoc[Upgrades Libray]
 
 .API Reference
 * xref:commands.adoc[Commands]

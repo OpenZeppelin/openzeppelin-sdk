@@ -1,4 +1,4 @@
-= Upgrades
+= Upgrades Library
 
 TIP: If you're using Truffle or Buidler, check out the new https://github.com/OpenZeppelin/openzeppelin-upgrades[Upgrades plugins] to integrate upgradeability into your existing workflow.
 
