@@ -1,0 +1,3 @@
+= Writing Upgradeable Contracts
+
+Moved to xref:upgrades-plugins::writing-upgradeable.adoc[Upgrades Plugins].

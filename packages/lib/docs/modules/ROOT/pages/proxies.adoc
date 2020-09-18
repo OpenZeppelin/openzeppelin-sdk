@@ -1,0 +1,3 @@
+= Proxy Upgrade Pattern
+
+Moved to xref:upgrades-plugins::proxies.adoc[Upgrades Plugins].
