@@ -1,6 +1,6 @@
-:warning: OpenZeppelin CLI is not being actively developed. We recommend using [Upgrades Plugins](https://docs.openzeppelin.com/upgrades-plugins/1.x/). 
-Read [here](https://forum.openzeppelin.com/t/building-for-interoperability-why-we-re-focusing-on-upgrades-plugins/4088) for more info.
-
+> OpenZeppelin SDK is not being actively developed. We recommend using [Upgrades Plugins](https://docs.openzeppelin.com/upgrades-plugins/1.x/) instead.
+>
+> For more information, see [Building for interoperability: why we’re focusing on Upgrades Plugins](https://forum.openzeppelin.com/t/building-for-interoperability-why-we-re-focusing-on-upgrades-plugins/4088).
 
 # OpenZeppelin SDK
 
