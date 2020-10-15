@@ -1,3 +1,7 @@
+> OpenZeppelin SDK is not being actively developed. We recommend using [Upgrades Plugins](https://docs.openzeppelin.com/upgrades-plugins/1.x/) instead.
+>
+> For more information, see [Building for interoperability: why we’re focusing on Upgrades Plugins](https://forum.openzeppelin.com/t/building-for-interoperability-why-we-re-focusing-on-upgrades-plugins/4088).
+
 # OpenZeppelin SDK Command-Line Interface _(@openzeppelin/cli)_
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
