@@ -16,31 +16,77 @@ pragma solidity >=0.4.24 <0.7.0;
 contract Initializable {
 
   /**
-   * @dev Indicates that the contract has been initialized.
+   * @dev Storage slot with the address of the current 'initialized' flag.
+   * This is the keccak-256 hash of "zos.initializable.initialized" subtracted by 1
    */
-  bool private initialized;
+  bytes32 internal constant INITIALIZED_SLOT = 0x7d7a37a9c9b8bd172dd5856df5c42095640bb8f663c76d7af29583ec5121dac4;
 
   /**
-   * @dev Indicates that the contract is in the process of being initialized.
+   * @dev Storage slot with the address of the current 'initializing' flag.
+   * This is the keccak-256 hash of "zos.initializable.initializing" subtracted by 1
    */
-  bool private initializing;
+  bytes32 internal constant INITIALIZING_SLOT = 0x1962c92ddb644cf68d2aa115edb30dc5f942367eaf370acead3c212ed8ea3439;
+
+	/**
+   * @dev Returns the current initialized flag.
+   * @return Boolean value of the initialized flag
+   */
+  function _initialized() internal view returns (bool initialized) {
+    bytes32 slot = INITIALIZED_SLOT;
+    assembly {
+      initialized := sload(slot)
+    }
+  }
+
+  /**
+   * @dev Sets the initialized flag.
+   * @param newInitialized Boolean value of the initialized flag.
+   */
+  function _setInitialized(bool newInitialized) internal {
+    bytes32 slot = INITIALIZED_SLOT;
+    assembly {
+      sstore(slot, newInitialized)
+    }
+  }
+
+  /**
+   * @dev Returns the current initializing flag.
+   * @return Boolean value of the initializing flag
+   */
+  function _initializing() internal view returns (bool initializing) {
+    bytes32 slot = INITIALIZING_SLOT;
+    assembly {
+      initializing := sload(slot)
+    }
+  }
+
+  /**
+   * @dev Sets the initializing flag.
+   * @param newInitializing Boolean value of the initializing flag.
+   */
+  function _setInitializing(bool newInitializing) internal {
+    bytes32 slot = INITIALIZING_SLOT;
+    assembly {
+      sstore(slot, newInitializing)
+    }
+  }
 
   /**
    * @dev Modifier to use in the initializer function of a contract.
    */
   modifier initializer() {
-    require(initializing || isConstructor() || !initialized, "Contract instance has already been initialized");
+    require(_initializing() || isConstructor() || !_initialized(), "Contract instance has already been initialized");
 
-    bool isTopLevelCall = !initializing;
+    bool isTopLevelCall = !_initializing();
     if (isTopLevelCall) {
-      initializing = true;
-      initialized = true;
+      _setInitializing(true);
+      _setInitialized(true);
     }
 
     _;
 
     if (isTopLevelCall) {
-      initializing = false;
+      _setInitializing(false);
     }
   }
 
@@ -56,7 +102,4 @@ contract Initializable {
     assembly { cs := extcodesize(self) }
     return cs == 0;
   }
-
-  // Reserved storage space to allow for layout changes in the future.
-  uint256[50] private ______gap;
 }
