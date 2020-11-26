@@ -44,7 +44,7 @@ function quoteArguments(args: string) {
   args = args.replace(MATCH_SCIENTIFIC, val => `${new BN(val).toString(10)}`);
 
   // Replace non quoted number by quoted number.
-  const MATCH_WORDS = new RegExp(START_LOOKBEHIND + '([-]?\\w+)' + END_LOOKAHEAD, 'g');
+  const MATCH_WORDS = new RegExp(START_LOOKBEHIND + '([-]?[\\w\\u00BF-\\u1FFF\\u2C00-\\uD7FF]+)' + END_LOOKAHEAD, 'g');
   args = args.replace(MATCH_WORDS, '"$2"');
   return args;
 }
