@@ -1,5 +1,5 @@
 import { Loggy } from '@openzeppelin/upgrades';
-import { dirname, isAbsolute, join, relative, resolve } from 'path';
+import { dirname, isAbsolute, join, resolve, posix } from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import { getImports } from '../../../utils/solidity';
@@ -35,7 +35,7 @@ export async function gatherSources(rootContracts: string[], workingDir: string)
 
   for (const contract of rootContracts) {
     queue.push({
-      name: relative(workingDir, contract),
+      name: posix.relative(workingDir, contract),
       url: resolve(workingDir, contract),
       root: workingDir,
     });
