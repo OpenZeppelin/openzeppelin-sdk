@@ -2,7 +2,7 @@
 
 == Proxies
 
-NOTE: Proxy contracts and their documentation have moved to xref:contracts::api:proxy.adoc[Contracts].
+NOTE: Proxy contracts and their documentation have moved to xref:contracts:api:proxy.adoc[Contracts].
 
 {{ProxyFactory}}
 
