@@ -30,7 +30,13 @@ contract ProxyFactory {
 
     if(_data.length > 0) {
       (bool success,) = proxy.call(_data);
-      require(success);
+      if (!success) {
+        // revert and provide the revert message.
+        assembly {
+          returndatacopy(0, 0, returndatasize)
+          revert(0, returndatasize)         
+        }
+      }
     }    
   }
 
@@ -86,7 +92,9 @@ contract ProxyFactory {
     assembly {
       addr := create2(0, add(code, 0x20), mload(code), salt)
       if iszero(extcodesize(addr)) {
-        revert(0, 0)
+        // revert and provide the revert message.
+        returndatacopy(0, 0, returndatasize)
+        revert(0, returndatasize)
       }
     }
 
