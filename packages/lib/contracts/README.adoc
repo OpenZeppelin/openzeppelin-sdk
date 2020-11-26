@@ -2,21 +2,7 @@
 
 == Proxies
 
-{{Proxy}}
-
-{{UpgradeabilityProxy}}
-
-{{AdminUpgradeabilityProxy}}
-
-{{BaseAdminUpgradeabilityProxy}}
-
-{{BaseUpgradeabilityProxy}}
-
-{{InitializableAdminUpgradeabilityProxy}}
-
-{{InitializableUpgradeabilityProxy}}
-
-{{ProxyAdmin}}
+NOTE: Proxy contracts and their documentation have moved to xref:contracts::api:proxy.adoc[Contracts].
 
 {{ProxyFactory}}
 
