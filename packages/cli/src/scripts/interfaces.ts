@@ -175,6 +175,7 @@ export interface SendTxParams extends MethodParams, Network {
   proxyAddress: string;
   value?: string;
   gas?: string;
+  asyncTx: boolean;
 }
 
 export interface CompileParams {

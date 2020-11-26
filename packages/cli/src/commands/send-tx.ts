@@ -34,6 +34,7 @@ const register: (program: any) => any = program =>
       '--gas <gas>',
       `gas limit of the transaction, will default to the limit specified in the configuration file, or use gas estimation if not set`,
     )
+    .withAsyncOption()
     .withNetworkOptions()
     .withNonInteractiveOption()
     .action(action);

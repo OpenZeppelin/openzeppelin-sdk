@@ -10,6 +10,7 @@ export default async function sendTx({
   network,
   txParams,
   networkFile,
+  asyncTx,
 }: Partial<SendTxParams>): Promise<void | never> {
   if (!proxyAddress) throw Error('A contract address must be specified.');
   if (!methodName) throw Error('A method name must be specified.');
@@ -17,5 +18,6 @@ export default async function sendTx({
   if (gas) txParams = { gas, ...txParams };
 
   const controller = new TransactionController(txParams, network, networkFile);
-  await controller.sendTransaction(proxyAddress, methodName, methodArgs);
+  const result = controller.sendTransaction(proxyAddress, methodName, methodArgs);
+  return asyncTx ? result : await result;
 }
